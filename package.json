@@ -1,0 +1,33 @@
+{
+  "name": "overhide-ethereum",
+  "version": "1.0.0",
+  "description": "Ethereum Remuneration API for overhide",
+  "engines": {
+    "node": "10.13.0"
+  },
+  "main": "main/js/overhide-ethereum.js",
+  "keywords": [
+    "overhide",
+    "ethereum",
+    "remuneration",
+    "api"
+  ],
+  "author": "Jakub Ner",
+  "license": "MIT",
+  "dependencies": {
+    "express": "4.16.4",
+    "bunyan": "1.8.12"
+  },
+  "devDependencies": {
+    "mocha": "5.2.0",
+    "chai": "4.2.0",
+    "chai-http": "4.2.0"
+  },
+  "scripts": {
+    "start": "node main/js/overhide-ethereum.js",
+    "test": "mocha test/js/smoke.js",
+    "dev": "nodemon main/js/overhide-ethereum.js | bunyan",
+    "docker_build": "docker build -t oh-eth -f main/docker/Dockerfile .",
+    "docker_run": "docker run --rm --name oh-eth -p 8080:8080 oh-eth"
+  }
+}
