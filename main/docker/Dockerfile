@@ -29,6 +29,11 @@ WORKDIR /home/node/app
 COPY package.json LICENSE /home/node/app/
 COPY main/js /home/node/app/main/js/
 
+ENV OH_ETH_PORT 8080
+ENV LOG_LEVEL warn
+ENV KEYV_URI redis://redis:6379
+ENV KEYV_AUTH_NAMESPACE users
+
 LABEL license MIT
 
 RUN npm update
