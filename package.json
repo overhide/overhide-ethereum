@@ -22,13 +22,15 @@
     "@keyv/redis": "1.3.8",
     "keyv-file": "0.1.7",
     "sha.js": "2.4.11",
-    "uuid": "3.3.2"
+    "uuid": "3.3.2",
+    "web3": "1.0.0-beta.36"
   },
   "config": {
     "OH_ETH_PORT": 8080,
     "LOG_LEVEL": "info",
     "KEYV_URI": "redis://localhost:6379",
-    "KEYV_AUTH_NAMESPACE": "test_users"
+    "KEYV_AUTH_NAMESPACE": "test_users",
+    "WEB3_URI": "http://localhost:8545"
   },
   "devDependencies": {
     "mocha": "5.2.0",
@@ -41,8 +43,9 @@
     "set-auth": "node tools/js/set-auth.js",
     "dev": "nodemon --inspect main/js/overhide-ethereum.js | bunyan",
     "build": "docker build -t oh-eth -f main/docker/Dockerfile .",
-    "run": "docker run --rm --link test-redis:redis --name oh-eth -p 8080:8080 oh-eth",
-    "redis": "docker run --name test-redis -p 6379:6379 -d redis",
-    "rediscli": "docker run -it --rm --link test-redis:redis redis redis-cli -h redis -p 6379"
+    "run": "docker run --rm --link redis:redis --name oh-eth -p 8080:8080 oh-eth",
+    "redis": "docker run --name redis -p 6379:6379 -d redis",
+    "rediscli": "docker run -it --rm --link redis:redis redis redis-cli -h redis -p 6379",
+    "geth": "docker run -d --name eth-node -v /Users/alice/ethereum:/root -p 8545:8545 -p 30303:30303 ethereum/client-go --rpc --rpcaddr 0.0.0.0 --rinkeby --syncmode \"light\""
   }
 }

@@ -7,7 +7,8 @@ The default configuration (see *Configuration* below) are reasonable for testing
 Read the rest of this README for details.
 
 1. `npm install`
-1. `docker run --name test-redis -p 6379:6379 -d redis`
+1. `npm run redis`
+1. `npm run geth`
 1. `npm run start`
  
 #   Configuration
@@ -30,6 +31,7 @@ Configuration points for this application:
 | LOG_LEVEL | logging level for the bunyan library, one of 'fatal','error','warn','info','debug','trace' | info |
 | KEYV_URI | see 'Keyv Datastore' section below | redis://localhost:6379 |
 | KEYV_AUTH_NAMESPACE | see 'Keyv Datastore' section below | test_users |
+| WEB3_URI | web3.js HttpProvider URI | http://localhost:8545 |
 
 # Bunyan Logging
 
@@ -59,11 +61,9 @@ It is highly recommended to run the development environment with the *KEYV_AUTH_
 
 The *KEYV_URI* configuration point must be correctly configured to run the application.  The default setting of "redis://localhost:6379" will work fine if you start your Redis via Docker:
 
-`docker run --name test-redis -p 6379:6379 -d redis`
+`docker run --name redis -p 6379:6379 -d redis`
 
 This starts a Redis datastore exposing port 6379 to your host system 
-
-> If you're running Docker using a docker-machine in VirtualBox, don't forget to port-forward port 6379 from VirtualBox VM to your host machine as well.
 
 To inspect your Redis datastore you can use the Redis CLI:
 
@@ -71,9 +71,26 @@ To inspect your Redis datastore you can use the Redis CLI:
 
 Replace the `<IP>` with your IP.
 
-# Docker Containers for *overhide-ethereum*
+# Docker
 
-## Building Docker Image
+The *package.json* contains all the *Docker* commands we use for development/testing as *scripts*; refer to that.
+
+> Using *docker-machine* in *VirtualBox*
+>
+> If you're running Docker using a *docker-machine* in *VirtualBox*, don't forget to port-forward port 6379 from VirtualBox VM to your host machine as well.
+>
+> In fact the ports you need forwarded for everything:
+>
+> | *port* | *why* |
+> | --- | --- |
+> | 8080 | node |
+> | 6379 | redis |
+> | 8545 | geth |
+> | 30303 | geth |
+
+## Docker Containers for *overhide-ethereum*
+
+### Building Docker Image
 
 `docker build -t oh-eth -f main/docker/Dockerfile .`
 
@@ -81,20 +98,20 @@ Replace the `<IP>` with your IP.
 
 Alternatively: `npm run build`
 
-## Running Docker Image
+### Running Docker Image
 
-Assuming you're already running the *test-redis* Docker image (`docker run --name test-redis -p 6379:6379 -d redis`), run *overhide-ethereum* using:
+Assuming you're already running the *redis* Docker image (`docker run --name redis -p 6379:6379 -d redis`), run *overhide-ethereum* using:
 
-`docker run --rm --link test-redis:redis --name oh-eth -p 8080:8080 oh-eth`
+`docker run --rm --link redis:redis --name oh-eth -p 8080:8080 oh-eth`
 
-* links to *test-redis* container
+* links to *redis* container
 * map to 0.0.0.0:8080 so localhost 8080 works for running tests against container
 * if running in VirtualBox (docker-machine) ensure to port forward port 8080 in the docker-machine VM ('default')
 * if using docker-machine, make sure to stop machine before running node.js outside of docker:  `docker-machine stop`
 
 Alternatively: `npm run run`
 
-## Logging from Docker Image
+### Logging from Docker Image
 
 `docker logs oh-eth | bunyan`
 

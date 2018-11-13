@@ -39,12 +39,14 @@ router.use(function(request, response, next){
 
 router.get('/get-transactions/:fromAddress/:toAddress', (req, rsp) => {
     log.debug('handling get-transactions endpoint');
-    let result = get_transactions({
-        fromAddress: req.params['fromAddress'],
-        toAddress: req.params['toAddress']
-    });
-    log.debug({result:result}, 'result from get-transactions endpoint');
-    rsp.json(result);
+    (async () => {
+        let result = await get_transactions({
+            fromAddress: req.params['fromAddress'],
+            toAddress: req.params['toAddress']
+        });
+        log.debug({result:result}, 'result from get-transactions endpoint');
+        rsp.json(result);    
+    })();
 })
 
 module.exports = router;
