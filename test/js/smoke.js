@@ -1,5 +1,6 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const ethCrypto = require('eth-crypto');
 const keyv = require('keyv');
 const shajs = require('sha.js')
 const uuid = require('uuid');
@@ -117,7 +118,10 @@ describe('smoke tests', () => {
       .auth(USER,PASSWORD)
       .then(function(res) {
         var reso = JSON.parse(res.text);
-        assert.isTrue(reso.blah == 'meh');
+        assert.isTrue(Array.isArray(reso));
+        assert.isTrue(reso.length > 0);
+        assert.isTrue(parseInt(reso[0]["transaction-value"]) > 0);
+        assert.isTrue(typeof reso[0]["transaction-date"] === 'string');
         done();
       })
       .catch(function(err) {
@@ -125,5 +129,54 @@ describe('smoke tests', () => {
       });
   });
 
+  it('validates lowercase and uppercase addresses work', (done) => {
+    chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
+      .get('/get-transactions/'+keth_acct1.toUpperCase()+'/'+keth_acct2.toLowerCase())
+      .auth(USER,PASSWORD)
+      .then(function(res) {
+        assert.isTrue(res.statusCode == 200);
+        done();
+      })
+      .catch(function(err) {
+        throw err;
+      });
+  });
+
+  it('validates skipping 0x at start of address causes 400', (done) => {
+    chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
+      .get('/get-transactions/'+keth_acct1.substr(2)+'/'+keth_acct2)
+      .auth(USER,PASSWORD)
+      .then(function(res) {
+        assert.isTrue(res.statusCode == 400);
+        done();
+      })
+      .catch(function(err) {
+        throw err;
+      });
+  });
+
+  it('validates checking signature', (done) => {
+    const message = ethCrypto.hash.keccak256("testing stuff");
+    let msg = Buffer.from(message).toString("base64");
+
+    // ethCrypto.sign("...", message);
+    let signed = "0xae39bed2c5e522c16bc3474be0f59f17fd4cf76913e2fe1bee94e27f2d58b5e531b629b30fc477c615c45d9235c805d6e214f228a9129fb29ffc518a4e1997691b";    
+    let sig = Buffer.from(signed).toString("base64");    
+    chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
+      .post('/is-signature-valid')
+      .auth(USER,PASSWORD)
+      .send({
+        signature: sig,
+        message: msg,
+        address: keth_acct1
+      })
+      .then(function(res) {
+        assert.isTrue(res.statusCode == 200);
+        done();
+      })
+      .catch(function(err) {
+        throw err;
+      });
+  });
 })
 

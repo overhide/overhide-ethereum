@@ -5,10 +5,23 @@ const ctx = require('../context.js').get();
 const log = ctx.logger.child({where:"get-transactions"});
 
 async function get_transactions({fromAddress, toAddress}) {
-  var web3 = await ctx.web3();
-  log.info('is connected: ' + web3);
-  log.info('in get_transactions ' + fromAddress)
-  return {blah: 'meh'};
+  if (typeof fromAddress !== 'string' || typeof toAddress !== 'string') throw new Error('fromAddress and toAddress must be strings');
+  fromAddress = fromAddress.toLowerCase();
+  toAddress = toAddress.toLowerCase();
+  if (! fromAddress.startsWith('0x') || ! toAddress.startsWith('0x')) throw new Error('fromAddress and toAddress must start with 0x');
+  var esApi = ctx.esApi; 
+  var result = [];
+  var txs = await esApi.account.txlist(fromAddress);
+  if (txs.status != 1) throw new Error(txs.message);
+  for (var tx of txs.result) {
+    if (tx.from.toLowerCase() == fromAddress && tx.to.toLowerCase() == toAddress) {
+      result.push({
+        "transaction-value": tx.value,
+        "transaction-date": new Date(tx.timeStamp * 1000).toISOString()
+      });
+    }    
+  }  
+  return result;
 }
 
 module.exports = get_transactions;

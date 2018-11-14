@@ -3,7 +3,9 @@
 const auth = require('basic-auth');
 const ctx = require('./context.js').get();
 const get_transactions = require('./glue/get-transactions');
-const router = require('express').Router();
+const is_signature_valid = require('./glue/is-signature-valid');
+const express = require('express')
+const router = express.Router();
 const shajs = require('sha.js')
 
 const log = ctx.logger.child({where:"router"});
@@ -37,15 +39,44 @@ router.use(function(request, response, next){
         });
 });
 
+// Parse JSON body
+router.use(express.json());
+
 router.get('/get-transactions/:fromAddress/:toAddress', (req, rsp) => {
     log.debug('handling get-transactions endpoint');
     (async () => {
-        let result = await get_transactions({
-            fromAddress: req.params['fromAddress'],
-            toAddress: req.params['toAddress']
-        });
-        log.debug({result:result}, 'result from get-transactions endpoint');
-        rsp.json(result);    
+        try {
+            let result = await get_transactions({
+                fromAddress: req.params['fromAddress'],
+                toAddress: req.params['toAddress']
+            });
+            log.debug({result:result}, 'result from get-transactions endpoint');
+            rsp.json(result);        
+        } 
+        catch (err) {
+            log.debug('error: ' + err);
+            return rsp.status(400).send(err);      
+        }
+    })();
+})
+
+router.post('/is-signature-valid', (req, rsp) => {
+    log.debug('handling is-signature-valid endpoint');
+    (async () => {
+        try {
+            var body = req.body;
+            let result = await is_signature_valid({
+                signature: body['signature'],
+                message: body['message'],
+                address: body['address']
+            });
+            log.debug({result:result}, 'result from is-signature-valid endpoint');
+            rsp.json(result);        
+        } 
+        catch (err) {
+            log.debug('error: ' + err);
+            return rsp.status(400).send(err);      
+        }
     })();
 })
 

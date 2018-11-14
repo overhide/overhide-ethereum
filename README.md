@@ -31,7 +31,8 @@ Configuration points for this application:
 | LOG_LEVEL | logging level for the bunyan library, one of 'fatal','error','warn','info','debug','trace' | info |
 | KEYV_URI | see 'Keyv Datastore' section below | redis://localhost:6379 |
 | KEYV_AUTH_NAMESPACE | see 'Keyv Datastore' section below | test_users |
-| WEB3_URI | web3.js HttpProvider URI | http://localhost:8545 |
+| ETHERSCAN_KEY | Application key for etherscan.io APIs | 446WA8I76EEQMXJ5NSUQA5Q17UXARBAF2 |
+| ETHERSCAN_TYPE | Empty for mainnet, else "morden", "ropsten", "rinkeby" | rinkeby |
 
 # Bunyan Logging
 
