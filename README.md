@@ -1,3 +1,5 @@
+(Ethereum)[https://www.ethereum.org/] implementation of the [overhide](https://overhide.io) remuneration API:  https://overhide.io/docs/remuneration.html.
+
 # Quick Start
  
 These steps assume Docker is available.
