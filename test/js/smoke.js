@@ -178,5 +178,30 @@ describe('smoke tests', () => {
         throw err;
       });
   });
+
+  it('valid signature but address unused on blockchain returns 400', (done) => {
+    const message = ethCrypto.hash.keccak256("testing stuff");
+    let msg = Buffer.from(message).toString("base64");
+    let newIdentity = ethCrypto.createIdentity();
+
+    // ethCrypto.sign("...", message);
+    let signed = ethCrypto.sign(newIdentity.privateKey, message);
+    let sig = Buffer.from(signed).toString("base64");    
+    chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
+      .post('/is-signature-valid')
+      .auth(USER,PASSWORD)
+      .send({
+        signature: sig,
+        message: msg,
+        address: newIdentity.address
+      })
+      .then(function(res) {
+        assert.isTrue(res.statusCode == 400);
+        done();
+      })
+      .catch(function(err) {
+        throw err;
+      });
+  });
 })
 
