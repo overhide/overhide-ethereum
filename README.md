@@ -10,7 +10,6 @@ Read the rest of this README for details.
 
 1. `npm install`
 1. `npm run redis`
-1. `npm run geth`
 1. `npm run start`
  
 #   Configuration
@@ -82,14 +81,12 @@ The *package.json* contains all the *Docker* commands we use for development/tes
 >
 > If you're running Docker using a *docker-machine* in *VirtualBox*, don't forget to port-forward port 6379 from VirtualBox VM to your host machine as well.
 >
-> In fact the ports you need forwarded for everything:
+> All the ports you need forwarded:
 >
 > | *port* | *why* |
 > | --- | --- |
 > | 8080 | node |
 > | 6379 | redis |
-> | 8545 | geth |
-> | 30303 | geth |
 
 ## Docker Containers for *overhide-ethereum*
 
