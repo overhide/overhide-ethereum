@@ -57,11 +57,18 @@ function removeUser() {
 function verifyUserAuthenticated() {
   // hit an endpoint and make sure we don't get a 401
   return new Promise((resolve,reject) => {
-    require("http").get('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT + '/get-transactions/0/0', {auth:USER+":"+PASSWORD}, (res) => {
-      const { statusCode } = res;
-      if (statusCode != 401) resolve();
-      else reject();
-    });
+    var endpoint = 'http://' + OH_ETH_HOST + ':' + OH_ETH_PORT + '/get-transactions/0/0';
+    console.log("verifyUserAuthenticated :: hitting endpoint " + endpoint);
+    try {
+      require("http").get(endpoint, {auth:USER+":"+PASSWORD}, (res) => {
+        const { statusCode } = res;
+        if (statusCode != 401) resolve();
+        else reject();
+      });
+    } catch (err) {
+      console.log("verifyUserAuthenticated :: error: " + err);
+      reject(err);
+    }
   });  
 }
 
@@ -80,9 +87,12 @@ describe('smoke tests', () => {
     console.log("\n");
 
     (async () => {
+      console.log("before hook :: adding user");
       await addUser();
-      console.log(await getKeyvAuthUsers().get(USER));
+      console.log("before hook :: added user");
+      console.log("before hook :: retrieved user: " + await getKeyvAuthUsers().get(USER));
       await verifyUserAuthenticated();
+      console.log("before hook :: verified authenticated");
       done();
     })();
   });
@@ -90,7 +100,9 @@ describe('smoke tests', () => {
   // cleanup hook for every test
   after((done) => {
     (async () => {
+      console.log("after hook :: removing user");
       removeUser();
+      console.log("after hook :: removed user");
       done();
     })();
   });

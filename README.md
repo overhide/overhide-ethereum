@@ -102,9 +102,11 @@ Alternatively: `npm run build`
 
 Assuming you're already running the *redis* Docker image (`docker run --name redis -p 6379:6379 -d redis`), run *overhide-ethereum* using:
 
-`docker run --rm --link redis:redis --name oh-eth -p 8080:8080 oh-eth`
+`docker run -d --link redis:redis --name oh-eth -e ETHERSCAN_KEY='<ETHERSCAN API KEY>'-p 8080:8080 oh-eth`
 
+* runs as daemon
 * links to *redis* container
+* furnishes ETHERSCAN_KEY environment variable
 * map to 0.0.0.0:8080 so localhost 8080 works for running tests against container
 * if running in VirtualBox (docker-machine) ensure to port forward port 8080 in the docker-machine VM ('default')
 * if using docker-machine, make sure to stop machine before running node.js outside of docker:  `docker-machine stop`
@@ -170,7 +172,7 @@ The tests aren't unit tests.  They do not start Node.js to run this application;
 The tests should pass regardless of configuration being tested:
 
 * a development environment started using `npm run dev`
-* a standalone Docker container started using `docker run --rm --name oh-eth -p 8080:8080 oh-eth`
+* a standalone Docker container started using `npm run run`
 * a full network of load-balanced Docker compose swarm started using `TBD`
 
 > *KEYV_URI* must be correctly configured to run this test suite; see *Keyv* section above.  This configuration must match the test-target application's configuration for the suite to start.

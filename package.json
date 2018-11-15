@@ -17,12 +17,14 @@
   "dependencies": {
     "basic-auth": "2.0.1",
     "bunyan": "1.8.12",
+    "cross-var": "1.1.0",
     "eth-crypto": "1.2.7",
     "etherscan-api": "9.0.0",
     "express": "4.16.4",
     "keyv": "3.1.0",
     "@keyv/redis": "1.3.8",
     "keyv-file": "0.1.7",
+    "run-script-os": "1.0.3",
     "sha.js": "2.4.11",
     "uuid": "3.3.2"
   },
@@ -45,8 +47,13 @@
     "set-auth": "node tools/js/set-auth.js",
     "dev": "nodemon --inspect main/js/overhide-ethereum.js | bunyan",
     "build": "docker build -t oh-eth -f main/docker/Dockerfile .",
-    "run": "docker run --rm --link redis:redis --name oh-eth -p 8080:8080 oh-eth",
+    "run": "run-script-os",
+    "run:win32": "docker run -d --link redis:redis --name oh-eth -e ETHERSCAN_KEY=%npm_package_config_ETHERSCAN_KEY% -e LOG_LEVEL=%npm_package_config_LOG_LEVEL% -e KEYV_AUTH_NAMESPACE=%npm_package_config_KEYV_AUTH_NAMESPACE% -p 8080:8080 oh-eth",
+    "run:darwin:freebsd:linux:sunos": "docker run -d --link redis:redis --name oh-eth -e ETHERSCAN_KEY=$npm_package_config_ETHERSCAN_KEY -e LOG_LEVEL=$npm_package_config_LOG_LEVEL -e KEYV_AUTH_NAMESPACE=$npm_package_config_KEYV_AUTH_NAMESPACE -p 8080:8080 oh-eth",
     "redis": "docker run --name redis -p 6379:6379 -d redis",
-    "rediscli": "docker run -it --rm --link redis:redis redis redis-cli -h redis -p 6379"
+    "rediscli": "docker run -it --rm --link redis:redis redis redis-cli -h redis -p 6379",
+    "run-bash": "docker run -it --rm --link redis:redis --name oh-eth -p 8080:8080 --entrypoint /bin/bash oh-eth",
+    "exec-bash": "docker exec -it oh-eth bash",
+    "clean": "docker kill oh-eth && docker rm oh-eth"
   }
 }
