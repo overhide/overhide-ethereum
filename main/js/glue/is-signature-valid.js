@@ -13,6 +13,7 @@ async function is_signature_valid({signature, message, address}) {
   if (! address.startsWith('0x')) throw new Error('address must start with 0x');
   var esApi = ctx.esApi; 
   var txs = await esApi.account.txlist(address);
+  log.debug(txs,"etherscan result");
   if (txs.status != 1) throw new Error(txs.message);
 
   // check signature valid

@@ -42,14 +42,14 @@
     "chai-http": "4.2.0"
   },
   "scripts": {
-    "start": "node main/js/overhide-ethereum.js",
-    "test": "mocha test/js/smoke.js",
+    "start": "node main/js/overhide-ethereum.js | bunyan",
+    "test": "mocha --timeout 5000 test/js/smoke.js",
     "set-auth": "node tools/js/set-auth.js",
     "dev": "nodemon --inspect main/js/overhide-ethereum.js | bunyan",
     "build": "docker build -t oh-eth -f main/docker/Dockerfile .",
     "run": "run-script-os",
-    "run:win32": "docker run -d --link redis:redis --name oh-eth -e ETHERSCAN_KEY=%npm_package_config_ETHERSCAN_KEY% -e LOG_LEVEL=%npm_package_config_LOG_LEVEL% -e KEYV_AUTH_NAMESPACE=%npm_package_config_KEYV_AUTH_NAMESPACE% -p 8080:8080 oh-eth",
-    "run:darwin:freebsd:linux:sunos": "docker run -d --link redis:redis --name oh-eth -e ETHERSCAN_KEY=$npm_package_config_ETHERSCAN_KEY -e LOG_LEVEL=$npm_package_config_LOG_LEVEL -e KEYV_AUTH_NAMESPACE=$npm_package_config_KEYV_AUTH_NAMESPACE -p 8080:8080 oh-eth",
+    "run:win32": "docker run -d --link redis:redis --name oh-eth -e ETHERSCAN_KEY=%npm_package_config_ETHERSCAN_KEY% -e ETHERSCAN_TYPE=%npm_package_config_ETHERSCAN_TYPE% -e LOG_LEVEL=%npm_package_config_LOG_LEVEL% -e KEYV_AUTH_NAMESPACE=%npm_package_config_KEYV_AUTH_NAMESPACE% -p 8080:8080 oh-eth",
+    "run:darwin:freebsd:linux:sunos": "docker run -d --link redis:redis --name oh-eth -e ETHERSCAN_KEY=$npm_package_config_ETHERSCAN_KEY -e ETHERSCAN_TYPE=$npm_package_config_ETHERSCAN_TYPE -e LOG_LEVEL=$npm_package_config_LOG_LEVEL -e KEYV_AUTH_NAMESPACE=$npm_package_config_KEYV_AUTH_NAMESPACE -p 8080:8080 oh-eth",
     "redis": "docker run --name redis -p 6379:6379 -d redis",
     "rediscli": "docker run -it --rm --link redis:redis redis redis-cli -h redis -p 6379",
     "run-bash": "docker run -it --rm --link redis:redis --name oh-eth -p 8080:8080 --entrypoint /bin/bash oh-eth",

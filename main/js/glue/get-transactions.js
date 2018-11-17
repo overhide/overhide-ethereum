@@ -12,6 +12,7 @@ async function get_transactions({fromAddress, toAddress}) {
   var esApi = ctx.esApi; 
   var result = [];
   var txs = await esApi.account.txlist(fromAddress);
+  log.debug(txs,"etherscan result");
   if (txs.status != 1) throw new Error(txs.message);
   for (var tx of txs.result) {
     if (tx.from.toLowerCase() == fromAddress && tx.to.toLowerCase() == toAddress) {

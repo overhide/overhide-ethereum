@@ -4,14 +4,40 @@
  
 These steps assume Docker is available.
 
-The default configuration (see *Configuration* below) are reasonable for testing.  
+Please review the *Configuration* section below as at the very least *ETHERSCAN_KEY* must be configured to run the tests in this package.  
 
 Read the rest of this README for details.
 
-1. `npm install`
-1. `npm run redis`
-1. `npm run start`
- 
+## Quick Start With *overhide-ethereum* In Docker Container
+
+If you're running Docker in *VirtualBox* (a *docker-machine*), please read the *Docker/Using docker-machine in VirtualBox* section below for important port forwarding information from the VM running Docker to your host system.
+
+1. `npm install` -- bring in dependencies
+1. `npm config set overhide-ethereum:ETHERSCAN_KEY=...` -- replace '...' with your https://etherscan.io API key
+1. `npm run build` -- build *overhide-ethereum* Docker image
+1. `npm run redis` -- start Redis image in Docker container
+1. `npm run run` -- start *overhide-ethereum* image in Docker container linked to Redis above
+1. `npm test` -- run tests against above
+
+From now on you'll need to use the following commands to stop/restart things:
+
+* `npm run clean` -- stop *overhide-ethereum* Docker image: reverse of `npm run run`
+* `docker rmi oh-eth` -- remove *overhide-ethereum* Docker image (only if first cleaned with above): reverse of `npm run build`
+* `docker kill redis; docker rm redis` -- stop Redis Docker image: reverse of `npm run redis`
+
+## Quick Start With *overhide-ethereum* Running Locally
+
+If you're running Docker in *VirtualBox* (a *docker-machine*), please read the *Docker/Using docker-machine in VirtualBox* section below for important port forwarding information from the VM running Docker to your host system.  
+
+Steps below assume *overhide-ethereum* is not running in a Docker container:  `docker ps -a` doesn't show "oh-eth" entry.  Otherwise `npm run clean` to stop it.
+
+1. `npm install` -- bring in dependencies
+1. `npm config set overhide-ethereum:ETHERSCAN_KEY=...` -- replace '...' with your https://etherscan.io API key
+1. `npm config set overhide-ethereum:OH_ETH_PORT=8081` -- especially necessary if you're running Docker in VirtualBox
+1. `npm run redis` -- start Redis image in Docker container
+1. `npm run start` -- start *overhide-ethereum* on localhost
+1. `npm test` -- in another terminal; run tests against above: 
+
 #   Configuration
 
 All the configuration points for the app are listed in the *package.json* *config* descriptor.
@@ -23,16 +49,16 @@ These *npm* configuration points are override-able with `npm config edit` or `np
 If an environment variable of the same name is made available, the environment variable's value precedes that
 of the *npm config* value (*~/.npmrc* or *package.json*).
 
-Configuration points for this application:
+Configuration points for *overhide-ethereum*:
 
 | *Configuration Point* | *Description* | *Sample Value* |
 | --- | --- | --- |
-| OH_ETH_PORT | application's port | 8080 |
-| OH_ETH_HOST | application's host: only respected when running test-suite | localhost |
+| OH_ETH_PORT | *overhide-ethereum*'s port | 8080 |
+| OH_ETH_HOST | *overhide-ethereum*'s host: only respected when running test-suite | localhost |
 | LOG_LEVEL | logging level for the bunyan library, one of 'fatal','error','warn','info','debug','trace' | info |
 | KEYV_URI | see 'Keyv Datastore' section below | redis://localhost:6379 |
 | KEYV_AUTH_NAMESPACE | see 'Keyv Datastore' section below | test_users |
-| ETHERSCAN_KEY | Application key for etherscan.io APIs | 446WA8I76EEQMXJ5NSUQA5Q17UXARBAF2 |
+| ETHERSCAN_KEY | *overhide-ethereum* key for etherscan.io APIs | 446WA8I76EEQMXJ5NSUQA5Q17UXARBAF2 |
 | ETHERSCAN_TYPE | Empty for mainnet, else "morden", "ropsten", "rinkeby" | rinkeby |
 
 # Bunyan Logging
@@ -61,7 +87,7 @@ It is highly recommended to run the development environment with the *KEYV_AUTH_
 
 ## KEYV_URI
 
-The *KEYV_URI* configuration point must be correctly configured to run the application.  The default setting of "redis://localhost:6379" will work fine if you start your Redis via Docker:
+The *KEYV_URI* configuration point must be correctly configured to run *overhide-ethereum*.  The default setting of "redis://localhost:6379" will work fine if you start your Redis via Docker:
 
 `docker run --name redis -p 6379:6379 -d redis`
 
@@ -75,9 +101,9 @@ Replace the `<IP>` with your IP.
 
 # Docker
 
-The *package.json* contains all the *Docker* commands we use for development/testing as *scripts*; refer to that.
+The *package.json* contains all the *Docker* commands we use for development/testing; run `npm run` to list them all.
 
-> Using *docker-machine* in *VirtualBox*
+> ## Using *docker-machine* in *VirtualBox*
 >
 > If you're running Docker using a *docker-machine* in *VirtualBox*, don't forget to port-forward port 6379 from VirtualBox VM to your host machine as well.
 >
@@ -87,6 +113,8 @@ The *package.json* contains all the *Docker* commands we use for development/tes
 > | --- | --- |
 > | 8080 | node |
 > | 6379 | redis |
+>
+> If you're running *docker-machine* with the above ports opened for listening by the VM, you cannot use port 8080 to run *overhide-ethereum* using *npm* on your local host--the port is already used by *docker-machine*.  If you're running *docker-machine* (e.g. for redis) and want to run the *overhide-ethereum* locally, take care to use the *OH_ETH_PORT* configuration to request a different port for your local *overhide-ethereum* and to target your tests against this local *overhide-ethereum*.
 
 ## Docker Containers for *overhide-ethereum*
 
@@ -139,7 +167,7 @@ You can override the configuration as per *Configuration* section above.
 
 ## Nodemon (Remote) Debugging
 
-If you start the application with `npm run dev` or *nodemon* from your command shell, you'll need to connect your development environment to this *node* process explicitly for remote debugging.
+If you start *overhide-ethereum* with `npm run dev` or *nodemon* from your command shell, you'll need to connect your development environment to this *node* process explicitly for remote debugging.
 
 Note that `nodemon` above is started with `--inspect` to allow remote debugging.  
 
@@ -159,7 +187,7 @@ As an example, to remote-debug from *VSCode* use the following runtime configura
   ]
 ```
 
-Select the "Node: Nodemon" runtime configuration in *VSCode* and look for a "node" process matching the PID reported by the 'ctx_config' console log from the application.
+Select the "Node: Nodemon" runtime configuration in *VSCode* and look for a "node" process matching the PID reported by the 'ctx_config' console log from *overhide-ethereum*.
 
 Once you see a "Debugger attached." message in your *nodemon* shell you're in business.
 
@@ -167,7 +195,7 @@ Once you see a "Debugger attached." message in your *nodemon* shell you're in bu
 
 `npm run test` or run the Mocha/Chai tests in `./test/js/*` manually.
 
-The tests aren't unit tests.  They do not start Node.js to run this application; they expect the target device-under-test application to be running.
+The tests aren't unit tests.  They do not start Node.js to run *overhide-ethereum*; they expect the target device-under-test *overhide-ethereum* to be running.
 
 The tests should pass regardless of configuration being tested:
 
@@ -175,7 +203,7 @@ The tests should pass regardless of configuration being tested:
 * a standalone Docker container started using `npm run run`
 * a full network of load-balanced Docker compose swarm started using `TBD`
 
-> *KEYV_URI* must be correctly configured to run this test suite; see *Keyv* section above.  This configuration must match the test-target application's configuration for the suite to start.
+> *KEYV_URI* must be correctly configured to run this test suite; see *Keyv* section above.  This configuration must match the test-target *overhide-ethereum*'s configuration for the suite to start.
 
 > The *KEYV_AUTH_NAMESPACE* **MUST** be prefixed with "test_" otherwise the test suite will abort.
 
@@ -190,4 +218,4 @@ Keep in mind that tests run as *npm* scripts with `npm run test` respect your en
 }
 ```
 
-> The OH_ETH_HOST and OH_ETH_PORT configurations points may be used to point the tests at the target application for testing.
+> The OH_ETH_HOST and OH_ETH_PORT configurations points may be used to point the tests at the target *overhide-ethereum* for testing.
