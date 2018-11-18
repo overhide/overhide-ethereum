@@ -12,14 +12,6 @@
 #   -> if running in VirtualBox (docker-machine) ensure to port forward port 8080 in the docker-machine VM ('default')
 #   -> if using docker-machine, make sure to stop machine before running node.js outside of docker:  `docker-machine stop`
 #
-# LOGGING
-#
-#   npm install -g bunyan
-#   docker logs oh-eth | bunyan
-#
-#   -> application has a JSON logger 'bunyan' 
-#   -> make these logs easier to consume by human: pipe log output to bunyan CLI.
-#
 
 FROM node:10.13.0
 
@@ -31,7 +23,6 @@ COPY main/js /home/node/app/main/js/
 COPY tools /home/node/app/tools/
 
 ENV OH_ETH_PORT 8080
-ENV LOG_LEVEL warn
 ENV KEYV_URI redis://redis:6379
 ENV KEYV_AUTH_NAMESPACE users
 

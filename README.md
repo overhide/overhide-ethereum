@@ -55,23 +55,23 @@ Configuration points for *overhide-ethereum*:
 | --- | --- | --- |
 | OH_ETH_PORT | *overhide-ethereum*'s port | 8080 |
 | OH_ETH_HOST | *overhide-ethereum*'s host: only respected when running test-suite | localhost |
-| LOG_LEVEL | logging level for the bunyan library, one of 'fatal','error','warn','info','debug','trace' | info |
+| DEBUG | see 'Logging' section below | overhide-ethereum:*,-overhide-ethereum:is-signature-valid:txs,-overhide-ethereum:get-transactions:txs |
 | KEYV_URI | see 'Keyv Datastore' section below | redis://localhost:6379 |
 | KEYV_AUTH_NAMESPACE | see 'Keyv Datastore' section below | test_users |
 | ETHERSCAN_KEY | *overhide-ethereum* key for etherscan.io APIs | 446WA8I76EEQMXJ5NSUQA5Q17UXARBAF2 |
 | ETHERSCAN_TYPE | Empty for mainnet, else "morden", "ropsten", "rinkeby" | rinkeby |
 
-# Bunyan Logging
+# Logging
 
-We use *bunyan* for JSON log output.  
+Logging is done via the https://www.npmjs.com/package/debug module.
 
-JSON logs might be deemed harder to read.  To make *bunyan* output more human friendly ensure to have *bunyan* CLI installed: 
+Logging verbosity is controlled via the *DEBUG* environment variable or an *npm* configuration point of the same name.
 
-`npm install -g bunyan`  
+Non-debug (error/warning/audit) logging is programmatically enabled by default despite setting of the *DEBUG* variable.  These are the "overhide-ethereum-log" logs.
 
-Then run node piping STDOUT to *bunyan* CLI:
+Setting *DEBUG* to "overhide-ethereum:*" will enable all debug logging.  This will be very verbose.  It's likely desirable to target debug logging, e.g:
 
-`npm run start | bunyan`
+`npm config set overhide-ethereum:DEBUG "overhide-ethereum:*,-overhide-ethereum:is-signature-valid:txs,-overhide-ethereum:get-transactions:txs"`
 
 # Keyv Datastore
 
@@ -143,7 +143,7 @@ Alternatively: `npm run run`
 
 ### Logging from Docker Image
 
-`docker logs oh-eth | bunyan`
+`docker logs oh-eth`
 
 # Notes on Running the Development Environment
 
@@ -151,9 +151,9 @@ To restart Node.js every time you change source files ensure to have *nodemon* i
 
 `npm install -g nodemon`
 
-Start Node.js using *nodemon*, pipe to *bunyan*:
+Start Node.js using *nodemon*:
 
-`nodemon --inspect main/js/overhide-ethereum.js | bunyan`
+`nodemon --inspect main/js/overhide-ethereum.js`
 
 Or use the npm script:
 

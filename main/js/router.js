@@ -8,14 +8,15 @@ const express = require('express')
 const router = express.Router();
 const shajs = require('sha.js')
 
-const log = ctx.logger.child({where:"router"});
+const log = ctx.log("router");
+const debug = ctx.debug("router");
 
 // basic authentication handler
 router.use(function(request, response, next){
     var user = auth(request);
-    log.debug({method: request.method, headers:request.headers, path:request.path}, 'request made');
+    debug('request made (method:%s)(headers:%s)(path:%s)', request.method, request.headers, request.path);
     if (!user) {
-        log.debug('invalid basic-auth header');
+        debug('invalid basic-auth header');
         // no basic-auth header or malformed
         response.set('WWW-Authenticate', 'Basic');
         return response.status(401).send();  
@@ -25,7 +26,7 @@ router.use(function(request, response, next){
             // found key-value for auth
             if (shajs("sha256").update(user.pass).digest("hex") !== passwordHash) {
                 // bad password
-                log.debug('bad password for user: ' + user);
+                debug('bad password for user: %s', user);
                 response.set('WWW-Authenticate', 'Basic');
                 return response.status(401).send();                          
             }
@@ -33,7 +34,7 @@ router.use(function(request, response, next){
         })
         .catch((e) => {
             // didn't find key-value
-            log.debug('no such user: '+ user +' ('+e+')');
+            debug('no such user: %s (%o)', user, e);
             response.set('WWW-Authenticate', 'Basic');
             return response.status(401).send();      
         });
@@ -43,25 +44,25 @@ router.use(function(request, response, next){
 router.use(express.json());
 
 router.get('/get-transactions/:fromAddress/:toAddress', (req, rsp) => {
-    log.debug('handling get-transactions endpoint');
+    debug('handling get-transactions endpoint');
     (async () => {
         try {
             let result = await get_transactions({
                 fromAddress: req.params['fromAddress'],
                 toAddress: req.params['toAddress']
             });
-            log.debug({result:result}, 'result from get-transactions endpoint');
+            debug('result from get-transactions endpoint: %o', result);
             rsp.json(result);        
         } 
         catch (err) {
-            log.debug('error: ' + err);
+            debug(err);
             return rsp.status(400).send(err);      
         }
     })();
 })
 
 router.post('/is-signature-valid', (req, rsp) => {
-    log.debug('handling is-signature-valid endpoint');
+    debug('handling is-signature-valid endpoint');
     (async () => {
         try {
             var body = req.body;
@@ -70,11 +71,11 @@ router.post('/is-signature-valid', (req, rsp) => {
                 message: body['message'],
                 address: body['address']
             });
-            log.debug({result:result}, 'result from is-signature-valid endpoint');
+            debug('result from is-signature-valid endpoint: %o',result);
             rsp.json(result);        
         } 
         catch (err) {
-            log.debug('error: ' + err);
+            debug(err);
             return rsp.status(400).send(err);      
         }
     })();

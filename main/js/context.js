@@ -23,22 +23,26 @@ const context_singleton = (function() {
      * @param {*} options 
      * 
      *    app_name: is the name of the application
-     *    log_level: a 'bunyan' log level such as 'info', 'warn', 'debug', 'trace'
+     *    debug: DEBUG environment setting for https://www.npmjs.com/package/debug
      *    keyv_uri: 'keyv' adapter uri for key-value abstraction 'keyv'
      *    keyv_auth_namespace: namespace to use in 'keyv' data store for authenticating
      *    etherscan_key: Key for etherscan.io API access
      *    etherscan_type: Type of network for etherscan.io access ("","ropsten","rinkeby","morden")
      */
-    wire: ({app_name = "app", log_level = "info", keyv_uri, keyv_auth_namespace, etherscan_key, etherscan_type} = {}) => {
+    wire: ({app_name, debug, keyv_uri, keyv_auth_namespace, etherscan_key, etherscan_type} = {}) => {
       if (context != null) throw new Error("Attempt to wire up another context where context already exists.");
+      if (app_name == null) throw new Error("APP_NAME must be specified.");
       if (keyv_uri == null) throw new Error("KEYV_URI must be specified: see README.md#Configuration.");
       if (keyv_auth_namespace == null) throw new Error("KEYV_AUTH_NAMESPACE must be specified: see README.md#Configuration.")
       if (etherscan_key == null) throw new Error("ETHERSCAN_KEY must be specified: see README.md#Configuration.")
 
       context = new Object();
 
-      let logger = require('bunyan').createLogger({name: app_name});
-      logger.level(log_level);
+      const _debug = require('debug');
+      _debug.enable((debug ? debug + ',' : '') + app_name + "-log:*");
+      let logger = (name) => {return _debug(app_name + "-log").extend(name);};
+      let debug_logger = (name) => {return _debug(app_name).extend(name);};
+      
 
       let keyv_4_auth = new (require('keyv'))({
         uri: typeof keyv_uri=== 'string' && keyv_uri,
@@ -54,8 +58,15 @@ const context_singleton = (function() {
         }
       }
 
-      Object.defineProperty(context, "logger", {
+      Object.defineProperty(context, "log", {
         value: logger,
+        writable: false,
+        enumerable: true,
+        configurable: true
+      });
+
+      Object.defineProperty(context, "debug", {
+        value: debug_logger,
         writable: false,
         enumerable: true,
         configurable: true
@@ -84,13 +95,15 @@ const context_singleton = (function() {
      * @return Application context with beans:
      * 
      *       {
-     *         logger:...,
+     *         log:...,
+     *         debug:...,
      *         keyv_4_auth:...,
      *         esApi:...
      *       } 
      * 
      *     where:
-     *       - 'logger' is the 'bunyan' main logger.
+     *       - 'log' is the main "audit" logger (https://www.npmjs.com/package/debug) -- enabled by default 
+     *       - 'debug' is the debug logger (https://www.npmjs.com/package/debug) -- disabled by default
      *       - 'keyv_4_auth' is the 'keyv' metadata key-value store abstraction for authenticated users
      *       - 'esApi' is the API as per https://github.com/sebs/etherscan-api
      */

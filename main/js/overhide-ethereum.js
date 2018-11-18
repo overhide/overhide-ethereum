@@ -6,7 +6,7 @@
 // hardcoded defaults.
 const APP_NAME = "overhide-ethereum";
 const OH_ETH_PORT = process.env.OH_ETH_PORT || process.env.npm_package_config_OH_ETH_PORT || 8080;
-const LOG_LEVEL = process.env.LOG_LEVEL || process.env.npm_package_config_LOG_LEVEL || "info";
+const DEBUG = process.env.DEBUG || process.env.npm_package_config_DEBUG;
 const KEYV_URI = process.env.KEYV_URI || process.env.npm_package_config_KEYV_URI;
 const KEYV_AUTH_NAMESPACE = process.env.KEYV_AUTH_NAMESPACE || process.env.npm_package_config_KEYV_AUTH_NAMESPACE;
 const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || process.env.npm_package_config_ETHERSCAN_KEY;
@@ -17,15 +17,15 @@ const ctx_config = {
   pid: process.pid,
   port: OH_ETH_PORT,
   app_name: APP_NAME, 
-  log_level: LOG_LEVEL,
+  debug: DEBUG,
   keyv_uri: KEYV_URI,
   keyv_auth_namespace: KEYV_AUTH_NAMESPACE,
   etherscan_key: ETHERSCAN_KEY,
   etherscan_type: ETHERSCAN_TYPE
 };
 const ctx = require('./context.js').wire(ctx_config);
-const log = ctx.logger.child({where:"app"});
-log.info({ctx_config: ctx_config});
+const log = ctx.log("app");
+log("CONFIG:\n%O", ctx_config);
 
 // Start the application
 const app = require('express')();
@@ -39,6 +39,6 @@ exports.app = app;
 [`exit`, `SIGINT`, `SIGUSR1`, `SIGUSR2`, `uncaughtException`, `SIGTERM`].forEach((eventType) => {
   process.on(eventType, (err) => {
     err && console.log("Error: " + err);
-    log.warn('exiting');
+    log('exiting');
     process.exit();
   })});

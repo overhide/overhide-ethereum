@@ -3,7 +3,8 @@
 const ctx = require('../context.js').get();
 const ethCrypto = require('eth-crypto');
 
-const log = ctx.logger.child({where:"is-signature-valid"});
+const log = ctx.log("is-signature-valid");
+const debug = ctx.debug("is-signature-valid");
 
 async function is_signature_valid({signature, message, address}) {
   if (typeof signature !== 'string' || typeof message !== 'string' || typeof address !== 'string') throw new Error('signature, message, address must be strings');
@@ -13,7 +14,7 @@ async function is_signature_valid({signature, message, address}) {
   if (! address.startsWith('0x')) throw new Error('address must start with 0x');
   var esApi = ctx.esApi; 
   var txs = await esApi.account.txlist(address);
-  log.debug(txs,"etherscan result");
+  debug.extend("txs")("etherscan result: %O", txs);
   if (txs.status != 1) throw new Error(txs.message);
 
   // check signature valid

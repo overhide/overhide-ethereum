@@ -2,7 +2,8 @@
 
 const ctx = require('../context.js').get();
 
-const log = ctx.logger.child({where:"get-transactions"});
+const log = ctx.log("get-transactions");
+const debug = ctx.debug("get-transactions");
 
 async function get_transactions({fromAddress, toAddress}) {
   if (typeof fromAddress !== 'string' || typeof toAddress !== 'string') throw new Error('fromAddress and toAddress must be strings');
@@ -12,7 +13,7 @@ async function get_transactions({fromAddress, toAddress}) {
   var esApi = ctx.esApi; 
   var result = [];
   var txs = await esApi.account.txlist(fromAddress);
-  log.debug(txs,"etherscan result");
+  debug.extend("txs")("etherscan result: %O", txs);
   if (txs.status != 1) throw new Error(txs.message);
   for (var tx of txs.result) {
     if (tx.from.toLowerCase() == fromAddress && tx.to.toLowerCase() == toAddress) {
