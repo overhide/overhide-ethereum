@@ -16,7 +16,6 @@
   "license": "MIT",
   "dependencies": {
     "basic-auth": "2.0.1",
-    "cross-var": "1.1.0",
     "debug": "4.1.0",
     "eth-crypto": "1.2.7",
     "etherscan-api": "9.0.0",
