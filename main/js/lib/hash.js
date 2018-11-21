@@ -1,10 +1,10 @@
 "use strict";
 
-const shajs = require('sha.js')
+const crypto = require('crypto')
 
 // @return hashed valued
 function hash(what) {
-  return shajs("sha256").update(what).digest("hex");
+  return crypto.createHash('sha256').update(what).digest("hex");
 }
 
 module.exports = hash;
