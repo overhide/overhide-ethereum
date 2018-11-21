@@ -2,7 +2,7 @@
 
 const keyv = require('keyv');
 const readline = require('readline');
-const shajs = require('sha.js')
+const hash = require('../../main/js/lib/hash.js');
 
 const VALID_CHARS_USERNAME = /^[a-zA-Z0-9~!@#$%^&*_,.\-+=]{4,}$/g;
 const VALID_CHARS_PASSWORD = /^[a-zA-Z0-9~!@#$%^&*_,.\-+=]{4,}$/g;
@@ -27,11 +27,6 @@ function getKeyvAuthUsers() {
     store: typeof keyv_uri !== 'string' && keyv_uri,
     namespace: KEYV_AUTH_NAMESPACE
   });
-}
-
-// @return hashed valued
-function hash(what) {
-  return shajs("sha256").update(what).digest("hex");
 }
 
 const rl = readline.createInterface({
@@ -90,10 +85,10 @@ var password_q = (resolve, reject) => {
 
   if (password.length == 0) {
     console.log("unsetting user: " + username);
-    await getKeyvAuthUsers().delete(username);
+    await getKeyvAuthUsers().delete(hash(username));
   } else {
     console.log("resetting user: " + username);
-    await getKeyvAuthUsers().set(username, hash(password));
+    await getKeyvAuthUsers().set(hash(username), hash(password));
   }
   rl.close();
   process.exit(0);

@@ -3,10 +3,10 @@
 const auth = require('basic-auth');
 const ctx = require('./context.js').get();
 const get_transactions = require('./glue/get-transactions');
+const hash = require('./lib/hash.js')
 const is_signature_valid = require('./glue/is-signature-valid');
 const express = require('express')
 const router = express.Router();
-const shajs = require('sha.js')
 
 const log = ctx.log("router");
 const debug = ctx.debug("router");
@@ -21,10 +21,10 @@ router.use(function(request, response, next){
         response.set('WWW-Authenticate', 'Basic');
         return response.status(401).send();  
     }
-    ctx.keyv_4_auth.get(user.name)
+    ctx.keyv_4_auth.get(hash(user.name))
         .then((passwordHash) => {
             // found key-value for auth
-            if (shajs("sha256").update(user.pass).digest("hex") !== passwordHash) {
+            if (hash(user.pass) !== passwordHash) {
                 // bad password
                 debug('bad password for user: %s', user);
                 response.set('WWW-Authenticate', 'Basic');

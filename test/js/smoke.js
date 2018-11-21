@@ -1,8 +1,8 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const ethCrypto = require('eth-crypto');
+const hash = require('../../main/js/lib/hash.js');
 const keyv = require('keyv');
-const shajs = require('sha.js')
 const uuid = require('uuid');
 const assert = chai.assert;
 const expect = chai.expect;
@@ -41,14 +41,14 @@ function getKeyvAuthUsers() {
 function addUser() {
   USER = uuid();
   PASSWORD = uuid();
-  return getKeyvAuthUsers().set(USER, shajs("sha256").update(PASSWORD).digest("hex"));
+  return getKeyvAuthUsers().set(hash(USER), hash(PASSWORD));
 }
 
 // Side effects: removes "authenticated" user from key-value store 
 // @return promise
 function removeUser() {
   if (USER) {
-    return getKeyvAuthUsers().delete(USER);
+    return getKeyvAuthUsers().delete(hash(USER));
   }
   return Promise.resolve(null);
 }
@@ -90,7 +90,7 @@ describe('smoke tests', () => {
       console.log("before hook :: adding user");
       await addUser();
       console.log("before hook :: added user");
-      console.log("before hook :: retrieved user: " + await getKeyvAuthUsers().get(USER));
+      console.log("before hook :: retrieved user: " + await getKeyvAuthUsers().get(hash(USER)));
       await verifyUserAuthenticated();
       console.log("before hook :: verified authenticated");
       done();
