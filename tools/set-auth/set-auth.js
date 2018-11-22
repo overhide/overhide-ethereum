@@ -1,9 +1,5 @@
 "use strict";
 
-const keyv = require('keyv');
-const readline = require('readline');
-const hash = require('../../main/js/lib/hash.js');
-
 const VALID_CHARS_USERNAME = /^[a-zA-Z0-9~!@#$%^&*_,.\-+=]{4,}$/g;
 const VALID_CHARS_PASSWORD = /^[a-zA-Z0-9~!@#$%^&*_,.\-+=]{4,}$/g;
 
@@ -18,16 +14,9 @@ function tonull(what) { return (what == null || what == "null") ? null : what; }
 if (!KEYV_URI) throw new Error("KEYV_URI must be specified: app metadata storage.");
 if (typeof KEYV_AUTH_NAMESPACE !== 'string' || KEYV_AUTH_NAMESPACE.length == 0) throw new Error("KEYV_AUTH_NAMESPACE must be set.");
 
-// @return A 'keyv' datastore instance for authenticated users
-function getKeyvAuthUsers() {
-  var keyv_uri = KEYV_URI;
-
-  return new keyv({
-    uri: typeof keyv_uri=== 'string' && keyv_uri,
-    store: typeof keyv_uri !== 'string' && keyv_uri,
-    namespace: KEYV_AUTH_NAMESPACE
-  });
-}
+const readline = require('readline');
+const crypto = require('../../main/js/lib/crypto.js').init();
+const keyv4auth = require('../../main/js/lib/keyv-4-auth.js').init({keyv_uri: KEYV_URI,keyv_auth_namespace: KEYV_AUTH_NAMESPACE});
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -85,10 +74,10 @@ var password_q = (resolve, reject) => {
 
   if (password.length == 0) {
     console.log("unsetting user: " + username);
-    await getKeyvAuthUsers().delete(hash(username));
+    await keyv4auth.get().delete(crypto.hash(username));
   } else {
     console.log("resetting user: " + username);
-    await getKeyvAuthUsers().set(hash(username), hash(password));
+    await keyv4auth.get().set(crypto.hash(username), crypto.hash(password));
   }
   rl.close();
   process.exit(0);

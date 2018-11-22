@@ -1,14 +1,3 @@
-const chai = require('chai');
-const chaiHttp = require('chai-http');
-const ethCrypto = require('eth-crypto');
-const hash = require('../../main/js/lib/hash.js');
-const keyv = require('keyv');
-const uuid = require('uuid');
-const assert = chai.assert;
-const expect = chai.expect;
-
-chai.use(chaiHttp);
-
 const keth_acct1 = '0x046c88317b23dc57F6945Bf4140140f73c8FC80F';
 const keth_acct2 = '0xd6106c445A07a6A1caF02FC8050F1FDe30d7cE8b';
 const SAFETY_PREFIX_FOR_AUTH_NAMESPACE = "test_";
@@ -25,30 +14,29 @@ var PASSWORD = null;
 //   set to null in package.json.
 function tonull(what) { return (what == null || what == "null") ? null : what; }
 
-// @return A 'keyv' datastore instance for authenticated users
-function getKeyvAuthUsers() {
-  var keyv_uri = KEYV_URI;
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const crypto = require('../../main/js/lib/crypto.js').init();
+const keyv4auth = require('../../main/js/lib/keyv-4-auth.js').init({keyv_uri: KEYV_URI,keyv_auth_namespace: KEYV_AUTH_NAMESPACE});
+const eth = require('../../main/js/lib/eth-chain.js').init();
+const uuid = require('uuid');
+const assert = chai.assert;
 
-  return new keyv({
-    uri: typeof keyv_uri=== 'string' && keyv_uri,
-    store: typeof keyv_uri !== 'string' && keyv_uri,
-    namespace: KEYV_AUTH_NAMESPACE
-  });
-}
+chai.use(chaiHttp);
 
 // Side effects: adds "authenticated" user to key-value store
 // @return promise
 function addUser() {
   USER = uuid();
   PASSWORD = uuid();
-  return getKeyvAuthUsers().set(hash(USER), hash(PASSWORD));
+  return keyv4auth.get().set(crypto.hash(USER), crypto.hash(PASSWORD));
 }
 
 // Side effects: removes "authenticated" user from key-value store 
 // @return promise
 function removeUser() {
   if (USER) {
-    return getKeyvAuthUsers().delete(hash(USER));
+    return keyv4auth.get().delete(crypto.hash(USER));
   }
   return Promise.resolve(null);
 }
@@ -90,7 +78,7 @@ describe('smoke tests', () => {
       console.log("before hook :: adding user");
       await addUser();
       console.log("before hook :: added user");
-      console.log("before hook :: retrieved user: " + await getKeyvAuthUsers().get(hash(USER)));
+      console.log("before hook :: retrieved user: " + await keyv4auth.get().get(crypto.hash(USER)));
       await verifyUserAuthenticated();
       console.log("before hook :: verified authenticated");
       done();
@@ -168,10 +156,10 @@ describe('smoke tests', () => {
   });
 
   it('validates checking signature', (done) => {
-    const message = ethCrypto.hash.keccak256("testing stuff");
+    const message = eth.keccak256("testing stuff");
     let msg = Buffer.from(message).toString("base64");
 
-    // ethCrypto.sign("...", message);
+    // eth.sign("...", message);
     let signed = "0xae39bed2c5e522c16bc3474be0f59f17fd4cf76913e2fe1bee94e27f2d58b5e531b629b30fc477c615c45d9235c805d6e214f228a9129fb29ffc518a4e1997691b";    
     let sig = Buffer.from(signed).toString("base64");    
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
@@ -192,12 +180,11 @@ describe('smoke tests', () => {
   });
 
   it('valid signature but address unused on blockchain returns 400', (done) => {
-    const message = ethCrypto.hash.keccak256("testing stuff");
+    const message = eth.keccak256("testing stuff");
     let msg = Buffer.from(message).toString("base64");
-    let newIdentity = ethCrypto.createIdentity();
+    let newIdentity = eth.createIdentity();
 
-    // ethCrypto.sign("...", message);
-    let signed = ethCrypto.sign(newIdentity.privateKey, message);
+    let signed = eth.sign(newIdentity.privateKey, message);
     let sig = Buffer.from(signed).toString("base64");    
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .post('/is-signature-valid')

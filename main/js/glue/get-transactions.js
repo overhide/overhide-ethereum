@@ -1,21 +1,19 @@
 "use strict";
 
-const ctx = require('../context.js').get();
+const eth = require('../lib/eth-chain.js');
 
-const log = ctx.log("get-transactions");
-const debug = ctx.debug("get-transactions");
+const log = require('../lib/log.js').fn("get-transactions");
+const debug = require('../lib/log.js').debug_fn("get-transactions");
 
 async function get_transactions({fromAddress, toAddress}) {
   if (typeof fromAddress !== 'string' || typeof toAddress !== 'string') throw new Error('fromAddress and toAddress must be strings');
   fromAddress = fromAddress.toLowerCase();
   toAddress = toAddress.toLowerCase();
   if (! fromAddress.startsWith('0x') || ! toAddress.startsWith('0x')) throw new Error('fromAddress and toAddress must start with 0x');
-  var esApi = ctx.esApi; 
   var result = [];
-  var txs = await esApi.account.txlist(fromAddress);
+  var txs = await eth.getTransactionsForAddress(fromAddress);
   debug.extend("txs")("etherscan result: %O", txs);
-  if (txs.status != 1) throw new Error(txs.message);
-  for (var tx of txs.result) {
+  for (var tx of txs) {
     if (tx.from.toLowerCase() == fromAddress && tx.to.toLowerCase() == toAddress) {
       result.push({
         "transaction-value": tx.value,

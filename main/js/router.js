@@ -1,15 +1,15 @@
 "use strict";
 
 const auth = require('basic-auth');
-const ctx = require('./context.js').get();
+const keyv4auth = require('./lib/keyv-4-auth.js').get();
 const get_transactions = require('./glue/get-transactions');
-const hash = require('./lib/hash.js')
+const crypto = require('./lib/crypto.js')
 const is_signature_valid = require('./glue/is-signature-valid');
 const express = require('express')
 const router = express.Router();
 
-const log = ctx.log("router");
-const debug = ctx.debug("router");
+const log = require('./lib/log.js').fn("router");
+const debug = require('./lib/log.js').debug_fn("router");
 
 // basic authentication handler
 router.use(function(request, response, next){
@@ -21,10 +21,10 @@ router.use(function(request, response, next){
         response.set('WWW-Authenticate', 'Basic');
         return response.status(401).send();  
     }
-    ctx.keyv_4_auth.get(hash(user.name))
+    keyv4auth.get(crypto.hash(user.name))
         .then((passwordHash) => {
             // found key-value for auth
-            if (hash(user.pass) !== passwordHash) {
+            if (crypto.hash(user.pass) !== passwordHash) {
                 // bad password
                 debug('bad password for user: %s', user);
                 response.set('WWW-Authenticate', 'Basic');

@@ -23,8 +23,10 @@ const ctx_config = {
   etherscan_key: ETHERSCAN_KEY,
   etherscan_type: ETHERSCAN_TYPE
 };
-const ctx = require('./context.js').wire(ctx_config);
-const log = ctx.log("app");
+const log = require('./lib/log.js').init(ctx_config).fn("app");
+const crypto = require('./lib/crypto.js').init(ctx_config);
+const keyv4auth = require('./lib/keyv-4-auth.js').init(ctx_config);
+const eth = require('./lib/eth-chain.js').init(ctx_config);
 log("CONFIG:\n%O", ctx_config);
 
 // Start the application
