@@ -1,9 +1,8 @@
 "use strict";
 
-const auth = require('basic-auth');
-const keyv4auth = require('./lib/keyv-4-auth.js').get();
+const BasicAuth = require('basic-auth');
+const auth = require('./lib/auth.js');
 const get_transactions = require('./glue/get-transactions');
-const crypto = require('./lib/crypto.js')
 const is_signature_valid = require('./glue/is-signature-valid');
 const express = require('express')
 const router = express.Router();
@@ -13,7 +12,7 @@ const debug = require('./lib/log.js').debug_fn("router");
 
 // basic authentication handler
 router.use(function(request, response, next){
-    var user = auth(request);
+    var user = BasicAuth(request);
     debug('request made (method:%s)(headers:%s)(path:%s)', request.method, request.headers, request.path);
     if (!user) {
         debug('invalid basic-auth header');
@@ -21,12 +20,10 @@ router.use(function(request, response, next){
         response.set('WWW-Authenticate', 'Basic');
         return response.status(401).send();  
     }
-    keyv4auth.get(crypto.hash(user.name))
-        .then((passwordHash) => {
-            // found key-value for auth
-            if (crypto.hash(user.pass) !== passwordHash) {
-                // bad password
-                debug('bad password for user: %s', user);
+    auth.isAuthValid(user.name, user.pass)
+        .then((valid) => {
+            if (!valid) {
+                debug('authentication invalid for user: %s', user);
                 response.set('WWW-Authenticate', 'Basic');
                 return response.status(401).send();                          
             }
@@ -34,7 +31,7 @@ router.use(function(request, response, next){
         })
         .catch((e) => {
             // didn't find key-value
-            debug('no such user: %s (%o)', user, e);
+            debug('error authenticating user: %s (%o)', user, e);
             response.set('WWW-Authenticate', 'Basic');
             return response.status(401).send();      
         });

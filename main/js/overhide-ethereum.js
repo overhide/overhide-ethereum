@@ -25,7 +25,7 @@ const ctx_config = {
 };
 const log = require('./lib/log.js').init(ctx_config).fn("app");
 const crypto = require('./lib/crypto.js').init(ctx_config);
-const keyv4auth = require('./lib/keyv-4-auth.js').init(ctx_config);
+const keyv4auth = require('./lib/auth.js').init(ctx_config);
 const eth = require('./lib/eth-chain.js').init(ctx_config);
 log("CONFIG:\n%O", ctx_config);
 

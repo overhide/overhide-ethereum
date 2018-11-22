@@ -1,6 +1,8 @@
 "use strict";
 
 const Keyv = require('keyv');
+const crypto = require('./crypto.js');
+const debug = require('./log.js').debug_fn("auth");
 
 // private attribtues
 const ctx = Symbol('context');
@@ -18,7 +20,7 @@ const getKeyv = Symbol('getKeyv');
  * Leverages node's module system for a sort of context & dependency injection, so order of requiring and initializing
  * these sorts of libraries matters.
  */
-class Keyv4Auth {
+class Auth {
   constructor() {
     this[ctx] = null;
   }
@@ -59,15 +61,58 @@ class Keyv4Auth {
     });
   }
 
+  /**
+   * Check user's authentication
+   * 
+   * @param user <string> to check
+   * @param password <string> to check
+   * @return a promise with <boolean> that's 'true' if password checks out for user
+   */
+  async isAuthValid(user, password) {
+    this[checkInit]();
+    var userhash = crypto.hash(user);
+    try {
+      var entry = await this[ctx].keyv.get(userhash);
+      if (entry) {
+        var salt = Object.keys(entry)[0];
+        var salted = entry[salt];
+        if (salted === crypto.hash(password, salt)) {
+          return true;
+        }
+        debug('bad password for user: %s', user);
+      }  
+    } catch (e) {
+      debug('no such user: %s (%o)', user, e);
+    }
+    return false;
+  }
 
   /**
-   *  @return is an object: the 'keyv' (https://www.npmjs.com/package/keyv) metadata key-value store abstraction for 
-   *          authenticated users
+   * Set user's authentication
+   * 
+   * @param user <string> to check
+   * @param password <string> to check
    */
-  get() {
+  async updateUser(user, password) {
     this[checkInit]();
-    return this[ctx].keyv;
+    var salt = crypto.randomChars(16);
+    var userhash = crypto.hash(user);
+    var passhash = crypto.hash(password, salt);
+    var value={};
+    value[salt]=passhash;
+    await this[ctx].keyv.set(userhash,value);
+  }
+
+  /**
+   * Delete user's authentication
+   * 
+   * @param user <string> to delete
+   */
+  async deleteUser(user) {
+    this[checkInit]();
+    var userhash = crypto.hash(user);
+    await this[ctx].keyv.delete(userhash);
   }
 }
 
-module.exports = (new Keyv4Auth());
+module.exports = (new Auth());

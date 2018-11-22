@@ -42,12 +42,23 @@ class Crypto {
   }
 
   /**
-   * @param what to hash
+   * @param {num} <number> length of string
+   * @param {enc} <string> encoding (default: 'ascii')
+   * @return <string> with random characters
+   */
+  randomChars(num,enc='ascii') {
+    return crypto.randomBytes(num).toString(enc)    
+  }
+
+  /**
+   * @param what <string>|<Buffer>|<TypedArray> to hash
+   * @param salt <string>|<Buffer>|<TypedArray> to hash with (optional)
    * @return hashed what
    */
-  hash(what) {
+  hash(what, salt) {
     this[checkInit]();
-    return crypto.createHash(HASH_ALGO).update(what).digest(DIGEST_FORMAT);
+    if (salt) return crypto.createHmac(HASH_ALGO, salt).update(what).digest(DIGEST_FORMAT);
+    else return crypto.createHash(HASH_ALGO).update(what).digest(DIGEST_FORMAT);
   }
 
 }

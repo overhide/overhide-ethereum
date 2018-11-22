@@ -16,8 +16,9 @@ function tonull(what) { return (what == null || what == "null") ? null : what; }
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const crypto = require('../../main/js/lib/crypto.js').init();
-const keyv4auth = require('../../main/js/lib/keyv-4-auth.js').init({keyv_uri: KEYV_URI,keyv_auth_namespace: KEYV_AUTH_NAMESPACE});
+require('../../main/js/lib/log.js').init({app_name:'smoke'});
+require('../../main/js/lib/crypto.js').init();
+const auth = require('../../main/js/lib/auth.js').init({keyv_uri: KEYV_URI,keyv_auth_namespace: KEYV_AUTH_NAMESPACE});
 const eth = require('../../main/js/lib/eth-chain.js').init();
 const uuid = require('uuid');
 const assert = chai.assert;
@@ -29,14 +30,14 @@ chai.use(chaiHttp);
 function addUser() {
   USER = uuid();
   PASSWORD = uuid();
-  return keyv4auth.get().set(crypto.hash(USER), crypto.hash(PASSWORD));
+  return auth.updateUser(USER, PASSWORD);
 }
 
 // Side effects: removes "authenticated" user from key-value store 
 // @return promise
 function removeUser() {
   if (USER) {
-    return keyv4auth.get().delete(crypto.hash(USER));
+    return auth.deleteUser(USER);
   }
   return Promise.resolve(null);
 }
@@ -78,7 +79,6 @@ describe('smoke tests', () => {
       console.log("before hook :: adding user");
       await addUser();
       console.log("before hook :: added user");
-      console.log("before hook :: retrieved user: " + await keyv4auth.get().get(crypto.hash(USER)));
       await verifyUserAuthenticated();
       console.log("before hook :: verified authenticated");
       done();

@@ -81,8 +81,8 @@ class EthChain {
   }
 
   /**
-   * @param {payload} to hash into string, could be string, Buffer, ArrayBuffer, Uint8Array
-   * @return the hash string ('0x..')
+   * @param {payload} <string>|<Buffer>|<TypedAray> to hash
+   * @return <string> the hash ('0x..')
    */
   keccak256(payload) {
     this[checkInit]();
@@ -90,9 +90,9 @@ class EthChain {
   }
 
   /**
-   * @param {key} string for signing ('0x..')
-   * @param {message} string to be signed (usually hash of payload)
-   * @return signed payload as string
+   * @param {key} <string> for signing ('0x..')
+   * @param {message} <string> to be signed (usually hash of payload)
+   * @return <string> signed payload
    */
   sign(key, message) {
     this[checkInit]();
@@ -101,10 +101,10 @@ class EthChain {
 
   /**
    * 
-   * @param {address} string of the public address corresponding to private key of signature
-   * @param {signature} the signature string ('0x..')
-   * @param {message} string that was signed (usually hash of payload)
-   * @return boolean if signature checks out
+   * @param {address} <string> of the public address corresponding to private key of signature
+   * @param {signature} <string> the signature ('0x..')
+   * @param {message} <string> that was signed (usually hash of payload)
+   * @return <boolean> if signature checks out
    */
   isSignatureValid(address, signature, message) {
     this[checkInit]();

@@ -64,6 +64,7 @@ class Log {
    * @return is a function: the debug logger (https://www.npmjs.com/package/debug) -- disabled by default
    */
   debug_fn(name) {
+    this[checkInit]();
     return debug(this[ctx].debug_logger_name).extend(name);
   }
 }
