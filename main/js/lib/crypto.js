@@ -2,6 +2,7 @@
 
 const crypto = require('crypto')
 
+const ENCODING = 'utf-8';
 const HASH_ALGO = 'sha256';
 const DIGEST_FORMAT = 'hex';
 
@@ -43,22 +44,21 @@ class Crypto {
 
   /**
    * @param {num} <number> length of string
-   * @param {enc} <string> encoding (default: 'ascii')
-   * @return <string> with random characters
+   * @return <string (utf-8)> with random characters
    */
-  randomChars(num,enc='ascii') {
-    return crypto.randomBytes(num).toString(enc)    
+  randomChars(num) {
+    return crypto.randomBytes(num).toString(ENCODING)    
   }
 
   /**
-   * @param what <string>|<Buffer>|<TypedArray> to hash
-   * @param salt <string>|<Buffer>|<TypedArray> to hash with (optional)
+   * @param what <string (utf-8)>|<Buffer>|<TypedArray> to hash
+   * @param salt <string (utf-8)>|<Buffer>|<TypedArray> to hash with (optional)
    * @return hashed what
    */
   hash(what, salt) {
     this[checkInit]();
-    if (salt) return crypto.createHmac(HASH_ALGO, salt).update(what).digest(DIGEST_FORMAT);
-    else return crypto.createHash(HASH_ALGO).update(what).digest(DIGEST_FORMAT);
+    if (salt) return crypto.createHmac(HASH_ALGO, salt).update(what, ENCODING).digest(DIGEST_FORMAT);
+    else return crypto.createHash(HASH_ALGO).update(what, ENCODING).digest(DIGEST_FORMAT);
   }
 
 }
