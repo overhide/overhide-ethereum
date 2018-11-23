@@ -53,7 +53,7 @@ class Crypto {
   /**
    * @param what <string (utf-8)>|<Buffer>|<TypedArray> to hash
    * @param salt <string (utf-8)>|<Buffer>|<TypedArray> to hash with (optional)
-   * @return hashed what
+   * @return <string> hashed what
    */
   hash(what, salt) {
     this[checkInit]();
