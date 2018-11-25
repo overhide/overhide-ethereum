@@ -35,7 +35,7 @@ class Crypto {
    * Initialize this library: this must be the first method called somewhere from where you're doing context & dependency
    * injection.
    * 
-   * @return this
+   * @returns {Crypto} this
    */
   init() {
     this[ctx] = {};
@@ -43,17 +43,17 @@ class Crypto {
   }
 
   /**
-   * @param {num} <number> length of string
-   * @return <string (utf-8)> with random characters
+   * @param {number} num - length of string
+   * @returns {string<utf-8>} with random characters
    */
   randomChars(num) {
     return crypto.randomBytes(num).toString(ENCODING)    
   }
 
   /**
-   * @param what <string (utf-8)>|<Buffer>|<TypedArray> to hash
-   * @param salt <string (utf-8)>|<Buffer>|<TypedArray> to hash with (optional)
-   * @return <string> hashed what
+   * @param {(string<utf-8>|Buffer|TypedArray)} what - to hash
+   * @param {(string<utf-8>|Buffer|TypedArray)} salt - to hash with (optional)
+   * @returns {string} hashed what
    */
   hash(what, salt) {
     this[checkInit]();

@@ -38,9 +38,9 @@ class EthChain {
    * Initialize this library: this must be the first method called somewhere from where you're doing context & dependency
    * injection.
    * 
-   * @param etherscan_key is key for etherscan.io API access
-   * @param etherscan_type is yype of network for etherscan.io access ("","ropsten","rinkeby","morden")
-   * @return this
+   * @param {string} etherscan_key - key for etherscan.io API access
+   * @param {string} etherscan_type - type of network for etherscan.io access ("","ropsten","rinkeby","morden")
+   * @return {EthChain} this
    */
   init({etherscan_key = null, etherscan_type = null} = {}) {
     var api = null;
@@ -57,13 +57,13 @@ class EthChain {
   }
 
   /**
-   * @param an Ethereum network address as string ('0x...')
+   * @param {string} address - an Ethereum network address ('0x...')
 
-   * @return promise passed an array of transactions: [{from:..,to:..,value:..,timeStamp},..] where 'from' is the payee 
+   * @returns {Promise<Object[]>} an array of transactions: [{from:..,to:..,value:..,timeStamp},..] where 'from' is the payee 
    *   address, 'to' is the recepient, 'value' is the amount of Wei, and 'timeStamp' is the transaction write unix time 
    *   in seconds.
    * 
-   * @throws Error if problem
+   * @throws {Error} if problem
    */
   async getTransactionsForAddress(address) {
     this[checkHasEtherscan]();
@@ -73,7 +73,7 @@ class EthChain {
   }
 
   /**
-   * @return a new identity with newly generated key strings: {privateKey:..,address:..}
+   * @returns {Object} a new identity with newly generated key strings: {privateKey:..,address:..}
    */
   createIdentity() {
     this[checkInit]();
@@ -81,8 +81,8 @@ class EthChain {
   }
 
   /**
-   * @param {payload} <string>|<Buffer>|<TypedAray> to hash
-   * @return <string> the hash ('0x..')
+   * @param {(string|Buffer|TypedArray)} payload - to hash
+   * @returns {string} the hash ('0x..')
    */
   keccak256(payload) {
     this[checkInit]();
@@ -90,9 +90,9 @@ class EthChain {
   }
 
   /**
-   * @param {key} <string> for signing ('0x..')
-   * @param {message} <string> to be signed (usually hash of payload)
-   * @return <string> signed payload
+   * @param {string} key - for signing ('0x..')
+   * @param {string} message - to be signed (usually hash of payload)
+   * @returns {string} signed payload
    */
   sign(key, message) {
     this[checkInit]();
@@ -101,10 +101,10 @@ class EthChain {
 
   /**
    * 
-   * @param {address} <string> of the public address corresponding to private key of signature
-   * @param {signature} <string> the signature ('0x..')
-   * @param {message} <string> that was signed (usually hash of payload)
-   * @return <boolean> if signature checks out
+   * @param {string} address - of the public address corresponding to private key of signature
+   * @param {string} signature - the signature ('0x..')
+   * @param {string} message - that was signed (usually hash of payload)
+   * @returns {boolean} if signature checks out
    */
   isSignatureValid(address, signature, message) {
     this[checkInit]();

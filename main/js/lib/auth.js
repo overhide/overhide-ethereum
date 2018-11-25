@@ -34,9 +34,9 @@ class Auth {
    * Initialize this library: this must be the first method called somewhere from where you're doing context & dependency
    * injection.
    * 
-   * @param keyv_uri is 'keyv' adapter uri for key-value abstraction 'keyv'
-   * @param keyv_auth_namespace is namespace to use in 'keyv' data store for authenticating
-   * @return this
+   * @param {string} keyv_uri - 'keyv' adapter uri for key-value abstraction 'keyv'
+   * @param {string} keyv_auth_namespace - namespace to use in 'keyv' data store for authenticating
+   * @returns {Auth} this
    */
   init({keyv_uri, keyv_auth_namespace}) {
     if (keyv_uri == null) throw new Error("KEYV_URI must be specified: see README.md#Configuration.");
@@ -64,9 +64,9 @@ class Auth {
   /**
    * Check user's authentication
    * 
-   * @param user <string> to check
-   * @param password <string> to check
-   * @return a promise with <boolean> that's 'true' if password checks out for user
+   * @param {string} user - to check
+   * @param {string} password - to check
+   * @returns {Promise<boolean>} a promise with that's 'true' if password checks out for user
    */
   async isAuthValid(user, password) {
     this[checkInit]();
@@ -90,8 +90,8 @@ class Auth {
   /**
    * Set user's authentication
    * 
-   * @param user <string> to check
-   * @param password <string> to check
+   * @param {string} user - to check
+   * @param {string} password - to check
    */
   async updateUser(user, password) {
     this[checkInit]();
@@ -106,7 +106,7 @@ class Auth {
   /**
    * Delete user's authentication
    * 
-   * @param user <string> to delete
+   * @param {string} user - to delete
    */
   async deleteUser(user) {
     this[checkInit]();

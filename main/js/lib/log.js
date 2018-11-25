@@ -34,9 +34,9 @@ class Log {
    * Initializes the logger to always be on despite environment variable.  Initializes debug logger based on DEBUG 
    * environment variable.
    * 
-   * @param app_name is the name of the application
-   * @param debug is DEBUG environment setting for https://www.npmjs.com/package/debug
-   * @return this
+   * @param {string} app_name - the name of the application
+   * @param {string} debug - DEBUG environment setting for https://www.npmjs.com/package/debug
+   * @return {Log} this
    */
   init({app_name, debug:debug_env}) {
     if (app_name == null) throw new Error("APP_NAME must be specified.");
@@ -51,8 +51,8 @@ class Log {
   }
 
   /**
-   * @param name to include in logger
-   * @return is a function: the main "audit" logger (https://www.npmjs.com/package/debug) -- enabled by default 
+   * @param {string} name - to include in logger
+   * @returns {debug} the main "audit" logger (https://www.npmjs.com/package/debug) -- enabled by default 
    */
   fn(name) {
     this[checkInit]();
@@ -60,8 +60,8 @@ class Log {
   }
 
   /**
-   * @param name to include in logger
-   * @return is a function: the debug logger (https://www.npmjs.com/package/debug) -- disabled by default
+   * @param {string} name - to include in logger
+   * @return {debug} the debug logger (https://www.npmjs.com/package/debug) -- disabled by default
    */
   debug_fn(name) {
     this[checkInit]();
