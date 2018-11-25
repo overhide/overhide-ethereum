@@ -1,5 +1,6 @@
-const keth_acct1 = '0x046c88317b23dc57F6945Bf4140140f73c8FC80F';
-const keth_acct2 = '0xd6106c445A07a6A1caF02FC8050F1FDe30d7cE8b';
+const eth_acct1 = '0x046c88317b23dc57F6945Bf4140140f73c8FC80F';
+const eth_acct2 = '0xd6106c445A07a6A1caF02FC8050F1FDe30d7cE8b';
+const POINT_0_1_ETH_IN_WEI = 10000000000000000;
 const SAFETY_PREFIX_FOR_AUTH_NAMESPACE = "test_";
 
 // Source properties from environment: must target same key-value store as target app, verified in 'before' hook with user login.
@@ -101,7 +102,7 @@ describe('smoke tests', () => {
 
   it('401 returned for invalid user', (done) => {
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
-      .get('/get-transactions/'+keth_acct1+'/'+keth_acct2)
+      .get('/get-transactions/'+eth_acct1+'/'+eth_acct2)
       .auth("fake","news")
       .then(function(res) {
         assert.isTrue(res.statusCode == 401);
@@ -112,16 +113,19 @@ describe('smoke tests', () => {
       });
   });
 
-  it('validates some transfer of keth from keth_acct1 to keth_acct2', (done) => {
+  it('validates a total of .03 eth was transferred from eth_acct1 to eth_acct2', (done) => {
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
-      .get('/get-transactions/'+keth_acct1+'/'+keth_acct2)
+      .get('/get-transactions/'+eth_acct1+'/'+eth_acct2)
       .auth(USER,PASSWORD)
       .then(function(res) {
         var reso = JSON.parse(res.text);
-        assert.isTrue(Array.isArray(reso));
-        assert.isTrue(reso.length > 0);
-        assert.isTrue(parseInt(reso[0]["transaction-value"]) > 0);
-        assert.isTrue(typeof reso[0]["transaction-date"] === 'string');
+        assert.isTrue(reso.tally == (3 * POINT_0_1_ETH_IN_WEI));
+        assert.isTrue(Array.isArray(reso.transactions));
+        assert.isTrue(reso.transactions.length == 3);
+        for (var tx of reso.transactions) {
+          assert.isTrue(parseInt(tx["transaction-value"]) == POINT_0_1_ETH_IN_WEI);
+          assert.isTrue((new Date(tx["transaction-date"])).getUTCFullYear() == '2018');
+        }
         done();
       })
       .catch(function(err) {
@@ -129,9 +133,69 @@ describe('smoke tests', () => {
       });
   });
 
+  it('validates .02 eth was transferred from eth_acct1 to eth_acct2 in the last 2 transactions', (done) => {
+    chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
+      .get('/get-transactions/'+eth_acct1+'/'+eth_acct2+'?max-most-recent=2')
+      .auth(USER,PASSWORD)
+      .then(function(res) {
+        var reso = JSON.parse(res.text);
+        assert.isTrue(reso.tally == (2 * POINT_0_1_ETH_IN_WEI));
+        assert.isTrue(Array.isArray(reso.transactions));
+        assert.isTrue(reso.transactions.length == 2);
+        const txsShouldBeOlderThan = new Date('2018-11-25T00:00:00Z').getTime();
+        for (var tx of reso.transactions) {
+          assert.isTrue(parseInt(tx["transaction-value"]) == POINT_0_1_ETH_IN_WEI);
+          assert.isTrue((new Date(tx["transaction-date"])).getTime() > txsShouldBeOlderThan);
+        }
+        done();
+      })
+      .catch(function(err) {
+        throw err;
+      });
+  });
+
+  it('validates .02 eth was transferred in 2 transactions from eth_acct1 to eth_acct2 since 2018-11-25T00:00:00Z', (done) => {
+    const sinceStr = '2018-11-25T00:00:00Z';
+    chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
+      .get('/get-transactions/'+eth_acct1+'/'+eth_acct2+'?since='+sinceStr)
+      .auth(USER,PASSWORD)
+      .then(function(res) {
+        var reso = JSON.parse(res.text);
+        assert.isTrue(reso.tally == (2 * POINT_0_1_ETH_IN_WEI));
+        assert.isTrue(Array.isArray(reso.transactions));
+        assert.isTrue(reso.transactions.length == 2);
+        const txsShouldBeOlderThan = new Date(sinceStr).getTime();
+        for (var tx of reso.transactions) {
+          assert.isTrue(parseInt(tx["transaction-value"]) == POINT_0_1_ETH_IN_WEI);
+          assert.isTrue((new Date(tx["transaction-date"])).getTime() > txsShouldBeOlderThan);
+        }
+        done();
+      })
+      .catch(function(err) {
+        throw err;
+      });
+  });
+
+  it('validates .02 eth was transferred from eth_acct1 to eth_acct2 since 2018-11-25T00:00:00Z as tally only', (done) => {
+    const sinceStr = '2018-11-25T00:00:00Z';
+    chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
+      .get('/get-transactions/'+eth_acct1+'/'+eth_acct2+'?since='+sinceStr+'&tally-only=true')
+      .auth(USER,PASSWORD)
+      .then(function(res) {
+        var reso = JSON.parse(res.text);
+        assert.isTrue(reso.tally == (2 * POINT_0_1_ETH_IN_WEI));
+        assert.notExists(reso.transactions);
+        done();
+      })
+      .catch(function(err) {
+        throw err;
+      });
+  });
+
+
   it('validates lowercase and uppercase addresses work', (done) => {
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
-      .get('/get-transactions/'+keth_acct1.toUpperCase()+'/'+keth_acct2.toLowerCase())
+      .get('/get-transactions/'+eth_acct1.toUpperCase()+'/'+eth_acct2.toLowerCase())
       .auth(USER,PASSWORD)
       .then(function(res) {
         assert.isTrue(res.statusCode == 200);
@@ -144,7 +208,7 @@ describe('smoke tests', () => {
 
   it('validates skipping 0x at start of address causes 400', (done) => {
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
-      .get('/get-transactions/'+keth_acct1.substr(2)+'/'+keth_acct2)
+      .get('/get-transactions/'+eth_acct1.substr(2)+'/'+eth_acct2)
       .auth(USER,PASSWORD)
       .then(function(res) {
         assert.isTrue(res.statusCode == 400);
@@ -168,7 +232,7 @@ describe('smoke tests', () => {
       .send({
         signature: sig,
         message: msg,
-        address: keth_acct1
+        address: eth_acct1
       })
       .then(function(res) {
         assert.isTrue(res.statusCode == 200);

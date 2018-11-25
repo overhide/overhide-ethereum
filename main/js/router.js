@@ -46,7 +46,10 @@ router.get('/get-transactions/:fromAddress/:toAddress', (req, rsp) => {
         try {
             let result = await get_transactions({
                 fromAddress: req.params['fromAddress'],
-                toAddress: req.params['toAddress']
+                toAddress: req.params['toAddress'],
+                maxMostRecent: req.query['max-most-recent'],
+                since: req.query['since'],
+                tallyOnly: req.query['tally-only']
             });
             debug('result from get-transactions endpoint: %o', result);
             rsp.json(result);        
