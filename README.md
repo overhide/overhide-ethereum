@@ -193,7 +193,7 @@ Once you see a "Debugger attached." message in your *nodemon* shell you're in bu
 
 ## Testing
 
-`npm run test` or run the Mocha/Chai tests in `./test/js/*` manually.
+`npm test` or run the Mocha/Chai tests in `./test/js/*` manually.
 
 The tests aren't unit tests.  They do not start Node.js to run *overhide-ethereum*; they expect the target device-under-test *overhide-ethereum* to be running.
 
@@ -207,7 +207,7 @@ The tests should pass regardless of configuration being tested:
 
 > The *KEYV_AUTH_NAMESPACE* **MUST** be prefixed with "test_" otherwise the test suite will abort.
 
-Keep in mind that tests run as *npm* scripts with `npm run test` respect your environment and [npm-config](https://docs.npmjs.com/misc/config).  Tests run using IDE test runners should have an IDE/extension-specific method to set environment variables.  For example in *VSCode* go to *File>Prefernces>[Workspace] Settings*, filter by "mocha", look for an "env" configuration point.  For the two most popular extensions--Mocha Sidebar, Mocha Test Explorer--you'll end up with:
+Keep in mind that tests run as *npm* scripts with `npm test` respect your environment and [npm-config](https://docs.npmjs.com/misc/config).  Tests run using IDE test runners should have an IDE/extension-specific method to set environment variables.  For example in *VSCode* go to *File>Prefernces>[Workspace] Settings*, filter by "mocha", look for an "env" configuration point.  For the two most popular extensions--Mocha Sidebar, Mocha Test Explorer--you'll end up with:
 
 ```
 "mocha.env": {
