@@ -42,7 +42,7 @@
   },
   "scripts": {
     "start": "node main/js/overhide-ethereum.js",
-    "test": "mocha --timeout 5000 test/js/smoke.js",
+    "test": "mocha --timeout 5000 test/js",
     "set-auth": "node tools/set-auth/set-auth.js",
     "dev": "nodemon --inspect main/js/overhide-ethereum.js",
     "build": "docker build -t oh-eth -f main/docker/Dockerfile .",
