@@ -227,7 +227,11 @@ Keep in mind that tests run as *npm* scripts with `npm test` respect your enviro
 All endpoints in this service are protected with basic authentication.  The list of authenticated used is kept in
 the datastore at KEYV_URI under the KEYV_AUTH_NAMESPACE namespace.
 
-To add/remove users use the npm script: `npm run set-auth`.
+To add/remove interactively use the npm script: `npm run set-auth`.
+
+To add a user using a CLI one-liner: `npm run set-auth set USERNAME PASSWORD`
+
+To remove a user using a CLI one-liner: `npm run set-auth unset USERNAME`
 
 # Health Check -- Endpoint
 

@@ -16,10 +16,48 @@ const auth = require('../../main/js/lib/auth.js').init({keyv_uri: KEYV_URI,keyv_
 /* MAIN */
 /********/
 
-console.log('Reset authentication credentials for user (CTRL-C to abort)');
-console.log('\n');
+console.log('Config:');
 KEYV_URI && console.log(`KEYV_URI:${KEYV_URI}`);
 console.log(`KEYV_AUTH_NAMESPACE:${KEYV_AUTH_NAMESPACE}`);
+console.log('\n');
+
+// CLI
+if (process.argv.length > 2) {
+  if (process.argv[2] == 'set'
+      && process.argv.length == 5
+      && process.argv[3].match(VALID_CHARS_USERNAME)
+      && process.argv[4].match(VALID_CHARS_PASSWORD)) {
+    (async () => {
+      await auth.updateUser(process.argv[3],process.argv[4]);
+      console.log(`resetting user: ${process.argv[3]}`);
+      process.exit(0);
+    })();      
+    return;
+  }
+  if (process.argv[2] == 'unset'
+      && process.argv.length == 4
+      && process.argv[3].match(VALID_CHARS_USERNAME)) {
+    (async () => {
+      await auth.deleteUser(process.argv[3]);
+      console.log(`unsetting user: ${process.argv[3]}`);
+      process.exit(0);
+    })();
+    return;
+  }
+  console.log(`
+  Usage:
+
+  npm run set-auth --set NAME PASSWORD
+  npm run set-auth --unset NAME
+
+  NAME must match: ${VALID_CHARS_USERNAME}
+  PASSWORD must match: ${VALID_CHARS_PASSWORD}
+  `);
+  process.exit(-1);
+}
+
+// INTERACTIVE
+console.log('Interactive reset of authentication credentials for user (CTRL-C to abort)');
 console.log('\n');
 
 var username_q = (resolve, reject) => {
