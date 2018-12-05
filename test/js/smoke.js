@@ -14,7 +14,7 @@ var PASSWORD = null;
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 require('../../main/js/lib/log.js').init({app_name:'smoke'});
-require('../../main/js/lib/crypto.js').init();
+const crypto = require('../../main/js/lib/crypto.js').init();
 const auth = require('../../main/js/lib/auth.js').init({keyv_uri: KEYV_URI,keyv_auth_namespace: KEYV_AUTH_NAMESPACE});
 const eth = require('../../main/js/lib/eth-chain.js').init();
 const uuid = require('uuid');
@@ -43,14 +43,27 @@ function removeUser() {
 function verifyUserAuthenticated() {
   // hit an endpoint and make sure we don't get a 401
   return new Promise((resolve,reject) => {
-    var endpoint = 'http://' + OH_ETH_HOST + ':' + OH_ETH_PORT + '/get-transactions/0/0';
+    var endpoint = 'http://' + OH_ETH_HOST + ':' + OH_ETH_PORT + '/status.json';
     console.log("verifyUserAuthenticated :: hitting endpoint " + endpoint);
     try {
       require("http").get(endpoint, {auth:USER+":"+PASSWORD}, (res) => {
         const { statusCode } = res;
-        if (statusCode != 401) resolve();
-        else reject();
-      });
+        if (statusCode != 200) {          
+          reject();
+        } else {
+          res.on('data', (data) => {
+            let resp = JSON.parse(data);
+            if ('metrics' in resp
+              && 'auth' in resp.metrics
+              && 'authNamespaceHash' in resp.metrics.auth
+              && resp.metrics.auth.authNamespaceHash == crypto.hash(KEYV_AUTH_NAMESPACE)) {
+                resolve();
+            } else {
+              reject(`Namespace hash ${crypto.hash(KEYV_AUTH_NAMESPACE)} not found in payload: ${data}`);
+            }
+          })  
+        }
+      }).on('error', err => reject(err));
     } catch (err) {
       console.log("verifyUserAuthenticated :: error: " + err);
       reject(err);
@@ -75,7 +88,7 @@ describe('smoke tests', () => {
     (async () => {
       console.log("before hook :: adding user");
       await addUser();
-      console.log("before hook :: added user");
+      console.log("before hook :: verifying user");
       await verifyUserAuthenticated();
       console.log("before hook :: verified authenticated");
       done();

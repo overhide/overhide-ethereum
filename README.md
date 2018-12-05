@@ -219,3 +219,26 @@ Keep in mind that tests run as *npm* scripts with `npm test` respect your enviro
 ```
 
 > The OH_ETH_HOST and OH_ETH_PORT configurations points may be used to point the tests at the target *overhide-ethereum* for testing.
+
+# Adding Users -- Tool
+
+All endpoints in this service are protected with basic authentication.  The list of authenticated used is kept in
+the datastore at KEYV_URI under the KEYV_AUTH_NAMESPACE namespace.
+
+To add/remove users use the npm script: `npm run set-auth`.
+
+# Health Check -- Endpoint
+
+This service furnishes metrics and a health check via the `/status.html` / `status.json` endpoints.
+
+These are behind basic authentication.  
+
+Example run (with service running on localhost:8080):
+
+```
+npm run set-auth
+> provide 'adam' for username
+> provide 'c0c0nut' for password
+
+curl http://adam:c0c0nut@localhost:8080/status.html
+```

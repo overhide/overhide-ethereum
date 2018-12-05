@@ -7,6 +7,7 @@ const log = require('./log.js').fn("auth");
 
 // private attribtues
 const ctx = Symbol('context');
+const metrics = Symbol('metrics');
 
 // private functions
 const checkInit = Symbol('checkInit');
@@ -46,6 +47,9 @@ class Auth {
     this[ctx] = {
       uri: keyv_uri,
       namespace: keyv_auth_namespace
+    };
+    this[metrics] = {
+      authNamespaceHash: crypto.hash(keyv_auth_namespace)
     };
 
     this[ctx].keyv = this[getKeyv]();
@@ -113,6 +117,14 @@ class Auth {
     this[checkInit]();
     var userhash = crypto.hash(user);
     await this[ctx].keyv.delete(userhash);
+  }
+
+  /**
+   * @returns {{authNamespaceHash:..}} metrics object.
+   */
+  metrics() {
+    this[checkInit]();
+    return this[metrics];
   }
 }
 

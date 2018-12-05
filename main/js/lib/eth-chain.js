@@ -5,6 +5,7 @@ const ethCrypto = require('eth-crypto');
 
 // private attribtues
 const ctx = Symbol('context');
+const metrics = Symbol('metrics');
 
 // private functions
 const checkInit = Symbol('checkInit');
@@ -53,6 +54,10 @@ class EthChain {
     this[ctx] = {
       api: api
     };
+    this[metrics] = {
+      txlistForAddressHits: 0
+    };
+
     return this;
   }
 
@@ -69,6 +74,7 @@ class EthChain {
     this[checkHasEtherscan]();
     var txs = await this[ctx].api.account.txlist(address);
     if (txs.status != 1) throw new Error(txs.message);
+    this[metrics].txlistForAddressHits++;
     return txs.result;
   }
 
@@ -110,6 +116,14 @@ class EthChain {
     this[checkInit]();
     var target = ethCrypto.recover(signature, message).toLowerCase();
     return (address == target);
+  }
+
+  /**
+   * @returns {{txlistForAddressHits:..}} metrics object.
+   */
+  metrics() {
+    this[checkInit]();
+    return this[metrics];
   }
 }
 

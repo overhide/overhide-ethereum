@@ -30,9 +30,16 @@ const eth = require('./lib/eth-chain.js').init(ctx_config);
 log("CONFIG:\n%O", ctx_config);
 
 // Start the application
-const app = require('express')();
+const express = require('express');
+const ejs = require('ejs');
+const path = require('path');
+const app = express();
 const router = require('./router');
 
+app.use(express.static(__dirname + `${path.sep}..${path.sep}static`));
+app.use(express.json());
+app.set('views', __dirname + `${path.sep}..${path.sep}static`);
+app.engine('html', ejs.renderFile);
 app.use("/", router);
 app.listen(OH_ETH_PORT);
 exports.app = app;  

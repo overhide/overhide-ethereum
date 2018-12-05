@@ -2,6 +2,7 @@
 
 const BasicAuth = require('basic-auth');
 const auth = require('./lib/auth.js');
+const eth = require('./lib/eth-chain.js');
 const get_transactions = require('./glue/get-transactions');
 const is_signature_valid = require('./glue/is-signature-valid');
 const express = require('express')
@@ -36,9 +37,6 @@ router.use(function(request, response, next){
             return response.status(401).send();      
         });
 });
-
-// Parse JSON body
-router.use(express.json());
 
 router.get('/get-transactions/:fromAddress/:toAddress', (req, rsp) => {
     debug('handling get-transactions endpoint');
@@ -79,6 +77,39 @@ router.post('/is-signature-valid', (req, rsp) => {
             return rsp.status(400).send(err);      
         }
     })();
+})
+
+// Health Check
+//
+// Set '/status.html' as 'ping path' for your load balancer.
+router.get('/status.html', (req, rsp) => {
+	var healthy = true;
+	if (healthy) {
+		rsp.status(200);
+	} else {
+		rsp.status(500);
+	}
+	var metrics = {
+        eth: eth.metrics(),
+        auth: auth.metrics()
+	}
+	rsp.render('health.html',{status: 'healthy', metrics: JSON.stringify(metrics,null,2)}); 
+})
+
+router.get('/status.json', (req, rsp) => {
+	var healthy = true;
+	if (healthy) {
+		rsp.status(200);
+	} else {
+		rsp.status(500);
+	}
+	rsp.json({
+		healthy: healthy ? true : false,
+		metrics: {
+            eth: eth.metrics(),
+            auth: auth.metrics()
+		}
+	});
 })
 
 module.exports = router;
