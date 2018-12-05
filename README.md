@@ -18,6 +18,7 @@ If you're running Docker in *VirtualBox* (a *docker-machine*), please read the *
 1. `npm run redis` -- start Redis image in Docker container
 1. `npm run run` -- start *overhide-ethereum* image in Docker container linked to Redis above
 1. `npm test` -- run tests against above
+1. `npm run set-auth` -- add user to authenticate against service
 
 From now on you'll need to use the following commands to stop/restart things:
 
@@ -37,6 +38,7 @@ Steps below assume *overhide-ethereum* is not running in a Docker container:  `d
 1. `npm run redis` -- start Redis image in Docker container
 1. `npm run start` -- start *overhide-ethereum* on localhost
 1. `npm test` -- in another terminal; run tests against above: 
+1. `npm run set-auth` -- add user to authenticate against service
 
 #   Configuration
 
