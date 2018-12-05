@@ -3,6 +3,7 @@
 const Keyv = require('keyv');
 const crypto = require('./crypto.js');
 const debug = require('./log.js').debug_fn("auth");
+const log = require('./log.js').fn("auth");
 
 // private attribtues
 const ctx = Symbol('context');
@@ -39,8 +40,8 @@ class Auth {
    * @returns {Auth} this
    */
   init({keyv_uri, keyv_auth_namespace}) {
-    if (keyv_uri == null) throw new Error("KEYV_URI must be specified: see README.md#Configuration.");
-    if (keyv_auth_namespace == null) throw new Error("KEYV_AUTH_NAMESPACE must be specified: see README.md#Configuration.")
+    if (!keyv_uri) log("WARNING:  KEYV_URI not be specified--using in-memory store (for testing)");
+    if (!keyv_auth_namespace) throw new Error("KEYV_AUTH_NAMESPACE must be specified: see README.md#Configuration.")
 
     this[ctx] = {
       uri: keyv_uri,

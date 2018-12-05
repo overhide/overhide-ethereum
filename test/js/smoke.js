@@ -4,16 +4,12 @@ const POINT_0_1_ETH_IN_WEI = 10000000000000000;
 const SAFETY_PREFIX_FOR_AUTH_NAMESPACE = "test_";
 
 // Source properties from environment: must target same key-value store as target app, verified in 'before' hook with user login.
-const OH_ETH_HOST = tonull(process.env.OH_ETH_HOST) || tonull(process.env.npm_package_config_OH_ETH_HOST) || 'localhost';
-const OH_ETH_PORT = tonull(process.env.OH_ETH_PORT) || tonull(process.env.npm_package_config_OH_ETH_PORT) || 8080;
-var KEYV_URI = tonull(process.env.KEYV_URI) || tonull(process.env.npm_package_config_KEYV_URI);
-const KEYV_AUTH_NAMESPACE = tonull(process.env.KEYV_AUTH_NAMESPACE) || tonull(process.env.npm_package_config_KEYV_AUTH_NAMESPACE);
+const OH_ETH_HOST = process.env.OH_ETH_HOST || process.env.npm_package_config_OH_ETH_HOST || 'localhost';
+const OH_ETH_PORT = process.env.OH_ETH_PORT || process.env.npm_package_config_OH_ETH_PORT || 8080;
+var KEYV_URI = process.env.KEYV_URI || process.env.npm_package_config_KEYV_URI;
+const KEYV_AUTH_NAMESPACE = process.env.KEYV_AUTH_NAMESPACE || process.env.npm_package_config_KEYV_AUTH_NAMESPACE;
 var USER = null;
 var PASSWORD = null;
-
-// @return [null] if 'what' is null even if a string containing "null": process.env.npm_package* will be a "null" string if 
-//   set to null in package.json.
-function tonull(what) { return (what == null || what == "null") ? null : what; }
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');

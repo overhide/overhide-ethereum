@@ -4,15 +4,8 @@ const VALID_CHARS_USERNAME = /^[a-zA-Z0-9~!@#$%^&*_,.\-+=]{4,}$/g;
 const VALID_CHARS_PASSWORD = /^[a-zA-Z0-9~!@#$%^&*_,.\-+=]{4,}$/g;
 
 // CONFIGURATION CONSTANTS
-const KEYV_URI = tonull(process.env.KEYV_URI) || tonull(process.env.npm_package_config_KEYV_URI) || null;
-const KEYV_AUTH_NAMESPACE = tonull(process.env.KEYV_AUTH_NAMESPACE) || tonull(process.env.npm_package_config_KEYV_AUTH_NAMESPACE) || 'users';
-
-// @return [null] if 'what' is null even if a string containing 'null': process.env.npm_package* will be a 'null' string if 
-//   set to null in package.json.
-function tonull(what) { return (what == null || what == 'null') ? null : what; }
-
-if (!KEYV_URI) throw new Error('KEYV_URI must be specified: app metadata storage.');
-if (typeof KEYV_AUTH_NAMESPACE !== 'string' || KEYV_AUTH_NAMESPACE.length == 0) throw new Error('KEYV_AUTH_NAMESPACE must be set.');
+const KEYV_URI = process.env.KEYV_URI || process.env.npm_package_config_KEYV_URI || null;
+const KEYV_AUTH_NAMESPACE = process.env.KEYV_AUTH_NAMESPACE || process.env.npm_package_config_KEYV_AUTH_NAMESPACE || 'users';
 
 const read = require('read');
 const log = require('../../main/js/lib/log.js').init({app_name:'set-auth'}).fn('main');
