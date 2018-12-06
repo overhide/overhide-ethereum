@@ -45,14 +45,13 @@
     "test": "mocha --timeout 5000 test/js",
     "set-auth": "node tools/set-auth/set-auth.js",
     "dev": "nodemon --inspect main/js/overhide-ethereum.js",
-    "build": "docker build -t oh-eth -f main/docker/Dockerfile .",
-    "run": "run-script-os",
-    "run:win32": "docker run -d --link redis:redis --name oh-eth -e ETHERSCAN_KEY=%npm_package_config_ETHERSCAN_KEY% -e ETHERSCAN_TYPE=%npm_package_config_ETHERSCAN_TYPE% -e DEBUG=%npm_package_config_DEBUG% -e KEYV_AUTH_NAMESPACE=%npm_package_config_KEYV_AUTH_NAMESPACE% -p 8080:8080 oh-eth",
-    "run:darwin:freebsd:linux:sunos": "docker run -d --link redis:redis --name oh-eth -e ETHERSCAN_KEY=$npm_package_config_ETHERSCAN_KEY -e ETHERSCAN_TYPE=$npm_package_config_ETHERSCAN_TYPE -e DEBUG=$npm_package_config_DEBUG -e KEYV_AUTH_NAMESPACE=$npm_package_config_KEYV_AUTH_NAMESPACE -p 8080:8080 oh-eth",
+    "compose": "run-script-os",
+    "compose:win32": "@powershell docker-compose -f main/docker/docker-compose.yml --project-directory . --project-name oh run -d --service-ports -e ETHERSCAN_KEY=$env:npm_package_config_ETHERSCAN_KEY -e ETHERSCAN_TYPE=$env:npm_package_config_ETHERSCAN_TYPE -e DEBUG=$env:npm_package_config_DEBUG -e KEYV_AUTH_NAMESPACE=$env:npm_package_config_KEYV_AUTH_NAMESPACE oh-eth",
+    "compose:darwin:freebsd:linux:sunos": "docker-compose -f main/docker/docker-compose.yml --project-directory . --project-name oh run -d --service-ports -e ETHERSCAN_KEY=$npm_package_config_ETHERSCAN_KEY -e ETHERSCAN_TYPE=$npm_package_config_ETHERSCAN_TYPE -e DEBUG=$npm_package_config_DEBUG -e KEYV_AUTH_NAMESPACE=$npm_package_config_KEYV_AUTH_NAMESPACE oh-eth",
     "redis": "docker run --name redis -p 6379:6379 -d redis",
-    "rediscli": "docker run -it --rm --link redis:redis redis redis-cli -h redis -p 6379",
-    "run-bash": "docker run -it --rm --link redis:redis --name oh-eth -p 8080:8080 --entrypoint /bin/bash oh-eth",
-    "exec-bash": "docker exec -it oh-eth bash",
-    "clean": "docker kill oh-eth && docker rm oh-eth"
+    "rediscli": "docker run -it --rm --link redis:redis --net oh_default redis redis-cli -h redis -p 6379",
+    "clean": "run-script-os",
+    "clean:win32": "@powershell docker rm (docker kill (docker ps -a -q --filter name=oh-eth)) ; docker rmi oh-eth:latest",
+    "clean:darwin:freebsd:linux:sunos": "docker rm $(docker kill $(docker ps -a -q --filter name=oh-eth)) ; docker rmi oh-eth:latest"
   }
 }

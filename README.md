@@ -4,6 +4,8 @@
  
 These steps assume Docker is available.
 
+On Windows, these steps assume *PowerShell* is setup and provisioned: some of the *npm scripts* are run with `@powershell` on Windows.
+
 Please review the *Configuration* section below as at the very least *ETHERSCAN_KEY* must be configured to run the tests in this package.  
 
 Read the rest of this README for details.
@@ -14,17 +16,14 @@ If you're running Docker in *VirtualBox* (a *docker-machine*), please read the *
 
 1. `npm install` -- bring in dependencies
 1. `npm config set overhide-ethereum:ETHERSCAN_KEY=...` -- replace '...' with your https://etherscan.io API key
-1. `npm run build` -- build *overhide-ethereum* Docker image
-1. `npm run redis` -- start Redis image in Docker container
-1. `npm run run` -- start *overhide-ethereum* image in Docker container linked to Redis above
+1. `npm run compose` -- build and start *overhide-ethereum* Docker container; ensure the Redis container is running
 1. `npm test` -- run tests against above
 1. `npm run set-auth` -- add user to authenticate against service
 
 From now on you'll need to use the following commands to stop/restart things:
 
-* `npm run clean` -- stop *overhide-ethereum* Docker image: reverse of `npm run run`
-* `docker rmi oh-eth` -- remove *overhide-ethereum* Docker image (only if first cleaned with above): reverse of `npm run build`
-* `docker kill redis; docker rm redis` -- stop Redis Docker image: reverse of `npm run redis`
+* `npm run clean` -- stop *overhide-ethereum* Docker container and remove image
+* `docker kill redis; docker rm redis` -- stop Redis container and remove image
 
 ## Quick Start With *overhide-ethereum* Running Locally
 
@@ -126,8 +125,6 @@ The *package.json* contains all the *Docker* commands we use for development/tes
 
 * build from root of this source (same as this *README*)  
 
-Alternatively: `npm run build`
-
 ### Running Docker Image
 
 Assuming you're already running the *redis* Docker image (`docker run --name redis -p 6379:6379 -d redis`), run *overhide-ethereum* using:
@@ -141,7 +138,7 @@ Assuming you're already running the *redis* Docker image (`docker run --name red
 * if running in VirtualBox (docker-machine) ensure to port forward port 8080 in the docker-machine VM ('default')
 * if using docker-machine, make sure to stop machine before running node.js outside of docker:  `docker-machine stop`
 
-Alternatively: `npm run run`
+Alternatively: `npm run compose` to ensure redis is running and to build and run this *oh-eth* container.
 
 ### Logging from Docker Image
 
@@ -202,8 +199,7 @@ The tests aren't unit tests.  They do not start Node.js to run *overhide-ethereu
 The tests should pass regardless of configuration being tested:
 
 * a development environment started using `npm run dev`
-* a standalone Docker container started using `npm run run`
-* a full network of load-balanced Docker compose swarm started using `TBD`
+* a standalone Docker container started using `npm run compose`
 
 > *KEYV_URI* must be correctly configured to run this test suite; see *Keyv* section above.  This configuration must match the test-target *overhide-ethereum*'s configuration for the suite to start.
 
