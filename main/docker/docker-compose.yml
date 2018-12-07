@@ -6,10 +6,15 @@ services:
       dockerfile: ./main/docker/Dockerfile
     image: oh-eth
     container_name: oh-eth
+    environment:
+    - KEYV_AUTH_NAMESPACE=test_users
     ports:
     - "8080:8080"
     links:
     - redis
+    command: > 
+      sh -c "npm run set-auth set adam c0c0nut
+      && npm run start"
   redis:
     image: redis
     ports:

@@ -14,9 +14,13 @@ Read the rest of this README for details.
 
 If you're running Docker in *VirtualBox* (a *docker-machine*), please read the *Docker/Using docker-machine in VirtualBox* section below for important port forwarding information from the VM running Docker to your host system.
 
+**Note:** the *npm run compose-dev* step (below) builds and runs a **for test only** opinionated container with settings and credentials suitable to be used for downstream testing (e.g. pegged to "rinkeby" testnet).
+
+To build a non-test container see *Building Docker Image* section below.
+
 1. `npm install` -- bring in dependencies
 1. `npm config set overhide-ethereum:ETHERSCAN_KEY=...` -- replace '...' with your https://etherscan.io API key
-1. `npm run compose` -- build and start *overhide-ethereum* Docker container; ensure the Redis container is running
+1. `npm run compose-dev` -- build and start *overhide-ethereum* Docker container; ensure the Redis container is running
 1. `npm test` -- run tests against above
 1. `npm run set-auth` -- add user to authenticate against service
 
@@ -27,14 +31,11 @@ From now on you'll need to use the following commands to stop/restart things:
 
 ## Quick Start With *overhide-ethereum* Running Locally
 
-If you're running Docker in *VirtualBox* (a *docker-machine*), please read the *Docker/Using docker-machine in VirtualBox* section below for important port forwarding information from the VM running Docker to your host system.  
-
-Steps below assume *overhide-ethereum* is not running in a Docker container:  `docker ps -a` doesn't show "oh-eth" entry.  Otherwise `npm run clean` to stop it.
-
 1. `npm install` -- bring in dependencies
 1. `npm config set overhide-ethereum:ETHERSCAN_KEY=...` -- replace '...' with your https://etherscan.io API key
-1. `npm config set overhide-ethereum:OH_ETH_PORT=8081` -- especially necessary if you're running Docker in VirtualBox
-1. `npm run redis` -- start Redis image in Docker container
+1. `npm config set overhide-ethereum:OH_ETH_PORT=8081` -- (optional) only necessary if you have a port conflict
+1. `npm run redis` -- start Redis image in Docker container: you need to have Redis available somewhere
+1. `npm config set overhide-ethereum:KEYV_URI=redis://<HOST>:<PORT>` -- (optional) only necessary if Redis (above) is not available at the default `localhost:6379`
 1. `npm run start` -- start *overhide-ethereum* on localhost
 1. `npm test` -- in another terminal; run tests against above: 
 1. `npm run set-auth` -- add user to authenticate against service
@@ -102,7 +103,12 @@ Replace the `<IP>` with your IP.
 
 # Docker
 
-The *package.json* contains all the *Docker* commands we use for development/testing; run `npm run` to list them all.
+The *package.json* contains the following *Docker* scripts:
+
+* `npm run build` -- build this service into an image
+* `npm run compose-dev` -- compose and start a *for development* image of this service and required Redis
+* `npm run redis` -- start a Redis container for testing (already done if doing *compose-dev*)
+* `npm run rediscli` -- start Redis CLI to look at Redis container
 
 > ## Using *docker-machine* in *VirtualBox*
 >
@@ -125,7 +131,9 @@ The *package.json* contains all the *Docker* commands we use for development/tes
 
 * build from root of this source (same as this *README*)  
 
-### Running Docker Image
+Alternatively: `npm run build`
+
+### Running Docker Image (For Dev/Testing)
 
 Assuming you're already running the *redis* Docker image (`docker run --name redis -p 6379:6379 -d redis`), run *overhide-ethereum* using:
 
@@ -138,7 +146,7 @@ Assuming you're already running the *redis* Docker image (`docker run --name red
 * if running in VirtualBox (docker-machine) ensure to port forward port 8080 in the docker-machine VM ('default')
 * if using docker-machine, make sure to stop machine before running node.js outside of docker:  `docker-machine stop`
 
-Alternatively: `npm run compose` to ensure redis is running and to build and run this *oh-eth* container.
+Alternatively: `npm run compose-dev` to ensure redis is running and to build and run this *oh-eth* container.
 
 ### Logging from Docker Image
 
@@ -198,8 +206,8 @@ The tests aren't unit tests.  They do not start Node.js to run *overhide-ethereu
 
 The tests should pass regardless of configuration being tested:
 
-* a development environment started using `npm run dev`
-* a standalone Docker container started using `npm run compose`
+* a development environment started using `npm run start` or `npm run dev`
+* a standalone Docker container started using `npm run compose-dev`
 
 > *KEYV_URI* must be correctly configured to run this test suite; see *Keyv* section above.  This configuration must match the test-target *overhide-ethereum*'s configuration for the suite to start.
 

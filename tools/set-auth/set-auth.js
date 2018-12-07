@@ -47,8 +47,8 @@ if (process.argv.length > 2) {
   console.log(`
   Usage:
 
-  npm run set-auth --set NAME PASSWORD
-  npm run set-auth --unset NAME
+  npm run set-auth set NAME PASSWORD
+  npm run set-auth unset NAME
 
   NAME must match: ${VALID_CHARS_USERNAME}
   PASSWORD must match: ${VALID_CHARS_PASSWORD}
