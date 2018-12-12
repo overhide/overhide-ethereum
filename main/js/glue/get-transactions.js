@@ -24,9 +24,10 @@ async function get_transactions({fromAddress, toAddress, maxMostRecent = null, s
       if (tx.timeStamp < sinceSeconds) break;
     }
     if (tx.from.toLowerCase() == fromAddress && tx.to.toLowerCase() == toAddress) {
-      tally += parseInt(tx.value);
+      let value = parseInt(tx.value);
+      tally += value;
       result_txs.push({
-        "transaction-value": tx.value,
+        "transaction-value": value,
         "transaction-date": new Date(tx.timeStamp * 1000).toISOString()
       });
       txsSeen++;
