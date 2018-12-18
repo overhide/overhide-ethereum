@@ -22,7 +22,6 @@
     "express": "4.16.4",
     "keyv": "3.1.0",
     "@keyv/redis": "1.3.8",
-    "keyv-file": "0.1.7",
     "read": "1.0.7",
     "run-script-os": "1.0.3",
     "uuid": "3.3.2"
@@ -47,8 +46,8 @@
     "dev": "nodemon --inspect main/js/overhide-ethereum.js",
     "build": "docker build -t oh-eth -f main/docker/Dockerfile .",
     "compose-dev": "run-script-os",
-    "compose-dev:win32": "@powershell docker-compose -f main/docker/docker-compose.yml --project-directory . --project-name oh run -d --service-ports -e ETHERSCAN_KEY=$env:npm_package_config_ETHERSCAN_KEY -e DEBUG=$env:npm_package_config_DEBUG oh-eth",
-    "compose-dev:darwin:freebsd:linux:sunos": "docker-compose -f main/docker/docker-compose.yml --project-directory . --project-name oh run -d --service-ports -e ETHERSCAN_KEY=$npm_package_config_ETHERSCAN_KEY -e DEBUG=$npm_package_config_DEBUG oh-eth",
+    "compose-dev:win32": "@powershell docker-compose -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -d --service-ports -e ETHERSCAN_KEY=$env:npm_package_config_ETHERSCAN_KEY -e DEBUG=$env:npm_package_config_DEBUG oh-eth",
+    "compose-dev:darwin:freebsd:linux:sunos": "docker-compose -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -d --service-ports -e ETHERSCAN_KEY=$npm_package_config_ETHERSCAN_KEY -e DEBUG=$npm_package_config_DEBUG oh-eth",
     "redis": "docker run --name redis -p 6379:6379 -d redis",
     "rediscli": "docker run -it --rm --link redis:redis --net oh_default redis redis-cli -h redis -p 6379",
     "clean": "run-script-os",
