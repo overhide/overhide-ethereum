@@ -54,7 +54,7 @@ router.get('/get-transactions/:fromAddress/:toAddress', (req, rsp) => {
         } 
         catch (err) {
             debug(err);
-            return rsp.status(400).send(err);      
+            return rsp.status(400).send(err.toString());      
         }
     })();
 })
@@ -74,7 +74,7 @@ router.post('/is-signature-valid', (req, rsp) => {
         } 
         catch (err) {
             debug(err);
-            return rsp.status(400).send(err);      
+            return rsp.status(400).send(err.toString());      
         }
     })();
 })
