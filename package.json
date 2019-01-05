@@ -15,15 +15,21 @@
   "author": "Jakub Ner",
   "license": "MIT",
   "dependencies": {
+    "@godaddy/terminus": "4.1.0",
     "basic-auth": "2.0.1",
+    "cors": "2.8.5",
     "debug": "4.1.0",
     "eth-crypto": "1.2.7",
     "etherscan-api": "9.0.0",
+    "express-rate-limit": "3.3.2",
     "express": "4.16.4",
+    "js-yaml": "3.12.0",
     "keyv": "3.1.0",
     "@keyv/redis": "1.3.8",
+    "license-compatibility-checker": "0.3.3",
     "read": "1.0.7",
     "run-script-os": "1.0.3",
+    "swagger-jsdoc": "3.2.6",
     "uuid": "3.3.2"
   },
   "config": {
@@ -32,7 +38,10 @@
     "KEYV_URI": "redis://localhost:6379",
     "KEYV_AUTH_NAMESPACE": "test_users",
     "ETHERSCAN_KEY": "",
-    "ETHERSCAN_TYPE": "rinkeby"
+    "ETHERSCAN_TYPE": "rinkeby",
+    "RATE_LIMIT_WINDOW_MS": 1000,
+    "RATE_LIMIT_MAX_REQUESTS_PER_WINDOW": 100,
+    "SWAGGER_URN": "localhost:54321"
   },
   "devDependencies": {
     "mocha": "5.2.0",
@@ -40,6 +49,7 @@
     "chai-http": "4.2.0"
   },
   "scripts": {
+    "lic-check": "license-compatibility-checker",
     "start": "node main/js/overhide-ethereum.js",
     "test": "mocha --timeout 5000 test/js",
     "set-auth": "node tools/set-auth/set-auth.js",

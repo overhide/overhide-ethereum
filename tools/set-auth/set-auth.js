@@ -4,8 +4,8 @@ const VALID_CHARS_USERNAME = /^[a-zA-Z0-9~!@#$%^&*_,.\-+=]{4,}$/g;
 const VALID_CHARS_PASSWORD = /^[a-zA-Z0-9~!@#$%^&*_,.\-+=]{4,}$/g;
 
 // CONFIGURATION CONSTANTS
-const KEYV_URI = process.env.KEYV_URI || process.env.npm_package_config_KEYV_URI || null;
-const KEYV_AUTH_NAMESPACE = process.env.KEYV_AUTH_NAMESPACE || process.env.npm_package_config_KEYV_AUTH_NAMESPACE || 'users';
+const KEYV_URI = process.env.KEYV_URI || process.env.npm_config_KEYV_URI || process.env.npm_package_config_KEYV_URI || null;
+const KEYV_AUTH_NAMESPACE = process.env.KEYV_AUTH_NAMESPACE || process.env.npm_config_KEYV_AUTH_NAMESPACE || process.env.npm_package_config_KEYV_AUTH_NAMESPACE || 'users';
 
 const read = require('read');
 const log = require('../../main/js/lib/log.js').init({app_name:'set-auth'}).fn('main');
