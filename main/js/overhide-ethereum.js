@@ -13,6 +13,7 @@ const terminus = require('@godaddy/terminus').createTerminus;
 // hardcoded defaults.
 const APP_NAME = "overhide-ethereum";
 const OH_ETH_PORT = process.env.OH_ETH_PORT || process.env.npm_config_OH_ETH_PORT || process.env.npm_package_config_OH_ETH_PORT || 8080;
+const BASIC_AUTH_ENABLED = process.env.BASIC_AUTH_ENABLED || process.env.npm_config_BASIC_AUTH_ENABLED || process.env.npm_package_config_BASIC_AUTH_ENABLED;
 const DEBUG = process.env.DEBUG || process.env.npm_config_DEBUG || process.env.npm_package_config_DEBUG;
 const KEYV_URI = process.env.KEYV_URI || process.env.npm_config_KEYV_URI || process.env.npm_package_config_KEYV_URI;
 const KEYV_AUTH_NAMESPACE = process.env.KEYV_AUTH_NAMESPACE || process.env.npm_config_KEYV_AUTH_NAMESPACE || process.env.npm_package_config_KEYV_AUTH_NAMESPACE;
@@ -27,6 +28,7 @@ const ctx_config = {
   pid: process.pid,
   port: OH_ETH_PORT,
   app_name: APP_NAME, 
+  basic_auth_enabled: /t/.test(BASIC_AUTH_ENABLED),
   debug: DEBUG,
   keyv_uri: KEYV_URI,
   keyv_auth_namespace: KEYV_AUTH_NAMESPACE,
@@ -43,6 +45,7 @@ const crypto = require('./lib/crypto.js').init(ctx_config);
 const auth = require('./lib/auth.js').init(ctx_config);
 const eth = require('./lib/eth-chain.js').init(ctx_config);
 const swagger = require('./lib/swagger.js').init(ctx_config);
+const basicAuthHandler = require('./lib/basic-auth-handler.js').init(ctx_config);
 log("CONFIG:\n%O", ctx_config);
 
 // Start the application
@@ -68,7 +71,7 @@ app.use("/", router);
 const server = http.createServer(app);
 
 function onSignal() {
-  log('terminating: starting cleanup');
+  log('terminating: starting cleanup');1
   return Promise.all([
     database.terminate()
   ]);

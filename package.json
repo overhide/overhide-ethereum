@@ -34,6 +34,7 @@
   },
   "config": {
     "OH_ETH_PORT": 8080,
+    "BASIC_AUTH_ENABLED": "",
     "DEBUG": "",
     "KEYV_URI": "redis://localhost:6379",
     "KEYV_AUTH_NAMESPACE": "test_users",

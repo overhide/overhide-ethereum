@@ -1,44 +1,18 @@
 "use strict";
 
-const BasicAuth = require('basic-auth');
-const auth = require('./lib/auth.js');
 const nocors = require('cors')();
 const get_transactions = require('./glue/get-transactions');
 const is_signature_valid = require('./glue/is-signature-valid');
 const express = require('express')
 const router = express.Router();
 const swagger = require('./lib/swagger.js');
+const basicAuthHandler = require('./lib/basic-auth-handler.js').get();
 
-const log = require('./lib/log.js').fn("router");
 const debug = require('./lib/log.js').debug_fn("router");
 
 
 // basic authentication handler
-router.use(function(request, response, next){
-    var user = BasicAuth(request);
-    debug('request made (method:%s)(headers:%s)(path:%s)', request.method, request.headers, request.path);
-    if (!user) {
-        debug('invalid basic-auth header');
-        // no basic-auth header or malformed
-        response.set('WWW-Authenticate', 'Basic');
-        return response.status(401).send();  
-    }
-    auth.isAuthValid(user.name, user.pass)
-        .then((valid) => {
-            if (!valid) {
-                debug('authentication invalid for user: %s', user);
-                response.set('WWW-Authenticate', 'Basic');
-                return response.status(401).send();                          
-            }
-            next(); // all good
-        })
-        .catch((e) => {
-            // didn't find key-value
-            debug('error authenticating user: %s (%o)', user, e);
-            response.set('WWW-Authenticate', 'Basic');
-            return response.status(401).send();      
-        });
-});
+if (basicAuthHandler) router.use(basicAuthHandler);
 
 /**
  * API spec handler: swagger.json

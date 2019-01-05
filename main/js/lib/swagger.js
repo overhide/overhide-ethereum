@@ -49,8 +49,7 @@ class Swagger {
   }
 
   /**
-   * @param {number} num - length of string
-   * @returns {string<utf-8>} with random characters
+   * @returns {string} rendered Swagger jsoon
    */
   render() {
     this[checkInit]();
