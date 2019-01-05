@@ -41,8 +41,7 @@
     "ETHERSCAN_KEY": "",
     "ETHERSCAN_TYPE": "rinkeby",
     "RATE_LIMIT_WINDOW_MS": 1000,
-    "RATE_LIMIT_MAX_REQUESTS_PER_WINDOW": 100,
-    "SWAGGER_URN": "localhost:54321"
+    "RATE_LIMIT_MAX_REQUESTS_PER_WINDOW": 100
   },
   "devDependencies": {
     "mocha": "5.2.0",

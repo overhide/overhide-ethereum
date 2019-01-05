@@ -3,6 +3,7 @@
 const express = require('express');
 const ejs = require('ejs');
 const http = require('http');
+const os = require('os');
 const path = require('path');
 const rateLimit = require("express-rate-limit");
 const terminus = require('@godaddy/terminus').createTerminus;
@@ -21,7 +22,6 @@ const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || process.env.npm_config_ETHERS
 const ETHERSCAN_TYPE = process.env.ETHERSCAN_TYPE || process.env.npm_config_ETHERSCAN_TYPE || process.env.npm_package_config_ETHERSCAN_TYPE;
 const RATE_LIMIT_WINDOW_MS = process.env.RATE_LIMIT_WINDOW_MS || process.env.npm_config_RATE_LIMIT_WINDOW_MS || process.env.npm_package_config_RATE_LIMIT_WINDOW_MS || 60000;
 const RATE_LIMIT_MAX_REQUESTS_PER_WINDOW = process.env.RATE_LIMIT_MAX_REQUESTS_PER_WINDOW || process.env.npm_config_RATE_LIMIT_MAX_REQUESTS_PER_WINDOW || process.env.npm_package_config_RATE_LIMIT_MAX_REQUESTS_PER_WINDOW || 10;
-const SWAGGER_URN = process.env.SWAGGER_URN || process.env.npm_config_SWAGGER_URN || process.env.npm_package_config_SWAGGER_URN;
 
 // Wire up application context
 const ctx_config = {
@@ -34,10 +34,11 @@ const ctx_config = {
   keyv_auth_namespace: KEYV_AUTH_NAMESPACE,
   etherscan_key: ETHERSCAN_KEY,
   etherscan_type: ETHERSCAN_TYPE,
+  ethereum_network: ETHERSCAN_TYPE,
   rateLimitWindowsMs: RATE_LIMIT_WINDOW_MS,
   rateLimitMax: RATE_LIMIT_MAX_REQUESTS_PER_WINDOW,
-  swagger_urn: SWAGGER_URN,
-  swagger_endpoints_path: path.resolve('router.js')
+  swagger_urn: os.hostname + ':' + OH_ETH_PORT,
+  swagger_endpoints_path: __dirname + path.sep + 'router.js'
 };
 const log = require('./lib/log.js').init(ctx_config).fn("app");
 const debug = require('./lib/log.js').init(ctx_config).debug_fn("app");

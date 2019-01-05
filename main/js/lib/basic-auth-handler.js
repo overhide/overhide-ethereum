@@ -59,7 +59,7 @@ class BasicAuthHandler {
     log('basic-auth enabled');
     return (request, response, next) => {
       var user = BasicAuth(request);
-      debug('request made (method:%s)(headers:%s)(path:%s)', request.method, request.headers, request.path);
+      debug('request made (method:%s)(headers:%o)(path:%s)', request.method, request.headers, request.path);
       if (!user) {
         debug('invalid basic-auth header');
         // no basic-auth header or malformed

@@ -4,7 +4,7 @@ Read about the API and play with it here:
 
 **Rinkeyby Testnet**: https://editor.swagger.io/?url=https://rinkeby.overhide.io/swagger.json
 
-**Mainnet**: https://editor.swagger.io/?https://ethereum.overhide.io/swagger.json
+**Mainnet**: https://editor.swagger.io/?url=https://ethereum.overhide.io/swagger.json
 
 # Quick Start
  
@@ -29,7 +29,7 @@ To build a non-test container see *Building Docker Image* section below.
 1. `npm run compose-dev` -- build and start *overhide-ethereum* Docker container; ensure the Redis container is running
 1. `npm test` -- run tests against above
 1. `npm run set-auth` -- add user to authenticate against service
-1. `point browser at http://editor.swagger.io/?http://localhost:8080/swagger.json` -- to use the API
+1. `point browser at http://editor.swagger.io/?url=http://localhost:8080/swagger.json` -- to use the API
 
 From now on you'll need to use the following commands to stop/restart things:
 
@@ -46,7 +46,7 @@ From now on you'll need to use the following commands to stop/restart things:
 1. `npm run start` -- start *overhide-ethereum* on localhost
 1. `npm test` -- in another terminal; run tests against above: 
 1. `npm run set-auth` -- add user to authenticate against service
-1. `point browser at http://editor.swagger.io/?http://localhost:8081/swagger.json` -- to use the API
+1. `point browser at http://editor.swagger.io/?url=http://localhost:8081/swagger.json` -- to use the API
 
 #   Configuration
 
@@ -72,7 +72,6 @@ Configuration points for *overhide-ethereum*:
 | ETHERSCAN_TYPE | Empty for mainnet, else "morden", "ropsten", "rinkeby" | rinkeby |
 | RATE_LIMIT_WINDOW_MS | Duration of API rate limiting window (milliseconds) | 1000 |
 | RATE_LIMIT_MAX_REQUESTS_PER_WINDOW | Number of API calls per rate limiting window | 3 |
-| SWAGGER_URN | URN at which *swagger.json* is available | localhost:8080 |
 
 # Logging
 
