@@ -96,6 +96,10 @@ class Swagger {
           license:
             name: License
             url: 'https://github.com/overhide/overhide-ethereum/LICENSE'
+        tags:
+          - name: remuneration provider
+            description: |
+              Implementation of the *overhide* "remuneration provider" APIs for Ethereum networks.
         definitions:
           Transaction:
             type: object

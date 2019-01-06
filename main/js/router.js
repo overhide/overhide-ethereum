@@ -1,6 +1,6 @@
 "use strict";
 
-const nocors = require('cors')();
+const allow_cors = require('cors')();
 const get_transactions = require('./glue/get-transactions');
 const is_signature_valid = require('./glue/is-signature-valid');
 const express = require('express')
@@ -10,7 +10,7 @@ const basicAuthHandler = require('./lib/basic-auth-handler.js').get();
 
 const debug = require('./lib/log.js').debug_fn("router");
 
-router.use(nocors);
+router.use(allow_cors);
 
 /**
  * API spec handler: swagger.json
@@ -30,7 +30,8 @@ if (basicAuthHandler) router.use(basicAuthHandler);
  *      summary: Retrieve remuneration transactions and/or their tally.
  *      description: |
  *        Retrieve the latest remuneration transactions (and/or their tally) from *from-address* to *to-address*
- *      operationId: "getTransactions"
+ *      tags:
+ *        - remuneration provider
  *      parameters:
  *        - in: path
  *          name: from-address
@@ -128,7 +129,8 @@ router.get('/get-transactions/:fromAddress/:toAddress', (req, rsp) => {
  *       Check if provided signature corresponds to the provided address, resolved to the provided message.
  *
  *       Check if provided address is a valid address in the ledger abstracted by this API.
- *     operationId: "isSigValid"
+ *     tags:
+ *       - remuneration provider
  *     parameters:
  *       - in: body
  *         name: body
