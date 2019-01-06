@@ -8,6 +8,7 @@ const OH_ETH_HOST = process.env.OH_ETH_HOST || process.env.npm_config_OH_ETH_HOS
 const OH_ETH_PORT = process.env.OH_ETH_PORT || process.env.npm_config_OH_ETH_PORT || process.env.npm_package_config_OH_ETH_PORT || 8080;
 var KEYV_URI = process.env.KEYV_URI || process.env.npm_config_KEYV_URI || process.env.npm_package_config_KEYV_URI;
 const KEYV_AUTH_NAMESPACE = process.env.KEYV_AUTH_NAMESPACE || process.env.npm_config_KEYV_AUTH_NAMESPACE || process.env.npm_package_config_KEYV_AUTH_NAMESPACE;
+const BASIC_AUTH_ENABLED = process.env.BASIC_AUTH_ENABLED || process.env.npm_config_BASIC_AUTH_ENABLED || process.env.npm_package_config_BASIC_AUTH_ENABLED;
 var USER = null;
 var PASSWORD = null;
 
@@ -111,6 +112,7 @@ describe('smoke tests', () => {
   /**************/
 
   it('401 returned for invalid user', (done) => {
+    if (!BASIC_AUTH_ENABLED) done();
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .get('/get-transactions/'+eth_acct1+'/'+eth_acct2)
       .auth("fake","news")
