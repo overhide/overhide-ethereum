@@ -1,5 +1,6 @@
 const eth_acct1 = '0x046c88317b23dc57F6945Bf4140140f73c8FC80F';
 const eth_acct2 = '0xd6106c445A07a6A1caF02FC8050F1FDe30d7cE8b';
+
 const POINT_0_1_ETH_IN_WEI = 10000000000000000;
 const SAFETY_PREFIX_FOR_AUTH_NAMESPACE = "test_";
 
@@ -232,19 +233,28 @@ describe('smoke tests', () => {
   });
 
   it('validates checking signature', (done) => {
-    const message = eth.keccak256("testing stuff");
-    let msg = Buffer.from(message).toString("base64");
-
-    // eth.sign("...", message);
-    let signed = "0xae39bed2c5e522c16bc3474be0f59f17fd4cf76913e2fe1bee94e27f2d58b5e531b629b30fc477c615c45d9235c805d6e214f228a9129fb29ffc518a4e1997691b";    
-    let sig = Buffer.from(signed).toString("base64");    
+    let message = eth.keccak256("testing stuff");
+    let encodedMessage = Buffer.from(message).toString("base64");   
+    // let signature = eth.sign(<private key for eth_acct1>, message);
+    let signature = "0xae39bed2c5e522c16bc3474be0f59f17fd4cf76913e2fe1bee94e27f2d58b5e531b629b30fc477c615c45d9235c805d6e214f228a9129fb29ffc518a4e1997691b"; 
+    let encodedSignature = Buffer.from(signature).toString("base64"); 
+    
+    /* 
+      sending payload:
+      
+      {
+        "signature": "MHhhZTM5YmVkMmM1ZTUyMmMxNmJjMzQ3NGJlMGY1OWYxN2ZkNGNmNzY5MTNlMmZlMWJlZTk0ZTI3ZjJkNThiNWU1MzFiNjI5YjMwZmM0NzdjNjE1YzQ1ZDkyMzVjODA1ZDZlMjE0ZjIyOGE5MTI5ZmIyOWZmYzUxOGE0ZTE5OTc2OTFi",
+        "message": "MHgyNGZkOWNhMTU0Y2I1MTg5NDhiYjczN2QwNGYzMDBjMGM2NzFlMzk2YTMyMTZlZWZmNmFiNDY2MDllYTNjNjU5",
+        "address": "0x046c88317b23dc57F6945Bf4140140f73c8FC80F"
+      }    
+    */
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .post('/is-signature-valid')
       .auth(USER,PASSWORD)
       .send({
-        signature: sig,
-        message: msg,
-        address: eth_acct1
+        signature: encodedSignature, // MHhhZTM5YmVkMmM1ZTUyMmMxNmJjMzQ3NGJlMGY1OWYxN2ZkNGNmNzY5MTNlMmZlMWJlZTk0ZTI3ZjJkNThiNWU1MzFiNjI5YjMwZmM0NzdjNjE1YzQ1ZDkyMzVjODA1ZDZlMjE0ZjIyOGE5MTI5ZmIyOWZmYzUxOGE0ZTE5OTc2OTFi
+        message: encodedMessage, // MHgyNGZkOWNhMTU0Y2I1MTg5NDhiYjczN2QwNGYzMDBjMGM2NzFlMzk2YTMyMTZlZWZmNmFiNDY2MDllYTNjNjU5
+        address: eth_acct1 // 0x046c88317b23dc57F6945Bf4140140f73c8FC80F
       })
       .then(function(res) {
         assert.isTrue(res.statusCode == 200);

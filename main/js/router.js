@@ -30,6 +30,7 @@ if (basicAuthHandler) router.use(basicAuthHandler);
  *      summary: Retrieve remuneration transactions and/or their tally.
  *      description: |
  *        Retrieve the latest remuneration transactions (and/or their tally) from *from-address* to *to-address*
+ *      operationId: "getTransactions"
  *      parameters:
  *        - in: path
  *          name: from-address
@@ -127,8 +128,10 @@ router.get('/get-transactions/:fromAddress/:toAddress', (req, rsp) => {
  *       Check if provided signature corresponds to the provided address, resolved to the provided message.
  *
  *       Check if provided address is a valid address in the ledger abstracted by this API.
+ *     operationId: "isSigValid"
  *     parameters:
  *       - in: body
+ *         name: body
  *         required: true
  *         schema:
  *           type: object
@@ -140,11 +143,11 @@ router.get('/get-transactions/:fromAddress/:toAddress', (req, rsp) => {
  *             signature:
  *               type: string
  *               description: |
- *                 base64 encoded signature to verify
+ *                 base64 encoded string of *signature* to verify
  *             message:
  *               type: string
  *               description: |
- *                 base64 encoded message that's signed for the address
+ *                 base64 encoded string of *message* that's signed for the *address*
  *             address:
  *               type: string
  *               description: |
