@@ -87,7 +87,7 @@ class Swagger {
 
             An example show case leveraging this API is at https://github.com/overhide/overhide-remuneration-demo.
           version: 1.0.0
-          title: overhide Remuneration API for Ethereum networks
+          title: overhide-ethereum API
           contact:
             email: info@overhide.io
           externalDocs:
