@@ -10,7 +10,7 @@ async function get_transactions({fromAddress, toAddress, maxMostRecent = null, s
   fromAddress = fromAddress.toLowerCase();
   toAddress = toAddress.toLowerCase();
   if (! fromAddress.startsWith('0x') || ! toAddress.startsWith('0x')) throw new Error('fromAddress and toAddress must start with 0x');
-  var txs = await eth.getTransactionsForAddress(toAddress);
+  var txs = await eth.getTransactionsForAddress(fromAddress);
   debug.extend("txs")("etherscan result: %O", txs);
   var tally = 0;
   var result_txs = [];
