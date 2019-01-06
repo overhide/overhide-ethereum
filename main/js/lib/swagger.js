@@ -77,9 +77,11 @@ class Swagger {
         basePath: /
         info:
           description: |          
-            Ethereum implementation of the *overhide* "remuneration provider" API.
+            An *overhide* "remuneration provider" API for Ethereum networks.
 
             These API docs are live: connected to the \`${this[ctx].network}\` Ethereum network.
+
+            GitHub repository for this *overhide-ethereum* service: https://github.com/overhide/overhide-ethereum
 
             Motivation for this API is written up at https://github.com/overhide/overhide-remuneration-demo/MOTIVATION.md.
 
