@@ -37,13 +37,14 @@ if (basicAuthHandler) router.use(basicAuthHandler);
  *          name: from-address
  *          required: true
  *          description: |
- *            A public address from which to verify payment details (amount/date) to the *to-address*.
+ *            A public address from which to verify payment details (amount/date) to the *to-address*.  A 42 character 
+ *            'hex' string prefixed with '0x'.
  *          type: string
  *        - in: path
  *          name: to-address
  *          required: true
  *          description: |
- *            The target public address to check for payment made.
+ *            The target public address to check for payment made.  A 42 character 'hex' string prefixed with '0x'.
  *          type: string
  *        - in: query
  *          name: max-most-recent
@@ -153,7 +154,7 @@ router.get('/get-transactions/:fromAddress/:toAddress', (req, rsp) => {
  *             address:
  *               type: string
  *               description: |
- *                 the address (public key) of signature
+ *                 the address (public key) of signature: a 42 character 'hex' string prefixed with '0x'
  *     consumes:
  *       - application/json
  *     produces:
