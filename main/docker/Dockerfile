@@ -24,8 +24,8 @@ COPY main/static /home/node/app/main/static/
 COPY tools /home/node/app/tools/
 
 ENV OH_ETH_PORT 8080
-ENV KEYV_URI redis://redis:6379
 ENV KEYV_AUTH_NAMESPACE users
+ENV BASIC_AUTH_ENABLED false
 
 LABEL license MIT
 
