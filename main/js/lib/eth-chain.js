@@ -78,7 +78,13 @@ class EthChain {
    */
   async getTransactionsForAddress(address) {
     this[checkHasEtherscan]();
-    var txs = await this[ctx].api.account.txlist(address);
+    try {
+      var txs = await this[ctx].api.account.txlist(address);
+    } catch (e) {
+      if (e === 'NOTOK') { /* etherscan returns 'NOTOK' when address not found */
+        return [];
+      }
+    }    
     if (txs.status != 1) throw new Error(txs.message);
     this[metrics].txlistForAddressHits++;
     return txs.result;

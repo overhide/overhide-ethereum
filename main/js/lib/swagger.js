@@ -130,6 +130,7 @@ class Swagger {
                 enum:
                   - address incompatible
                   - invalid signature
+                  - no transactions for address
           401:
             description: Authentication information is missing or invalid
             headers:

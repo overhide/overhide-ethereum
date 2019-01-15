@@ -11,7 +11,8 @@ async function is_signature_valid({signature, message, address}) {
   // check address valid on blockchain
   address = address.toLowerCase();
   if (! address.startsWith('0x')) throw new Error('address must start with 0x');
-  var txs = await eth.getTransactionsForAddress(address); // if no exception, good to go
+  var txs = await eth.getTransactionsForAddress(address); 
+  if (txs.length == 0) throw new Error("no transactions for address");
   debug.extend("txs")("etherscan result: %O", txs);
 
   // check signature valid
