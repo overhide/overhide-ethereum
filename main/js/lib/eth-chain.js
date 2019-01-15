@@ -1,7 +1,13 @@
 "use strict";
 
 const esApi = require('etherscan-api')
-const ethCrypto = require('eth-crypto');
+const web3 = new (require('web3'))();
+const crypto = require('crypto')
+
+
+const ENCODING = 'utf-8';
+const HASH_ALGO = 'sha256';
+const DIGEST_FORMAT = 'hex';
 
 // private attribtues
 const ctx = Symbol('context');
@@ -83,7 +89,7 @@ class EthChain {
    */
   createIdentity() {
     this[checkInit]();
-    return ethCrypto.createIdentity();
+    return web3.eth.accounts.create();
   }
 
   /**
@@ -92,7 +98,7 @@ class EthChain {
    */
   keccak256(payload) {
     this[checkInit]();
-    return ethCrypto.hash.keccak256(payload);
+    return crypto.createHash(HASH_ALGO).update(payload, ENCODING).digest(DIGEST_FORMAT);
   }
 
   /**
@@ -102,7 +108,7 @@ class EthChain {
    */
   sign(key, message) {
     this[checkInit]();
-    return ethCrypto.sign(key, message);
+    return web3.eth.accounts.sign(message, key).signature;
   }
 
   /**
@@ -114,7 +120,7 @@ class EthChain {
    */
   isSignatureValid(address, signature, message) {
     this[checkInit]();
-    var target = ethCrypto.recover(signature, message).toLowerCase();
+    var target = web3.eth.accounts.recover(message, signature).toLowerCase();
     return (address == target);
   }
 

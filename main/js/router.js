@@ -109,7 +109,7 @@ router.get('/get-transactions/:fromAddress/:toAddress', (req, rsp) => {
                 toAddress: req.params['toAddress'],
                 maxMostRecent: req.query['max-most-recent'],
                 since: req.query['since'],
-                tallyOnly: req.query['tally-only']
+                tallyOnly: /t/.test(req.query['tally-only'])
             });
             debug('result from get-transactions endpoint: %o', result);
             rsp.json(result);        

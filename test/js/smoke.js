@@ -235,16 +235,16 @@ describe('smoke tests', () => {
   it('validates checking signature', (done) => {
     let message = eth.keccak256("testing stuff");
     let encodedMessage = Buffer.from(message).toString("base64");   
-    // let signature = eth.sign(<private key for eth_acct1>, message);
-    let signature = "0xae39bed2c5e522c16bc3474be0f59f17fd4cf76913e2fe1bee94e27f2d58b5e531b629b30fc477c615c45d9235c805d6e214f228a9129fb29ffc518a4e1997691b"; 
+    //let signature = eth.sign('0x<private key for eth_acct1>', message);
+    let signature = "0x102bf1975cd68ca35fb5feafb7fb11e8439ce81ad6cab5df57ec321e7e2f8dcc5e4c1ab5a359d7a1ce609a43db4fd7bc548b421863bfc92cff624b40edd50f5c1c";
     let encodedSignature = Buffer.from(signature).toString("base64"); 
     
     /* 
       sending payload:
       
       {
-        "signature": "MHhhZTM5YmVkMmM1ZTUyMmMxNmJjMzQ3NGJlMGY1OWYxN2ZkNGNmNzY5MTNlMmZlMWJlZTk0ZTI3ZjJkNThiNWU1MzFiNjI5YjMwZmM0NzdjNjE1YzQ1ZDkyMzVjODA1ZDZlMjE0ZjIyOGE5MTI5ZmIyOWZmYzUxOGE0ZTE5OTc2OTFi",
-        "message": "MHgyNGZkOWNhMTU0Y2I1MTg5NDhiYjczN2QwNGYzMDBjMGM2NzFlMzk2YTMyMTZlZWZmNmFiNDY2MDllYTNjNjU5",
+        "signature": "MHg2YmM4MGJhMDRjYjg0MjI0ZDBkZjAyOTBkNjJhMTUzYmE2NmMwYTY3YWUyNmYxNzI2Y2E1M2JhYTJkNjU0MGU0NTQwZTFhODc0MDNkYTBiYWVjMmQ0YTFlZmY3ZDUzOGZkZmExNDZmZWQ4OTEwYzU0NTQ3M2VjNzYyYTEwNDhiNzFi",
+        "message": "MzM2N2E0N2Y0OGNkNTk0OGU2OGVkNjQ5Zjc0ZDZmY2M2MDcyNWE4ODE1OTM1NDNhZTY0NmE5YjYzZjU1ZmUxOQ",
         "address": "0x046c88317b23dc57F6945Bf4140140f73c8FC80F"
       }    
     */
@@ -253,7 +253,7 @@ describe('smoke tests', () => {
       .auth(USER,PASSWORD)
       .send({
         signature: encodedSignature, // MHhhZTM5YmVkMmM1ZTUyMmMxNmJjMzQ3NGJlMGY1OWYxN2ZkNGNmNzY5MTNlMmZlMWJlZTk0ZTI3ZjJkNThiNWU1MzFiNjI5YjMwZmM0NzdjNjE1YzQ1ZDkyMzVjODA1ZDZlMjE0ZjIyOGE5MTI5ZmIyOWZmYzUxOGE0ZTE5OTc2OTFi
-        message: encodedMessage, // MHgyNGZkOWNhMTU0Y2I1MTg5NDhiYjczN2QwNGYzMDBjMGM2NzFlMzk2YTMyMTZlZWZmNmFiNDY2MDllYTNjNjU5
+        message: encodedMessage, // MzM2N2E0N2Y0OGNkNTk0OGU2OGVkNjQ5Zjc0ZDZmY2M2MDcyNWE4ODE1OTM1NDNhZTY0NmE5YjYzZjU1ZmUxOQ
         address: eth_acct1 // 0x046c88317b23dc57F6945Bf4140140f73c8FC80F
       })
       .then(function(res) {
