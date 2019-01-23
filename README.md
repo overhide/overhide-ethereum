@@ -6,6 +6,17 @@ Read about the API and play with it here:
 
 **Mainnet**: https://editor.swagger.io/?url=https://ethereum.overhide.io/swagger.json
 
+# About
+
+The *overhide* system provides a suite of remuneration providers that implement the *overhide* remuenration API.  This repository is the Ethereum *overhide* remuneration API provider.
+
+![](overview-eth.png)
+*Figure 1: Shows the Ethereum overhide-remuneration provider exposing the API.*
+ 
+Read more about this suite of tools in support of ledger-based authorization flows by [playing around with the demo](TBD) and reading all about the [intention and motivation behind the system](TBD/why).  
+
+This [Rinkeyby testnet](TBD) provider is used in the [demo](TBD).
+
 # Quick Start
  
 These steps assume Docker is available.
