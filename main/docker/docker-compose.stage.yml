@@ -1,4 +1,0 @@
-version: '3'
-services:
-  oh-eth:
-    env_file: .npmrc.stage

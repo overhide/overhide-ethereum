@@ -2,7 +2,7 @@
 
 Read about the API and play with it here:
 
-**Rinkeyby Testnet**: https://editor.swagger.io/?url=https://rinkeby.overhide.io/swagger.json
+**Rinkeyby Testnet**: https://editor.swagger.io/?url=https://rinkeby.ethereum.overhide.io/swagger.json
 
 **Mainnet**: https://editor.swagger.io/?url=https://ethereum.overhide.io/swagger.json
 

@@ -57,8 +57,6 @@
     "dev": "nodemon --inspect main/js/overhide-ethereum.js",
     "build": "docker build -t oh-eth -f main/docker/Dockerfile .",
     "compose-dev": "docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh up -d",
-    "compose-stage": "docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.stage.yml --project-directory . --project-name oh up -d",
-    "compose-prod": "docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.prod.yml --project-directory . --project-name oh up -d",
     "rediscli": "docker run -it --rm --link redis:redis --net oh_default redis redis-cli -h redis -p 6379",
     "clean": "run-script-os",
     "clean:win32": "@powershell docker rm (docker kill (docker ps -a -q --filter name=oh-eth)) ; docker rmi oh-eth:latest",
