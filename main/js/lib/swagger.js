@@ -81,6 +81,11 @@ class Swagger {
 
             These API docs are live: connected to the \`${this[ctx].network}\` Ethereum network.
 
+            > These APIs are available on two networks:
+            >
+            > * [mainnet](https://ethereum.overhide.io/swagger.html)
+            > * [rinkeby](https://rinkeby.ethereum.overhide.io/swagger.html)
+
             GitHub repository for this *overhide-ethereum* service: https://github.com/overhide/overhide-ethereum
 
             Motivation for this API is written up at https://github.com/overhide/overhide-remuneration-demo/MOTIVATION.md.

@@ -83,7 +83,7 @@ Configuration points for *overhide-ethereum*:
 | *Configuration Point* | *Description* | *Sample Value* |
 | --- | --- | --- |
 | OH_ETH_PORT | *overhide-ethereum*'s port | 8080 |
-| OH_ETH_HOST | *overhide-ethereum*'s host: only respected when running test-suite | localhost |
+| OH_ETH_HOST | *overhide-ethereum*'s host | localhost |
 | DEBUG | see 'Logging' section below | overhide-ethereum:*,-overhide-ethereum:is-signature-valid:txs,-overhide-ethereum:get-transactions:txs |
 | BASIC_AUTH_ENABLED | Is service protected by basic authentication? | true |
 | KEYV_URI | see 'Keyv Datastore' section below | redis://redis:6379 |
