@@ -6,7 +6,7 @@ const http = require('http');
 const os = require('os');
 const path = require('path');
 const rateLimit = require("express-rate-limit");
-const terminus = require('@godaddy/terminus').createTerminus;
+const { createTerminus: terminus, HealthCheckError } = require('@godaddy/terminus');
 
 // CONFIGURATION CONSTANTS
 //
@@ -82,6 +82,11 @@ function onSignal() {
 
 async function onHealthCheck() {
   var healthy = true;
+  if (!healthy) {
+    let reason = 'onHealthCheck failed';
+    log(reason);
+    throw new HealthCheckError('healtcheck failed', [reason])
+  }
   let status = {
     healthy: healthy ? true : false,
     metrics: {
