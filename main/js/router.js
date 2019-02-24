@@ -129,7 +129,7 @@ router.get('/get-transactions/:fromAddress/:toAddress', (req, rsp) => {
  *     description: |
  *       Check if provided signature corresponds to the provided address, resolved to the provided message.
  *
- *       Check if provided address is a valid address in the ledger abstracted by this API.
+ *       Check if provided address is a valid address with at least one entry on the ledger.
  *     tags:
  *       - remuneration provider
  *     parameters:
