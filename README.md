@@ -1,9 +1,4 @@
-<p align="center"><img src="./.github/header.png" usemap="#image-map"/></p>
-
-<map name="image-map">
-    <area target="" alt="" title="" href="https://github.com/overhide/about" coords="214,7,419,43" shape="rect">
-    <area target="" alt="" title="" href="https://github.com/overhide" coords="418,46,214,81" shape="rect">
-</map>
+<p align="center"><a href="https://github.com/overhide/about"><img src="./.github/logo.png" width="200px"/></a></p>
 
 # overhide-ethereum
 
