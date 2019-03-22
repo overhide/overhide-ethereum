@@ -1,4 +1,4 @@
-<p align="center"><img src="./.github/logo.png" usemap="#image-map"/></p>
+<p align="center"><img src="./.github/header.png" usemap="#image-map"/></p>
 
 <map name="image-map">
     <area target="" alt="" title="" href="https://github.com/overhide/about" coords="214,7,419,43" shape="rect">
