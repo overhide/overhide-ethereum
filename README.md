@@ -1,6 +1,6 @@
-<a href="https://github.com/overhide"><img style="float:right;" src="./.github/goto.png"/></a>
+<p align="center"><a href="https://github.com/overhide"><img src="./.github/goto.png"/></a></p>
 
-<h1><img style="vertical-align:middle;" src="./.github/logo.png"/> overhide-ethereum</h1>
+# overhide-ethereum
 
 [Ethereum](https://www.ethereum.org/) implementation of the [overhide](https://overhide.io) remuneration API.
 
