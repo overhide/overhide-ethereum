@@ -1,21 +1,25 @@
+<a href="https://github.com/overhide"><img style="float:right;" src="./.github/goto.png"/></a>
+
+<h1><img style="vertical-align:middle;" src="./.github/logo.png"/> overhide-ethereum</h1>
+
 [Ethereum](https://www.ethereum.org/) implementation of the [overhide](https://overhide.io) remuneration API.
 
 Read about the API and play with it here:
 
-**Rinkeyby Testnet**: https://editor.swagger.io/?url=https://rinkeby.ethereum.overhide.io/swagger.json
+**Rinkeyby Testnet**: https://rinkeby.ethereum.overhide.io/swagger.html
 
-**Mainnet**: https://editor.swagger.io/?url=https://ethereum.overhide.io/swagger.json
+**Mainnet**: https://ethereum.overhide.io/swagger.html
 
 # About
 
 The *overhide* system provides a suite of remuneration providers that implement the *overhide* remuenration API.  This repository is the Ethereum *overhide* remuneration API provider.
 
-![](overview-eth.png)
+![](./.github/overview-eth.png)
 *Figure 1: Shows the Ethereum overhide-remuneration provider exposing the API.*
  
-Read more about this suite of tools in support of ledger-based authorization flows by [playing around with the demo](TBD) and reading all about the [intention and motivation behind the system](TBD/why).  
+Read more about this suite of tools in support of ledger-based authorization flows by [playing around with the demo](https://overhide.github.io/ledgers.js/demo/login.html) (source)[https://github.com/overhide/ledgers.js] and reading all about the [intention and motivation behind the system](https://github.com/overhide/ledgers.js/blob/master/why/why.md).  
 
-This [Rinkeyby testnet](TBD) provider is used in the [demo](TBD).
+This [Rinkeyby testnet](https://rinkeby.ethereum.overhide.io/swagger.html) provider is used in the [demo](https://overhide.github.io/ledgers.js/demo/login.html).
 
 # Quick Start
  
