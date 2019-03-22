@@ -1,4 +1,4 @@
-<p align="center"><a href="https://github.com/overhide"><img src="./.github/goto.png"/></a></p>
+<p align="center"><a href="https://github.com/overhide"><img src="./.github/logo.png"/></a></p>
 
 # overhide-ethereum
 
