@@ -94,8 +94,7 @@ async function onHealthCheck() {
       eth: eth.metrics(),
       auth: auth.metrics()
     }
-  };
-  debug('onHealthCheck <= %o', status);
+  };  
   return status;
 }
 
