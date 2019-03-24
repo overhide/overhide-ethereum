@@ -13,6 +13,7 @@ const { createTerminus: terminus, HealthCheckError } = require('@godaddy/terminu
 // Try fetching from environment first (for Docker overrides etc.) then from npm config; fail-over to 
 // hardcoded defaults.
 const APP_NAME = "overhide-ethereum";
+const VERSION = process.env.npm_package_version;
 const OH_ETH_HOST = process.env.OH_ETH_HOST || process.env.npm_config_OH_ETH_HOST || process.env.npm_package_config_OH_ETH_HOST || 'localhost';
 const OH_ETH_PORT = process.env.OH_ETH_PORT || process.env.npm_config_OH_ETH_PORT || process.env.npm_package_config_OH_ETH_PORT || 8080;
 const BASE_URL = process.env.BASE_URL || process.env.npm_config_BASE_URL || process.env.npm_package_config_BASE_URL;
@@ -28,9 +29,10 @@ const RATE_LIMIT_MAX_REQUESTS_PER_WINDOW = process.env.RATE_LIMIT_MAX_REQUESTS_P
 // Wire up application context
 const ctx_config = {
   pid: process.pid,
+  app_name: APP_NAME, 
+  version: VERSION,
   host: OH_ETH_HOST,
   port: OH_ETH_PORT,
-  app_name: APP_NAME, 
   basic_auth_enabled: /t/.test(BASIC_AUTH_ENABLED),
   debug: DEBUG,
   keyv_uri: KEYV_URI,
@@ -89,6 +91,7 @@ async function onHealthCheck() {
     throw new HealthCheckError('healtcheck failed', [reason])
   }
   let status = {
+    version: VERSION,
     healthy: healthy ? true : false,
     metrics: {
       eth: eth.metrics(),
