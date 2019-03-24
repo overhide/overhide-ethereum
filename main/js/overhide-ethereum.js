@@ -15,6 +15,7 @@ const { createTerminus: terminus, HealthCheckError } = require('@godaddy/terminu
 const APP_NAME = "overhide-ethereum";
 const OH_ETH_HOST = process.env.OH_ETH_HOST || process.env.npm_config_OH_ETH_HOST || process.env.npm_package_config_OH_ETH_HOST || 'localhost';
 const OH_ETH_PORT = process.env.OH_ETH_PORT || process.env.npm_config_OH_ETH_PORT || process.env.npm_package_config_OH_ETH_PORT || 8080;
+const BASE_URL = process.env.BASE_URL || process.env.npm_config_BASE_URL || process.env.npm_package_config_BASE_URL;
 const BASIC_AUTH_ENABLED = process.env.BASIC_AUTH_ENABLED || process.env.npm_config_BASIC_AUTH_ENABLED || process.env.npm_package_config_BASIC_AUTH_ENABLED;
 const DEBUG = process.env.DEBUG || process.env.npm_config_DEBUG || process.env.npm_package_config_DEBUG;
 const KEYV_URI = process.env.KEYV_URI || process.env.npm_config_KEYV_URI || process.env.npm_package_config_KEYV_URI;
@@ -39,7 +40,7 @@ const ctx_config = {
   ethereum_network: ETHERSCAN_TYPE,
   rateLimitWindowsMs: RATE_LIMIT_WINDOW_MS,
   rateLimitMax: RATE_LIMIT_MAX_REQUESTS_PER_WINDOW,
-  swagger_urn: OH_ETH_HOST + ':' + OH_ETH_PORT,
+  base_url: BASE_URL,
   swagger_endpoints_path: __dirname + path.sep + 'router.js'
 };
 const log = require('./lib/log.js').init(ctx_config).fn("app");

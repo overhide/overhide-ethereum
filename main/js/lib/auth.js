@@ -41,7 +41,7 @@ class Auth {
    * @returns {Auth} this
    */
   init({keyv_uri, keyv_auth_namespace}) {
-    if (!keyv_uri) log("WARNING:  KEYV_URI not be specified--using in-memory store (for testing)");
+    if (!keyv_uri) log("WARNING:  KEYV_URI not be specified--using in-memory store");
     if (!keyv_auth_namespace) throw new Error("KEYV_AUTH_NAMESPACE must be specified: see README.md#Configuration.")
 
     this[ctx] = {

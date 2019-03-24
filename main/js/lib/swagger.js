@@ -33,19 +33,19 @@ class Swagger {
    * Initialize this library: this must be the first method called somewhere from where you're doing context & dependency
    * injection.
    * 
-   * @param {string} swagger_urn - URI at which Swagger docs are being served
+   * @param {string} base_url - URL at which Swagger docs are being served
    * @param {string} swagger_endpoints_path - path to file with annotated endpoints for more API definitions
    * @param {string} ethereum_network - connected to
    * @param {string} basic_auth_enabled - is basic authentication enabled for this API
    * @returns {Swagger} this
    */
-  init({ swagger_urn, swagger_endpoints_path, ethereum_network, basic_auth_enabled } = {}) {
-    if (swagger_urn == null) throw new Error("SWAGGER_URN must be specified.");
+  init({ base_url, swagger_endpoints_path, ethereum_network, basic_auth_enabled } = {}) {
+    if (base_url == null) throw new Error("BASE_URL must be specified.");
     if (swagger_endpoints_path == null) throw new Error("Swagger endpoints_path must be specified.");
     if (basic_auth_enabled == null) throw new Error("BASIC_AUTH_ENABLED must be specified.");
 
     this[ctx] = {
-      urn: swagger_urn,
+      url: base_url,
       path: swagger_endpoints_path,
       network: ethereum_network || "mainnet",
       isAuth: basic_auth_enabled
@@ -73,7 +73,7 @@ class Swagger {
     let yaml = `
       swaggerDefinition: 
         swagger: '2.0'
-        host: ${this[ctx].urn}
+        host: ${this[ctx].url}
         basePath: /
         info:
           description: |          
@@ -88,9 +88,9 @@ class Swagger {
 
             GitHub repository for this *overhide-ethereum* service: https://github.com/overhide/overhide-ethereum
 
-            Motivation for this API is written up at https://github.com/overhide/overhide-remuneration-demo/MOTIVATION.md.
+            Motivation for this API is written up at https://github.com/overhide/ledgers.js/blob/master/why/why.md.
 
-            An example show case leveraging this API is at https://github.com/overhide/overhide-remuneration-demo.
+            An example show case leveraging this API is at https://github.com/overhide/ledgers.js.
           version: 1.0.0
           title: overhide-ethereum API
           contact:
@@ -100,7 +100,7 @@ class Swagger {
             url: 'https://github.com/overhide/overhide-ethereum'
           license:
             name: License
-            url: 'https://github.com/overhide/overhide-ethereum/LICENSE'
+            url: 'https://github.com/overhide/overhide-ethereum/blob/master/LICENSE'
         tags:
           - name: remuneration provider
             description: |

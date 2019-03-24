@@ -36,12 +36,13 @@
   "config": {
     "OH_ETH_HOST": "localhost",
     "OH_ETH_PORT": 8080,
+    "BASE_URL": "localhost:8080",
     "BASIC_AUTH_ENABLED": "",
     "DEBUG": "",
-    "KEYV_URI": "redis://localhost:6379",
+    "KEYV_URI": "",
     "KEYV_AUTH_NAMESPACE": "test_users",
     "ETHERSCAN_KEY": "",
-    "ETHERSCAN_TYPE": "rinkeby",
+    "ETHERSCAN_TYPE": "",
     "RATE_LIMIT_WINDOW_MS": 1000,
     "RATE_LIMIT_MAX_REQUESTS_PER_WINDOW": 100
   },

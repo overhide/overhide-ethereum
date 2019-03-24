@@ -88,6 +88,7 @@ Configuration points for *overhide-ethereum*:
 | --- | --- | --- |
 | OH_ETH_PORT | *overhide-ethereum*'s port | 8080 |
 | OH_ETH_HOST | *overhide-ethereum*'s host | localhost |
+| BASE_URL | `host:port` *base URL* as used from outside (of load-balancer) to access service | localhost:8080
 | DEBUG | see 'Logging' section below | overhide-ethereum:*,-overhide-ethereum:is-signature-valid:txs,-overhide-ethereum:get-transactions:txs |
 | BASIC_AUTH_ENABLED | Is service protected by basic authentication? | true |
 | KEYV_URI | see 'Keyv Datastore' section below | redis://redis:6379 |
