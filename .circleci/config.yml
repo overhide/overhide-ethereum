@@ -30,6 +30,6 @@ jobs:
           name: test
           command: npm run test-report
       - store_test_results:
-          path: ~/test-report
+          path: ./test-report
       - store_artifacts:
-          path: ~/test-report
+          path: ./test-report
