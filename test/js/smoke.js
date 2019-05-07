@@ -1,5 +1,8 @@
-const eth_acct1 = '0x046c88317b23dc57F6945Bf4140140f73c8FC80F';
-const eth_acct2 = '0xd6106c445A07a6A1caF02FC8050F1FDe30d7cE8b';
+const eth_acct1 = '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12'; 
+const eth_acct1_priv = '0x0c0af234fd5d4071257f2f7e0cd4d4d5b35544ca64068d98c002c05a444e4fe0';
+
+const eth_acct2 = '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77';
+const eth_acct2_priv = '0xf272821a099ac068f9e4f464bebad92a7ff1404daeb1d3f739777827380e1019';
 
 const POINT_0_1_ETH_IN_WEI = 10000000000000000;
 const SAFETY_PREFIX_FOR_AUTH_NAMESPACE = "test_";
@@ -137,7 +140,7 @@ describe('smoke tests', () => {
         assert.isTrue(reso.transactions.length == 3);
         for (var tx of reso.transactions) {
           assert.isTrue(parseInt(tx["transaction-value"]) == POINT_0_1_ETH_IN_WEI);
-          assert.isTrue((new Date(tx["transaction-date"])).getUTCFullYear() == '2018');
+          assert.isTrue((new Date(tx["transaction-date"])).getUTCFullYear() == '2019');
         }
         done();
       })
@@ -167,8 +170,8 @@ describe('smoke tests', () => {
       });
   });
 
-  it('validates .02 eth was transferred in 2 transactions from eth_acct1 to eth_acct2 since 2018-11-25T00:00:00Z', (done) => {
-    const sinceStr = '2018-11-25T00:00:00Z';
+  it('validates .02 eth was transferred in 2 transactions from eth_acct1 to eth_acct2 since 2019-05-07T14:18:00Z', (done) => {
+    const sinceStr = '2019-05-07T14:18:00Z';
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .get('/get-transactions/'+eth_acct1+'/'+eth_acct2+'?since='+sinceStr)
       .auth(USER,PASSWORD)
@@ -189,8 +192,8 @@ describe('smoke tests', () => {
       });
   });
 
-  it('validates .02 eth was transferred from eth_acct1 to eth_acct2 since 2018-11-25T00:00:00Z as tally only', (done) => {
-    const sinceStr = '2018-11-25T00:00:00Z';
+  it('validates .02 eth was transferred from eth_acct1 to eth_acct2 since 2019-05-07T14:18:00Z as tally only', (done) => {
+    const sinceStr = '2019-05-07T14:18:00Z';
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .get('/get-transactions/'+eth_acct1+'/'+eth_acct2+'?since='+sinceStr+'&tally-only=true')
       .auth(USER,PASSWORD)
@@ -235,8 +238,7 @@ describe('smoke tests', () => {
   it('validates checking signature', (done) => {
     let message = eth.keccak256("testing stuff");
     let encodedMessage = Buffer.from(message).toString("base64");   
-    //let signature = eth.sign('0x<private key for eth_acct1>', message);
-    let signature = "0x102bf1975cd68ca35fb5feafb7fb11e8439ce81ad6cab5df57ec321e7e2f8dcc5e4c1ab5a359d7a1ce609a43db4fd7bc548b421863bfc92cff624b40edd50f5c1c";
+    let signature = eth.sign(eth_acct1_priv, message);
     let encodedSignature = Buffer.from(signature).toString("base64"); 
     
     /* 
