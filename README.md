@@ -2,6 +2,8 @@
 
 # overhide-ethereum
 
+[![CircleCI](https://circleci.com/gh/overhide/overhide-ethereum.svg?style=svg)](https://circleci.com/gh/overhide/overhide-ethereum)
+
 [Ethereum](https://www.ethereum.org/) implementation of the [overhide](https://overhide.io) remuneration API.
 
 Read about the API and play with it here:
