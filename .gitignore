@@ -1,6 +1,7 @@
 node_modules/
+test-report/
 .nyc_output/
 .vscode/
 .npmrc
 .npmrc.dev
-test-results.xml
+

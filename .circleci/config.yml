@@ -29,10 +29,7 @@ jobs:
       - run:
           name: test
           command: npm run test-report
-          environment:
-            MOCHA_FILE: ~/junit/test-results.xml
-          when: always          
       - store_test_results:
-          path: ~/junit
+          path: ~/test-report
       - store_artifacts:
-          path: ~/junit       
+          path: ~/test-report
