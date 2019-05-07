@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/overhide-ethereum
     docker:
-      - image: circleci/node:latest
+      - image: circleci/node:chakracore-10.13.0-browsers
     steps:
       - checkout
       - run:
@@ -12,7 +12,7 @@ jobs:
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
-          name: install-npm-wee
+          name: npm-install
           command: npm install
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
