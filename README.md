@@ -19,7 +19,7 @@ The *overhide* system provides a suite of remuneration providers that implement 
 ![](./.github/overview-eth.png)
 *Figure 1: Shows the Ethereum overhide-remuneration provider exposing the API.*
  
-Read more about this suite of tools in support of ledger-based authorization flows by [playing around with the demos](https://www.npmjs.com/package/ledgers.js#getting-a-taste) and reading all about the [intention and motivation behind the system](https://github.com/overhide/ledgers.js/blob/master/why/why.md).  
+Read more about this suite of tools in support of ledger-based authorization flows by [playing around with the demos](https://www.npmjs.com/package/ledgers.js#getting-a-taste) and reading all about the [intention and motivation behind the system](https://overhide.io/2019/03/20/why.html).  
 
 This [Rinkeyby testnet](https://rinkeby.ethereum.overhide.io/swagger.html) provider is used in the [demos](https://www.npmjs.com/package/ledgers.js#getting-a-taste).
 

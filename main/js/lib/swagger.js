@@ -88,7 +88,7 @@ class Swagger {
 
             GitHub repository for this *overhide-ethereum* service: https://github.com/overhide/overhide-ethereum
 
-            Motivation for this API is written up at https://github.com/overhide/ledgers.js/blob/master/why/why.md.
+            Motivation for this API is written up at https://overhide.io/2019/03/20/why.html.
 
             An example show case leveraging this API is at https://github.com/overhide/ledgers.js.
           version: 1.0.0
