@@ -94,7 +94,8 @@ class Swagger {
           version: 1.0.0
           title: overhide-ethereum API
           contact:
-            email: r/overhide (reddit)
+            name: r/overhide (reddit)
+            url: https://www.reddit.com/r/overhide/
           externalDocs:
             description: GitHub repository for overhide-ethereum.
             url: 'https://github.com/overhide/overhide-ethereum'
