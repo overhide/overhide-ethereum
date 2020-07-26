@@ -18,13 +18,13 @@ The *overhide* system provides a suite of remuneration providers that implement 
 
 ![](./.github/overview-eth.png)
 *Figure 1: Shows the Ethereum overhide-remuneration provider exposing the API.*
- 
+
 Read more about this suite of tools in support of ledger-based authorization flows by [playing around with the demos](https://www.npmjs.com/package/ledgers.js#getting-a-taste) and reading all about the [intention and motivation behind the system](https://overhide.io/2019/03/20/why.html).  
 
 This [Rinkeyby testnet](https://rinkeby.ethereum.overhide.io/swagger.html) provider is used in the [demos](https://www.npmjs.com/package/ledgers.js#getting-a-taste).
 
 # Quick Start
- 
+
 These steps assume Docker is available.
 
 On Windows, the `npm run clean` script assumes *PowerShell* is setup and provisioned: runs with `@powershell`.  Ensure *PowerShell* is
@@ -42,6 +42,7 @@ If you're running Docker in *VirtualBox* (a *docker-machine*), please read the *
 
 To build a non-test container see *Building Docker Image* section below.
 
+1. `npm install --global --production windows-build-tools`
 1. `npm install` -- bring in dependencies
 1. copy *./.npmrc.sample* to *./npmrc.dev*
 1. edit *./.npmrc.dev* and set "ETHERSCAN_KEY" to your https://etherscan.io API key 
@@ -57,6 +58,7 @@ From now on you'll need to use the following commands to stop/restart things:
 
 ## Quick Start With *overhide-ethereum* Running Locally
 
+1. `npm install --global --production windows-build-tools`
 1. `npm install` -- bring in dependencies
 1. `npm config set overhide-ethereum:ETHERSCAN_KEY=...` -- replace '...' with your https://etherscan.io API key
 1. `npm config set overhide-ethereum:OH_ETH_PORT=8081` -- (optional) only necessary if you have a port conflict
