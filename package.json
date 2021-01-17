@@ -26,7 +26,7 @@
     "express-rate-limit": "3.3.2",
     "js-yaml": "^3.13.1",
     "keyv": "3.1.0",
-    "license-compatibility-checker": "0.3.3",
+    "license-compatibility-checker": "^0.3.4",
     "read": "1.0.7",
     "run-script-os": "1.0.3",
     "swagger-jsdoc": "^3.2.9",
