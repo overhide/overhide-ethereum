@@ -11,7 +11,10 @@ jobs:
           command: touch .npmrc.dev
       - run:
           shell: /bin/sh
-          command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -e ETHERSCAN_KEY -e ETHERSCAN_TYPE -d -v test-report:/home/node/app/test-report oh-eth npm run test-report
+          command: mkdir test-report          
+      - run:
+          shell: /bin/sh
+          command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -e ETHERSCAN_KEY -e ETHERSCAN_TYPE -v test-report:/home/node/app/test-report oh-eth npm run test-report
       - store_test_results:
           path: ./test-report
       - store_artifacts:
