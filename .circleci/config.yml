@@ -17,6 +17,8 @@ jobs:
       - run:
           command: printf $ETHERSCAN_TYPE >> .npmrc.dev
       - run:
+          command: cat .npmrc.dev
+      - run:
           command: |
             docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml -f main/docker/docker-compose.test.yml --project-directory . --project-name oh up
       - store_test_results:
