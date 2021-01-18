@@ -32,4 +32,4 @@ LABEL license MIT
 
 RUN npm install
 
-CMD ["node", "main/js/overhide-ethereum.js"]
+ENTRYPOINT ["node", "main/js/overhide-ethereum.js"]
