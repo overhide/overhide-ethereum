@@ -14,7 +14,7 @@ jobs:
           command: mkdir test-report          
       - run:
           shell: /bin/sh
-          command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -e ETHERSCAN_KEY -e ETHERSCAN_TYPE -e KEYV_URI=redis://localhost:6379 -v test-report:/home/node/app/test-report oh-eth npm run test-report
+          command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -e ETHERSCAN_KEY -e ETHERSCAN_TYPE -e KEYV_URI=redis://redis:6379 -e BASIC_AUTH_ENABLED=true -v test-report:/home/node/app/test-report oh-eth npm run test-report
       - store_test_results:
           path: ./test-report
       - store_artifacts:
