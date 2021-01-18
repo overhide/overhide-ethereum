@@ -12,8 +12,8 @@ jobs:
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
-          name: npm-install
-          command: npm install --no-audit
+          name: npm-udpate
+          command: npm update
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:

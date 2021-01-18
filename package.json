@@ -21,17 +21,17 @@
     "cors": "2.8.5",
     "debug": "4.1.0",
     "ejs": "2.6.1",
-    "etherscan-api": "10.0.5",
+    "etherscan-api": "9.0.0",
     "express": "4.16.4",
     "express-rate-limit": "3.3.2",
-    "js-yaml": "^3.14.1",
+    "js-yaml": "^3.13.1",
     "keyv": "3.1.0",
-    "license-compatibility-checker": "^0.3.4",
+    "license-compatibility-checker": "0.3.3",
     "read": "1.0.7",
     "run-script-os": "1.0.3",
     "swagger-jsdoc": "^3.2.9",
     "uuid": "3.3.2",
-    "web3": "^1.3.1"
+    "web3": "^1.0.0-beta.54"
   },
   "config": {
     "OH_ETH_HOST": "localhost",
