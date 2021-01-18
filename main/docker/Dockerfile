@@ -22,6 +22,7 @@ COPY package.json LICENSE /home/node/app/
 COPY main/js /home/node/app/main/js/
 COPY main/static /home/node/app/main/static/
 COPY tools /home/node/app/tools/
+COPY test /home/node/app/test/
 
 ENV OH_ETH_PORT 8080
 ENV KEYV_AUTH_NAMESPACE users
@@ -29,6 +30,6 @@ ENV BASIC_AUTH_ENABLED false
 
 LABEL license MIT
 
-RUN npm update
+RUN npm install
 
 CMD ["node", "main/js/overhide-ethereum.js"]

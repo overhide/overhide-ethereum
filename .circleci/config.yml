@@ -2,33 +2,13 @@ version: 2
 jobs:
   build:
     working_directory: ~/overhide-ethereum
-    docker:
-      - image: circleci/node:chakracore-10.13
+    machine:
+      - image: ubuntu-2004:202010-01
     steps:
       - checkout
       - run:
-          name: update-npm
-          command: 'sudo npm install -g npm@latest'
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-      - run:
-          name: npm-udpate
-          command: npm update
-      - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-          paths:
-            - ./node_modules
-      - run:
-          command: npm run start
-          background: true
-      - run:
           shell: /bin/sh
-          command: |
-            wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 10 http://localhost:8080/status.json
-            :
-      - run:
-          name: test
-          command: npm run test-report
+          command: 'docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -e ETHERSCAN_KEY -e ETHERSCAN_TYPE -d -v test-report:/home/node/app/test-report oh-eth npm run test-report'
       - store_test_results:
           path: ./test-report
       - store_artifacts:
