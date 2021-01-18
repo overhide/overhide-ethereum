@@ -8,10 +8,16 @@ jobs:
       - checkout
       - run:
           shell: /bin/sh
-          command: printf "DEBUG=overhide-ethereum:*,-overhide-ethereum:is-signature-valid:txs,-overhide-ethereum:get-transactions:txs" > .npmrc.dev
+          command: |
+            printf "DEBUG=overhide-ethereum:*,-overhide-ethereum:is-signature-valid:txs,-overhide-ethereum:get-transactions:txs" > .npmrc.dev
+            printf "\n" >> .npmrc.dev
+            printf $ETHERSCAN_KEY >> .npmrc.dev
+            printf "\n" >> .npmrc.dev
+            printf $ETHERSCAN_TYPE >> .npmrc.dev
       - run:
           shell: /bin/sh
-          command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -e ETHERSCAN_KEY -e ETHERSCAN_TYPE -e KEYV_URI=redis://redis:6379 -e BASIC_AUTH_ENABLED=true -v test-report:/home/node/app/test-report oh-eth npm run test-report
+          command: |
+            docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml -f main/docker/docker-compose.test.yml --project-directory . --project-name oh up
       - store_test_results:
           path: ./test-report
       - store_artifacts:

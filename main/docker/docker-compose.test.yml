@@ -1,0 +1,5 @@
+version: '3'
+services:
+  oh-eth:
+    volumes:
+    - ./test-report:/home/node/app/test-report
