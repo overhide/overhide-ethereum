@@ -8,6 +8,9 @@ jobs:
       - checkout
       - run:
           shell: /bin/sh
+          command: touch .npmrc.dev
+      - run:
+          shell: /bin/sh
           command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -e ETHERSCAN_KEY -e ETHERSCAN_TYPE -d -v test-report:/home/node/app/test-report oh-eth npm run test-report
       - store_test_results:
           path: ./test-report
