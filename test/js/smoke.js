@@ -116,7 +116,10 @@ describe('smoke tests', () => {
   /**************/
 
   it('401 returned for invalid user', (done) => {
-    if (!BASIC_AUTH_ENABLED) done();
+    if (!BASIC_AUTH_ENABLED) {
+      done();
+      return;
+    }
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .get('/get-transactions/'+eth_acct1+'/'+eth_acct2)
       .auth("fake","news")
