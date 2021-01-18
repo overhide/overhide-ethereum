@@ -3,12 +3,12 @@ jobs:
   build:
     working_directory: ~/overhide-ethereum
     machine:
-      - image: ubuntu-2004:202010-01
+      image: ubuntu-2004:202010-01
     steps:
       - checkout
       - run:
           shell: /bin/sh
-          command: 'docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -e ETHERSCAN_KEY -e ETHERSCAN_TYPE -d -v test-report:/home/node/app/test-report oh-eth npm run test-report'
+          command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -e ETHERSCAN_KEY -e ETHERSCAN_TYPE -d -v test-report:/home/node/app/test-report oh-eth npm run test-report
       - store_test_results:
           path: ./test-report
       - store_artifacts:
