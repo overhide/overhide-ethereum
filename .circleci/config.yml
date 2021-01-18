@@ -15,10 +15,7 @@ jobs:
           command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -e ETHERSCAN_KEY -e ETHERSCAN_TYPE -e KEYV_URI=redis://redis:6379 -e BASIC_AUTH_ENABLED=true -v test-report:/home/node/app/test-report -d oh-eth
       - run:
           shell: /bin/sh
-          command: export CONTAINER_ID=`docker ps -q --filter name="oh-eth"`
-      - run:
-          shell: /bin/sh
-          command: docker exec $CONTAINER_ID npm run test-report
+          command: docker exec `docker ps -q --filter name="oh-eth"` npm run test-report
       - store_test_results:
           path: ./test-report
       - store_artifacts:
