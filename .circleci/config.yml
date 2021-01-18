@@ -2,8 +2,6 @@ version: 2
 jobs:
   build:
     working_directory: ~/overhide-ethereum
-    docker:
-      - image: circleci/node:chakracore-10.13.0-browsers
     steps:
       - checkout
       - run:
