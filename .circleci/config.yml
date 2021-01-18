@@ -7,7 +7,6 @@ jobs:
     steps:
       - checkout
       - run:
-          shell: /bin/sh
           command: |
             printf "DEBUG=overhide-ethereum:*,-overhide-ethereum:is-signature-valid:txs,-overhide-ethereum:get-transactions:txs" > .npmrc.dev
             printf "\n" >> .npmrc.dev
@@ -15,7 +14,6 @@ jobs:
             printf "\n" >> .npmrc.dev
             printf $ETHERSCAN_TYPE >> .npmrc.dev
       - run:
-          shell: /bin/sh
           command: |
             docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml -f main/docker/docker-compose.test.yml --project-directory . --project-name oh up
       - store_test_results:
