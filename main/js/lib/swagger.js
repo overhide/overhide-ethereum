@@ -36,19 +36,16 @@ class Swagger {
    * @param {string} base_url - URL at which Swagger docs are being served
    * @param {string} swagger_endpoints_path - path to file with annotated endpoints for more API definitions
    * @param {string} ethereum_network - connected to
-   * @param {string} basic_auth_enabled - is basic authentication enabled for this API
    * @returns {Swagger} this
    */
-  init({ base_url, swagger_endpoints_path, ethereum_network, basic_auth_enabled } = {}) {
+  init({ base_url, swagger_endpoints_path, ethereum_network } = {}) {
     if (base_url == null) throw new Error("BASE_URL must be specified.");
     if (swagger_endpoints_path == null) throw new Error("Swagger endpoints_path must be specified.");
-    if (basic_auth_enabled == null) throw new Error("BASIC_AUTH_ENABLED must be specified.");
 
     this[ctx] = {
       url: base_url,
       path: swagger_endpoints_path,
-      network: ethereum_network || "mainnet",
-      isAuth: basic_auth_enabled
+      network: ethereum_network || "mainnet"
     };
     return this;
   }
@@ -58,21 +55,18 @@ class Swagger {
    */
   render() {
     this[checkInit]();
-    if (this[ctx].isAuth) {
-      var securityDefinitions = `
-        security:
-          - BasicAuth: []
-        securityDefinitions:
-          BasicAuth:
-            type: basic
-      `;
-    } else {
-      var securityDefinitions = '';
-    }
 
     let yaml = `
       swaggerDefinition: 
-        swagger: '2.0'
+        openapi: 3.0.1
+        components:
+          securitySchemes:
+            bearerAuth:
+              type: http
+              scheme: bearer
+              bearerFormat: uses https://token.overhide.io
+        security:
+          - bearerAuth: uses https://token.overhide.io
         host: ${this[ctx].url}
         basePath: /
         info:
@@ -86,11 +80,14 @@ class Swagger {
             > * [mainnet](https://ethereum.overhide.io/swagger.html)
             > * [rinkeby](https://rinkeby.ethereum.overhide.io/swagger.html)
 
-            GitHub repository for this *overhide-ethereum* service: https://github.com/overhide/overhide-ethereum
+            GitHub repository for this *overhide-ethereum* service: [https://github.com/overhide/overhide-ethereum](https://github.com/overhide/overhide-ethereum).
 
-            Motivation for this API is written up at https://overhide.io/2019/03/20/why.html.
+            Motivation for this API is written up at [https://overhide.io/2019/03/20/why.html](https://overhide.io/2019/03/20/why.html).
 
-            An example show case leveraging this API is at https://github.com/overhide/ledgers.js.
+            An example show case leveraging this API is at [https://github.com/overhide/ledgers.js](https://github.com/overhide/ledgers.js).
+
+            These APIs require bearer tokens to be furnished in an 'Authorization' header as 'Bearer ..' values.  The tokens are to be retrieved from
+            [https://token.overhide.io](https://token.overhide.io).
           version: 1.0.0
           title: overhide-ethereum API
           contact:
@@ -147,7 +144,6 @@ class Swagger {
               Client is calling the API too frequently.
 
               Conditions for this response to occur are remuneration provider dependant.
-${securityDefinitions}
       apis: 
         - ${this[ctx].path}
     `;

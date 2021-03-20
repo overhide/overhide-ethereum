@@ -84,7 +84,8 @@ class EthChain {
       if (e === 'NOTOK') { /* etherscan returns 'NOTOK' when address not found */
         return [];
       }
-    }    
+    } 
+    if (!txs) throw new Error(`no result for ${address}`);
     if (txs.status != 1) throw new Error(txs.message);
     this[metrics].txlistForAddressHits++;
     return txs.result;

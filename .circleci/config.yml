@@ -12,7 +12,7 @@ jobs:
             printf "DEBUG=overhide-ethereum:*,-overhide-ethereum:is-signature-valid:txs,-overhide-ethereum:get-transactions:txs" > .npmrc.dev
       - run:
           shell: /bin/sh
-          command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -e ETHERSCAN_KEY -e ETHERSCAN_TYPE -e KEYV_URI=redis://redis:6379 -e BASIC_AUTH_ENABLED=true -v ~/overhide-ethereum/test-report:/home/node/app/test-report -d oh-eth
+          command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -e ETHERSCAN_KEY -e ETHERSCAN_TYPE -v ~/overhide-ethereum/test-report:/home/node/app/test-report -d oh-eth
       - run:
           shell: /bin/sh
           command: sleep 10

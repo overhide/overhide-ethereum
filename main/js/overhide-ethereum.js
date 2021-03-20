@@ -17,10 +17,10 @@ const VERSION = process.env.npm_package_version;
 const OH_ETH_HOST = process.env.OH_ETH_HOST || process.env.npm_config_OH_ETH_HOST || process.env.npm_package_config_OH_ETH_HOST || 'localhost';
 const OH_ETH_PORT = process.env.OH_ETH_PORT || process.env.npm_config_OH_ETH_PORT || process.env.npm_package_config_OH_ETH_PORT || 8080;
 const BASE_URL = process.env.BASE_URL || process.env.npm_config_BASE_URL || process.env.npm_package_config_BASE_URL || 'localhost:8080';
-const BASIC_AUTH_ENABLED = process.env.BASIC_AUTH_ENABLED || process.env.npm_config_BASIC_AUTH_ENABLED || process.env.npm_package_config_BASIC_AUTH_ENABLED;
 const DEBUG = process.env.DEBUG || process.env.npm_config_DEBUG || process.env.npm_package_config_DEBUG;
-const KEYV_URI = process.env.KEYV_URI || process.env.npm_config_KEYV_URI || process.env.npm_package_config_KEYV_URI;
-const KEYV_AUTH_NAMESPACE = process.env.KEYV_AUTH_NAMESPACE || process.env.npm_config_KEYV_AUTH_NAMESPACE || process.env.npm_package_config_KEYV_AUTH_NAMESPACE;
+const SALT = process.env.SALT || process.env.npm_config_SALT || process.env.npm_package_config_SALT;
+const TOKEN_URL = process.env.TOKEN_URL || process.env.npm_config_TOKEN_URL || process.env.npm_package_config_TOKEN_URL;
+const ISPROD = process.env.ISPROD || process.env.npm_config_ISPROD || process.env.npm_package_config_ISPROD || false;
 const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || process.env.npm_config_ETHERSCAN_KEY || process.env.npm_package_config_ETHERSCAN_KEY;
 const ETHERSCAN_TYPE = process.env.ETHERSCAN_TYPE || process.env.npm_config_ETHERSCAN_TYPE || process.env.npm_package_config_ETHERSCAN_TYPE;
 const RATE_LIMIT_WINDOW_MS = process.env.RATE_LIMIT_WINDOW_MS || process.env.npm_config_RATE_LIMIT_WINDOW_MS || process.env.npm_package_config_RATE_LIMIT_WINDOW_MS || 60000;
@@ -33,10 +33,10 @@ const ctx_config = {
   version: VERSION,
   host: OH_ETH_HOST,
   port: OH_ETH_PORT,
-  basic_auth_enabled: /t/.test(BASIC_AUTH_ENABLED),
   debug: DEBUG,
-  keyv_uri: KEYV_URI,
-  keyv_auth_namespace: KEYV_AUTH_NAMESPACE,
+  salt: SALT,
+  tokenUrl: TOKEN_URL,
+  isTest: !ISPROD,
   etherscan_key: ETHERSCAN_KEY,
   etherscan_type: ETHERSCAN_TYPE,
   ethereum_network: ETHERSCAN_TYPE,
@@ -48,12 +48,13 @@ const ctx_config = {
 const log = require('./lib/log.js').init(ctx_config).fn("app");
 const debug = require('./lib/log.js').init(ctx_config).debug_fn("app");
 const crypto = require('./lib/crypto.js').init(ctx_config);
-const auth = require('./lib/auth.js').init(ctx_config);
 const eth = require('./lib/eth-chain.js').init(ctx_config);
 const swagger = require('./lib/swagger.js').init(ctx_config);
-const basicAuthHandler = require('./lib/basic-auth-handler.js').init(ctx_config);
-log("CONFIG:\n%O", ctx_config);
-
+const token = require('./lib/token.js').init(ctx_config);
+log("CONFIG:\n%O", ((cfg) => {
+  cfg.salt = cfg.salt.replace(/.(?=.{2})/g,'*'); 
+  return cfg;
+})({...ctx_config}));
 // Start the application
 const app = express();
 const router = require('./router');
@@ -94,8 +95,7 @@ async function onHealthCheck() {
     version: VERSION,
     healthy: healthy ? true : false,
     metrics: {
-      eth: eth.metrics(),
-      auth: auth.metrics()
+      eth: eth.metrics()
     }
   };  
   return status;

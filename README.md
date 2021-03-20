@@ -46,7 +46,7 @@ To build a non-test container see *Building Docker Image* section below.
 1. `npm install` -- bring in dependencies
 1. copy *./.npmrc.sample* to *./npmrc.dev*
 1. edit *./.npmrc.dev* and set "ETHERSCAN_KEY" to your https://etherscan.io API key 
-1. `npm run compose-dev` -- build and start *overhide-ethereum* Docker container; brings up a Redis container for KEYV in case BASIC_AUTH_ENABLED is *true* (explained later)
+1. `npm run compose-dev` -- build and start *overhide-ethereum* Docker container
 1. `npm test` -- run tests against above
 1. `npm run set-auth` -- add user to authenticate against service
 1. `point browser at http://editor.swagger.io/?url=http://localhost:8080/swagger.json` -- to use the API
@@ -54,7 +54,6 @@ To build a non-test container see *Building Docker Image* section below.
 From now on you'll need to use the following commands to stop/restart things:
 
 * `npm run clean` -- stop *overhide-ethereum* Docker container and remove image
-* `docker kill redis; docker rm redis` -- stop Redis container and remove image
 
 ## Quick Start With *overhide-ethereum* Running Locally
 
@@ -67,13 +66,27 @@ From now on you'll need to use the following commands to stop/restart things:
 1. `npm run set-auth` -- add user to authenticate against service
 1. `point browser at http://editor.swagger.io/?url=http://localhost:8081/swagger.json` -- to use the API
 
+# Security
+
+The service uses `Authorization` headers with `Bearer ..` tokens for all endpoints.
+
+By default, the `./main/js/lib/token.js` in this distro will check provided tokens against https://token.overhide.io/swagger.html (see `GET /validate`).  The default action takes place if a `SALT` value is left unconfigured.
+
+If `SALT` is left unconfigured (default), your users must register for an API key with https://token.overhide.io.  The API key must be used to retrieve tokens as per https://token.overhide.io/swagger.html.
+
+If you want to leverage the `SALT` config when standing up an instance of this service, you'll need to also stand-up your own instance of [overhide-client-auth](https://github.com/overhide/overhide-client-auth) service to furnish the tokens for this code (just remember to modify the `SALT` values in both services).
+
+Alternatively, you can rework `./main/js/lib/token.js` to provide your own token-auth...  it's OSS.
+
+The default service at https://ethereum.overhide.io/swagger.html and https://rinkeby.ethereum.overhide.io/swagger.html use tokens from the default token provider at https://token.overhide.io/register ([API](https://token.overhide.io/swagger.html)).
+
 #   Configuration
 
 All the configuration points for the app are listed in the *package.json* *config* descriptor.
 
 Configuration defaults in *package.json* are reasonable only for testing.  
 
-These *npm* configuration points are override-able with `npm config edit` or `npm config set` (see [npm-config](https://docs.npmjs.com/misc/config)): e.g. `npm config set overhide-ethereum:KEYV_AUTH_NAMESPACE new-value` sets a new-value for *KEYV_AUTH_NAMESPACE* in the user's *~/.npmrc*.
+These *npm* configuration points are override-able with `npm config edit` or `npm config set` (see [npm-config](https://docs.npmjs.com/misc/config)): e.g. `npm config set overhide-ethereum:ETHERSCAN_KEY  new-value` sets a new-value for *ETHERSCAN_KEY* in the user's *~/.npmrc*.
 
 For Docker compose environments configuration settings are taken from:
 
@@ -94,9 +107,8 @@ Configuration points for *overhide-ethereum*:
 | OH_ETH_HOST | *overhide-ethereum*'s host | localhost |
 | BASE_URL | `host:port` *base URL* as used from outside (of load-balancer) to access service | localhost:8080
 | DEBUG | see 'Logging' section below | overhide-ethereum:*,-overhide-ethereum:is-signature-valid:txs,-overhide-ethereum:get-transactions:txs |
-| BASIC_AUTH_ENABLED | Is service protected by basic authentication? | true |
-| KEYV_URI | see 'Keyv Datastore' section below | redis://redis:6379 |
-| KEYV_AUTH_NAMESPACE | see 'Keyv Datastore' section below | test_users |
+| SALT | Salt for bearer-token validation (see *Security* above) | c0c0nut |
+| TOKEN_URL | Token validation URL (see *Security* above) | https://token.overhide.io/validate |
 | ETHERSCAN_KEY | *overhide-ethereum* key for etherscan.io APIs | 446WA8I76EEQMXJ5NSUQA5Q17UXARBAF2 |
 | ETHERSCAN_TYPE | Empty for mainnet, else "morden", "ropsten", "rinkeby" | rinkeby |
 | RATE_LIMIT_WINDOW_MS | Duration of API rate limiting window (milliseconds) | 1000 |
@@ -114,43 +126,14 @@ Setting *DEBUG* to "overhide-ethereum:*" will enable all debug logging.  This wi
 
 `npm config set overhide-ethereum:DEBUG "overhide-ethereum:*,-overhide-ethereum:is-signature-valid:txs,-overhide-ethereum:get-transactions:txs"`
 
-# Keyv Datastore
-
-We use [keyv](https://github.com/lukechilds/keyv) for key-value access for metadata.  The data store itself could be Redis, Mongo, MySql, Postgres, any persistence supported by [keyv](https://github.com/lukechilds/keyv).
-
-*Keyv* is used for basic authentication user storage.  If the BASIC_AUTH_ENABLED configuration point is *false*, there is no need to set the *KEYV* configuration points: you can leave *KEYV_URI* and *KEYV_AUTH_NAMESPACE* unset.
-
-## KEYV_AUTH_NAMESPACE
-
-The namespace for the storage of basic-auth users is specified using the *KEYV_AUTH_NAMESPACE* configuration point.  The default value for the namespace is "test_users".
-
-Keys stored in *KEYV_AUTH_NAMESPACE* are usernames and values are hashed passwords (SHA256 of user's password).
-
-It is highly recommended to run the development environment with the *KEYV_AUTH_NAMESPACE* configuration point set to the value of "test_users".
-
-## KEYV_URI
-
-The *KEYV_URI* configuration point must be correctly configured to run *overhide-ethereum* if BASIC_AUTH_ENABLED is *true*.  
-
-The *./npmrc.sample* default setting of "redis://redis:6379" will work fine if you start your Redis via Docker Compose:
-
-`npm run compose-dev`
-
-To inspect your Redis datastore you can use the Redis CLI:
-
-`npm run rediscli` 
-
-Replace the `<IP>` with your IP.
-
 # Docker
 
 The *package.json* contains the following *Docker* scripts:
 
 * `npm run build` -- build this service into an image
-* `npm run compose-dev` -- compose and start a *for development* image of this service and required Redis: uses the *./.npmrc.dev* configuration for environment.
+* `npm run compose-dev` -- compose and start a *for development* image of this service: uses the *./.npmrc.dev* configuration for environment.
 * `npm run compose-stage` -- compose and start a *staging* image of this service: uses the *./.npmrc.stage* configuration for environment.
 * `npm run compose-prod` -- compose and start a *production* image of this service: uses the *./.npmrc.prod* configuration for environment.
-* `npm run rediscli` -- start Redis CLI to look at Redis container
 
 > ## Using *docker-machine* in *VirtualBox*
 >
@@ -161,17 +144,10 @@ The *package.json* contains the following *Docker* scripts:
 > | *port* | *why* |
 > | --- | --- |
 > | 8080 | node |
-> | 6379 | redis |
 >
-> If you're running *docker-machine* with the above ports opened for listening by the VM, you cannot use port 8080 to run *overhide-ethereum* using *npm* on your local host--the port is already used by *docker-machine*.  If you're running *docker-machine* (e.g. for redis) and want to run the *overhide-ethereum* locally, take care to use the *OH_ETH_PORT* configuration to request a different port for your local *overhide-ethereum* and to target your tests against this local *overhide-ethereum*.
+> If you're running *docker-machine* with the above ports opened for listening by the VM, you cannot use port 8080 to run *overhide-ethereum* using *npm* on your local host--the port is already used by *docker-machine*.  If you're running *docker-machine* and want to run the *overhide-ethereum* locally, take care to use the *OH_ETH_PORT* configuration to request a different port for your local *overhide-ethereum* and to target your tests against this local *overhide-ethereum*.
 
 ## Docker Containers for *overhide-ethereum*
-
-### Composing "Dev" Docker Image
-
-Run `npm run compose-dev` to ensure redis is running and to build and run this *oh-eth* container.
-
-The *staging* and *production* Docker compositions do not include bringing up a redis container.
 
 ### Building Docker Image (Non-Compose)
 
@@ -183,12 +159,9 @@ Alternatively: `npm run build`
 
 ### Running Docker Image (For Dev/Testing, Non-Compose)
 
-Assuming you're already running the *redis* Docker image (`docker run --name redis -p 6379:6379 -d redis`), run *overhide-ethereum* using:
-
-`docker run -d --link redis:redis --name oh-eth -e ETHERSCAN_KEY='<ETHERSCAN API KEY>'-p 8080:8080 oh-eth`
+`docker run -d --name oh-eth -e ETHERSCAN_KEY='<ETHERSCAN API KEY>'-p 8080:8080 oh-eth`
 
 * runs as daemon
-* links to *redis* container
 * furnishes ETHERSCAN_KEY environment variable
 * map to 0.0.0.0:8080 so localhost 8080 works for running tests against container
 * if running in VirtualBox (docker-machine) ensure to port forward port 8080 in the docker-machine VM ('default')
@@ -255,35 +228,14 @@ The tests should pass regardless of configuration being tested:
 * a development environment started using `npm run start` or `npm run dev`
 * a standalone Docker container started using `npm run compose-dev`
 
-> If *BASIC_AUTH_ENABLED* is *true*, *KEYV_URI* must be correctly configured to run this test suite; see *Keyv* section above.  This configuration must match the test-target *overhide-ethereum*'s configuration for the suite to start.
-
-> The *KEYV_AUTH_NAMESPACE* **MUST** be prefixed with "test_" otherwise the test suite will abort.
-
 > The OH_ETH_HOST and OH_ETH_PORT configurations points may be used to point the tests at the target *overhide-ethereum* for testing.
-
-# Adding Users -- Tool
-
-If *BASIC_AUTH_ENABLED* is *true*, all endpoints in this service are protected with basic authentication.  The list of authenticated users is kept in
-the datastore at KEYV_URI under the KEYV_AUTH_NAMESPACE namespace.
-
-To add/remove interactively use the npm script: `npm run set-auth`.
-
-To add a user using a CLI one-liner: `npm run set-auth set USERNAME PASSWORD`
-
-To remove a user using a CLI one-liner: `npm run set-auth unset USERNAME`
 
 # Health Check -- Endpoint
 
 This service furnishes metrics and a health check via the `status.json` endpoint.
 
-These are behind basic authentication.  
-
 Example run (with service running on localhost:8080):
 
 ```
-npm run set-auth
-> provide 'adam' for username
-> provide 'c0c0nut' for password
-
-curl http://adam:c0c0nut@localhost:8080/status.html
+curl http://localhost:8080/status.html
 ```

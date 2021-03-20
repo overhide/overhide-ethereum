@@ -6,9 +6,9 @@ const is_signature_valid = require('./glue/is-signature-valid');
 const express = require('express')
 const router = express.Router();
 const swagger = require('./lib/swagger.js');
-const basicAuthHandler = require('./lib/basic-auth-handler.js').get();
 
 const debug = require('./lib/log.js').debug_fn("router");
+const token = require('./lib/token.js').check.bind(require('./lib/token.js'));
 
 router.use(allow_cors);
 
@@ -19,9 +19,6 @@ router.get('/swagger.json', (req, res, next) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(swagger.render());
 });
-
-// basic authentication handler
-if (basicAuthHandler) router.use(basicAuthHandler);
 
 /**
  *  @swagger
@@ -39,23 +36,27 @@ if (basicAuthHandler) router.use(basicAuthHandler);
  *          description: |
  *            A public address from which to verify payment details (amount/date) to the *to-address*.  A 42 character 
  *            'hex' string prefixed with '0x'.
- *          type: string
+ *          schema:
+ *            type: string
  *        - in: path
  *          name: to-address
  *          required: true
  *          description: |
  *            The target public address to check for payment made.  A 42 character 'hex' string prefixed with '0x'.
- *          type: string
+ *          schema:
+ *            type: string
  *        - in: query
  *          name: max-most-recent
  *          required: false
- *          type: integer
+ *          schema:
+ *            type: integer
  *          description: |
  *            Number of most recent transactions to retrieve.
  *        - in: query
  *          name: since
  *          required: false
- *          type: string
+ *          schema:
+ *            type: string
  *          description: |
  *            Retrieve transactions since this date-time (inclusive) until now.
  *
@@ -63,7 +64,8 @@ if (basicAuthHandler) router.use(basicAuthHandler);
  *        - in: query
  *          name: tally-only
  *          required: false
- *          type: boolean
+ *          schema:
+ *            type: boolean
  *          description: |
  *            If present and set to `true` then the 200/OK response will not list individual *transactions*, just the
  *            *tally*.
@@ -100,7 +102,7 @@ if (basicAuthHandler) router.use(basicAuthHandler);
  *        429:
  *          $ref: "#/responses/429"
  */
-router.get('/get-transactions/:fromAddress/:toAddress', (req, rsp) => {
+router.get('/get-transactions/:fromAddress/:toAddress', token, (req, rsp) => {
     debug('handling get-transactions endpoint');
     (async () => {
         try {
@@ -170,7 +172,7 @@ router.get('/get-transactions/:fromAddress/:toAddress', (req, rsp) => {
  *       429:
  *         $ref: "#/responses/429"
  */
-router.post('/is-signature-valid', (req, rsp) => {
+router.post('/is-signature-valid', token, (req, rsp) => {
     debug('handling is-signature-valid endpoint');
     (async () => {
         try {

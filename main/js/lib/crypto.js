@@ -5,6 +5,7 @@ const crypto = require('crypto')
 const ENCODING = 'utf-8';
 const HASH_ALGO = 'sha256';
 const DIGEST_FORMAT = 'hex';
+const SYMMETRIC_ALGO = 'aes-256-cbc';
 
 // private attribtues
 const ctx = Symbol('context');
@@ -35,7 +36,7 @@ class Crypto {
    * Initialize this library: this must be the first method called somewhere from where you're doing context & dependency
    * injection.
    * 
-   * @returns {Crypto} this
+   * @return this
    */
   init() {
     this[ctx] = {};
@@ -61,6 +62,27 @@ class Crypto {
     else return crypto.createHash(HASH_ALGO).update(what, ENCODING).digest(DIGEST_FORMAT);
   }
 
+  /**
+   * @param {(string<utf-8>|Buffer|TypedArray)} plainblob - to hash
+   * @param {string<utf-8>} password
+   * @returns {Buffer} cypherblob
+   */
+  symmetricEncrypt(plainblob, password) {
+    this[checkInit]();
+    var cypher = crypto.createCipher(SYMMETRIC_ALGO,password);
+    return Buffer.concat([cypher.update(plainblob,ENCODING),cypher.final()]);
+  }
+
+    /**
+   * @param {Buffer} cypherblob - to hash
+   * @param {(string<utf-8>|Buffer|TypedArray)} password - to hash with (optional)
+   * @returns {Buffer} plainblob
+   */
+  symmetricDecrypt(cypherblob, password) {
+    this[checkInit]();
+    var cypher = crypto.createDecipher(SYMMETRIC_ALGO,password);
+    return Buffer.concat([cypher.update(cypherblob),cypher.final()]);
+  }
 }
 
 module.exports = (new Crypto());

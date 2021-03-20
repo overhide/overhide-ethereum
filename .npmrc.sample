@@ -1,10 +1,9 @@
 OH_ETH_HOST=localhost
 OH_ETH_PORT=8080
 BASE_URL=localhost:8080
-BASIC_AUTH_ENABLED=true
 DEBUG=
-KEYV_URI=redis://redis:6379
-KEYV_AUTH_NAMESPACE=test_users
+SALT=
+TOKEN_URL=https://token.overhide.io/validate
 ETHERSCAN_KEY=
 ETHERSCAN_TYPE=rinkeby
 RATE_LIMIT_WINDOW_MS=1000
