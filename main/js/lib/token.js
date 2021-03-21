@@ -37,6 +37,9 @@ class Token {
   // @param {} next -- next middleware call trigger
   [failToken](reason, res, next) {   
     debug(`token invalid: %s`, reason);
+    // deprecation: noop for now, as the API used to not require tokens, but soon this will be a 401.  Uncomment below when ready.
+    // res.status(401).send("unauthorized token");
+    // return;
     next(); // don't enforce yet
   }
 
@@ -88,26 +91,22 @@ class Token {
     }
 
     if (this[ctx].salt) {
-      var isValid = this.isValidLocal(token);
+      var [isValid, reason] = this.isValidLocal(token);
     } else {
-      var isValid = await this.isValidRemote(token);
+      var [isValid, reason] = await this.isValidRemote(token);
     }
 
     if (isValid) {
       next();
     } else {
-      // deprecation: noop for now, as the API used to not require tokens, but soon this will be a 401.  Uncomment below when ready.
-      // res.status(401).send("unauthorized token");
-      // return;
-      next();
-      
+      this[failToken](reason, res, next);
     }
   }
 
   /**
    * Check remotely for token validity.
    * @param {*} token -- to check
-   * @returns {bool} whether token is valid
+   * @returns {[bool,string]} whether token is valid + reason string
    */
   async isValidRemote(token) {
     this[checkInit]();
@@ -121,14 +120,12 @@ class Token {
       });
       if (response.status != 200) {
         let text = await response.text();
-        debug(`token validation failed GET %s code: %s error: %s`, url, response.status, text);
-        return false;
+        return [false, `token validation failed GET ${url} code: ${response.status} error: ${text}`];
       }
       debug('token valid GET %s: OK', url);
-      return true;
+      return [true, ''];
     } catch (err) {
-      debug(`token validation exception (GET ${url}): ${err.toString()}`);
-      return false;
+      return [false, `token validation exception (GET ${url}): ${err.toString()}`];
     }
   }
 
@@ -144,21 +141,18 @@ class Token {
       token = JSON.parse(token);
       var apikey = token['apikey'];
       if (this[ctx].isTest !== token['istest']) {
-        this[failToken](`evironment mismatch (test token:${token['istest']})(test environment:${this[ctx].isTest})`, res, next);
-        return false;
+        return [false, `evironment mismatch (test token:${token['istest']})(test environment:${this[ctx].isTest})`];
       }
       if ((((new Date()) - Date.parse(token['created'])) / 1000) > token['token_validity_seconds']) {
-        this[failToken](`token expired`, res, next);
-        return false;
+        return [false, `token expired`];
       }
     }
     catch (err) {
-      this[failToken](`bad token`, res, next);
-      return false;
+      return [false, `bad token`];
     }
 
     debug(`token valid (apikey:%s)`, apikey);
-    return true;
+    return [true, ''];
   }
 }
 
