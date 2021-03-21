@@ -8,6 +8,8 @@ const POINT_0_1_ETH_IN_WEI = 10000000000000000;
 
 const OH_ETH_HOST = process.env.OH_ETH_HOST || process.env.npm_config_OH_ETH_HOST || process.env.npm_package_config_OH_ETH_HOST || 'localhost';
 const OH_ETH_PORT = process.env.OH_ETH_PORT || process.env.npm_config_OH_ETH_PORT || process.env.npm_package_config_OH_ETH_PORT || 8080;
+const TOKEN_URL = `https://token.overhide.io/token`;
+const API_KEY = '0x___API_KEY_ONLY_FOR_DEMOS_AND_TESTS___';
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -17,9 +19,51 @@ const eth = require('../../main/js/lib/eth-chain.js').init();
 const uuid = require('uuid');
 const assert = chai.assert;
 
+var TOKEN;
+
 chai.use(chaiHttp);
 
+// @return promise
+function getToken() {
+  return new Promise((resolve,reject) => {
+    var endpoint = `${TOKEN_URL}?apikey=${API_KEY}`;
+    console.log("getToken :: hitting endpoint " + endpoint);
+    try {
+      require("https").get(endpoint, (res) => {
+        const { statusCode } = res;
+        if (statusCode != 200) {          
+          reject();
+        } else {
+          res.on('data', (data) => {
+            TOKEN = data;
+            console.log("getToken :: OK: " + TOKEN);
+            resolve();
+          })  
+        }
+      }).on('error', err => reject(err));
+    } catch (err) {
+      console.log("getToken :: error: " + err);
+      reject(err);
+    }
+  });  
+}
+
 describe('smoke tests', () => {
+
+  // initialization hook for every test
+  before((done) => { 
+    console.log("Settings: \n");
+    OH_ETH_HOST && console.log('OH_ETH_HOST:'+OH_ETH_HOST);
+    OH_ETH_PORT && console.log('OH_ETH_PORT:'+OH_ETH_PORT);
+    TOKEN_URL && console.log('TOKEN_URL:'+TOKEN_URL);
+    API_KEY && console.log('API_KEY:'+API_KEY);
+    console.log("\n");
+
+    (async () => {
+      await getToken();
+      done();
+    })();
+  });
 
   /**************/
   /* The tests. */
@@ -28,6 +72,7 @@ describe('smoke tests', () => {
   it('validates a total of .03 eth was transferred from eth_acct1 to eth_acct2', (done) => {
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .get('/get-transactions/'+eth_acct1+'/'+eth_acct2)
+      .set({ "Authorization": `Bearer ${TOKEN}` })
       .then(function(res) {
         var reso = JSON.parse(res.text);
         assert.isTrue(reso.tally == (3 * POINT_0_1_ETH_IN_WEI));
@@ -47,6 +92,7 @@ describe('smoke tests', () => {
   it('validates .02 eth was transferred from eth_acct1 to eth_acct2 in the last 2 transactions', (done) => {
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .get('/get-transactions/'+eth_acct1+'/'+eth_acct2+'?max-most-recent=2')
+      .set({ "Authorization": `Bearer ${TOKEN}` })
       .then(function(res) {
         var reso = JSON.parse(res.text);
         assert.isTrue(reso.tally == (2 * POINT_0_1_ETH_IN_WEI));
@@ -68,6 +114,7 @@ describe('smoke tests', () => {
     const sinceStr = '2019-05-07T14:18:00Z';
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .get('/get-transactions/'+eth_acct1+'/'+eth_acct2+'?since='+sinceStr)
+      .set({ "Authorization": `Bearer ${TOKEN}` })
       .then(function(res) {
         var reso = JSON.parse(res.text);
         assert.isTrue(reso.tally == (2 * POINT_0_1_ETH_IN_WEI));
@@ -89,6 +136,7 @@ describe('smoke tests', () => {
     const sinceStr = '2019-05-07T14:18:00Z';
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .get('/get-transactions/'+eth_acct1+'/'+eth_acct2+'?since='+sinceStr+'&tally-only=true')
+      .set({ "Authorization": `Bearer ${TOKEN}` })
       .then(function(res) {
         var reso = JSON.parse(res.text);
         assert.isTrue(reso.tally == (2 * POINT_0_1_ETH_IN_WEI));
@@ -104,6 +152,7 @@ describe('smoke tests', () => {
   it('validates lowercase and uppercase addresses work', (done) => {
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .get('/get-transactions/'+eth_acct1.toUpperCase()+'/'+eth_acct2.toLowerCase())
+      .set({ "Authorization": `Bearer ${TOKEN}` })
       .then(function(res) {
         assert.isTrue(res.statusCode == 200);
         done();
@@ -116,6 +165,7 @@ describe('smoke tests', () => {
   it('validates skipping 0x at start of address causes 400', (done) => {
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .get('/get-transactions/'+eth_acct1.substr(2)+'/'+eth_acct2)
+      .set({ "Authorization": `Bearer ${TOKEN}` })
       .then(function(res) {
         assert.isTrue(res.statusCode == 400);
         done();
@@ -142,6 +192,7 @@ describe('smoke tests', () => {
     */
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .post('/is-signature-valid')
+      .set({ "Authorization": `Bearer ${TOKEN}` })
       .send({
         signature: encodedSignature, // MHhhZTM5YmVkMmM1ZTUyMmMxNmJjMzQ3NGJlMGY1OWYxN2ZkNGNmNzY5MTNlMmZlMWJlZTk0ZTI3ZjJkNThiNWU1MzFiNjI5YjMwZmM0NzdjNjE1YzQ1ZDkyMzVjODA1ZDZlMjE0ZjIyOGE5MTI5ZmIyOWZmYzUxOGE0ZTE5OTc2OTFi
         message: encodedMessage, // MzM2N2E0N2Y0OGNkNTk0OGU2OGVkNjQ5Zjc0ZDZmY2M2MDcyNWE4ODE1OTM1NDNhZTY0NmE5YjYzZjU1ZmUxOQ
@@ -165,6 +216,7 @@ describe('smoke tests', () => {
     let sig = Buffer.from(signed).toString("base64");    
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .post('/is-signature-valid')
+      .set({ "Authorization": `Bearer ${TOKEN}` })
       .send({
         signature: sig,
         message: msg,
