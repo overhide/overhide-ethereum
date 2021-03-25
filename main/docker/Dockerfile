@@ -13,7 +13,7 @@
 #   -> if using docker-machine, make sure to stop machine before running node.js outside of docker:  `docker-machine stop`
 #
 
-FROM node:10.13.0
+FROM node:12.21.0
 
 EXPOSE 8080
 
