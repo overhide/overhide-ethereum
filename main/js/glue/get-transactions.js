@@ -1,6 +1,6 @@
 "use strict";
 
-const eth = require('../lib/eth-chain.js');
+const database = require('../lib/database.js');
 
 const log = require('../lib/log.js').fn("get-transactions");
 const debug = require('../lib/log.js').debug_fn("get-transactions");
@@ -10,25 +10,25 @@ async function get_transactions({fromAddress, toAddress, maxMostRecent = null, s
   fromAddress = fromAddress.toLowerCase();
   toAddress = toAddress.toLowerCase();
   if (! fromAddress.startsWith('0x') || ! toAddress.startsWith('0x')) throw new Error('fromAddress and toAddress must start with 0x');
-  var txs = await eth.getTransactionsForAddress(fromAddress);
-  debug.extend("txs")("etherscan result: %O", txs);
+  var txs = await database.getTransactionsFromTo(fromAddress, toAddress);
+  debug.extend("txs")("result: %O", txs);
   var tally = 0;
   var result_txs = [];
   var txsSeen = 0;
   var sinceSeconds = since == null ? 0 : (new Date(since)).getTime() / 1000;
-  for (var tx of txs.sort((a,b) => ((a.timeStamp - b.timeStamp) * -1))) {
+  for (var tx of txs.sort((a,b) => b.time.getTime() - a.time.getTime())) {
     if (maxMostRecent) {
       if (txsSeen == maxMostRecent) break;
     }
     if (sinceSeconds > 0) {
-      if (tx.timeStamp < sinceSeconds) break;
+      if (tx.time < sinceSeconds) break;
     }
     if (tx.from.toLowerCase() == fromAddress && tx.to.toLowerCase() == toAddress) {
       let value = parseInt(tx.value);
       tally += value;
       result_txs.push({
         "transaction-value": value,
-        "transaction-date": new Date(tx.timeStamp * 1000).toISOString()
+        "transaction-date": tx.time
       });
       txsSeen++;
     }

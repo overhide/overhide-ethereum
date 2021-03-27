@@ -36,8 +36,6 @@ Read the rest of this README for details.
 
 ## Quick Start With *overhide-ethereum* In Docker Container
 
-If you're running Docker in *VirtualBox* (a *docker-machine*), please read the *Docker/Using docker-machine in VirtualBox* section below for important port forwarding information from the VM running Docker to your host system.
-
 **Note:** the *npm run compose-dev* step (below) builds and runs a **for test only** opinionated container with settings and credentials suitable to be used for downstream testing (e.g. pegged to "rinkeby" testnet).
 
 To build a non-test container see *Building Docker Image* section below.
@@ -47,6 +45,9 @@ To build a non-test container see *Building Docker Image* section below.
 1. copy *./.npmrc.sample* to *./npmrc.dev*
 1. edit *./.npmrc.dev* and set "ETHERSCAN_KEY" to your https://etherscan.io API key 
 1. `npm run compose-dev` -- build and start *overhide-ethereum* Docker container
+1. jump to "First Time DB Setup" section for the first-time DB setup
+1. jump to "Database Evolutions" section, especially the "For Docker" subsection
+1. your *oh-eth* container failed since your DB wasn't setup--now it is--find your *oh-eth* container name: `docker ps -a`; look for *oh-eth* with an "Exited" status.
 1. `npm test` -- run tests against above
 1. `npm run set-auth` -- add user to authenticate against service
 1. `point browser at http://editor.swagger.io/?url=http://localhost:8080/swagger.json` -- to use the API
@@ -59,6 +60,8 @@ From now on you'll need to use the following commands to stop/restart things:
 
 1. `npm install --global --production windows-build-tools`
 1. `npm install` -- bring in dependencies
+1. jump to "First Time DB Setup" section for the first-time DB setup
+1. jump to "Database Evolutions" section, especially the "For Docker" subsection
 1. `npm config set overhide-ethereum:ETHERSCAN_KEY=...` -- replace '...' with your https://etherscan.io API key
 1. `npm config set overhide-ethereum:OH_ETH_PORT=8081` -- (optional) only necessary if you have a port conflict
 1. `npm run start` -- start *overhide-ethereum* on localhost
@@ -82,9 +85,9 @@ The default service at https://ethereum.overhide.io/swagger.html and https://rin
 
 #   Configuration
 
-All the configuration points for the app are listed in the *package.json* *config* descriptor.
+All the configuration points for the app are listed in [.npmrc.sample](.npmrc.sample).
 
-Configuration defaults in *package.json* are reasonable only for testing.  
+Configuration defaults in See [.npmrc.sample](.npmrc.sample) are reasonable only for testing.  
 
 These *npm* configuration points are override-able with `npm config edit` or `npm config set` (see [npm-config](https://docs.npmjs.com/misc/config)): e.g. `npm config set overhide-ethereum:ETHERSCAN_KEY  new-value` sets a new-value for *ETHERSCAN_KEY* in the user's *~/.npmrc*.
 
@@ -99,7 +102,7 @@ These files are not source controlled.  Create them using *./.npmrc.sample* as a
 If an environment variable of the same name is made available, the environment variable's value precedes that
 of the *npm config* value (*~/.npmrc* or *package.json*).
 
-Configuration points for *overhide-ethereum*:
+Some notable configuration points for *overhide-ethereum*:
 
 | *Configuration Point* | *Description* | *Sample Value* |
 | --- | --- | --- |
@@ -109,10 +112,88 @@ Configuration points for *overhide-ethereum*:
 | DEBUG | see 'Logging' section below | overhide-ethereum:*,-overhide-ethereum:is-signature-valid:txs,-overhide-ethereum:get-transactions:txs |
 | SALT | Salt for bearer-token validation (see *Security* above) | c0c0nut |
 | TOKEN_URL | Token validation URL (see *Security* above) | https://token.overhide.io/validate |
-| ETHERSCAN_KEY | *overhide-ethereum* key for etherscan.io APIs | 446WA8I76EEQMXJ5NSUQA5Q17UXARBAF2 |
-| ETHERSCAN_TYPE | Empty for mainnet, else "morden", "ropsten", "rinkeby" | rinkeby |
-| RATE_LIMIT_WINDOW_MS | Duration of API rate limiting window (milliseconds) | 1000 |
-| RATE_LIMIT_MAX_REQUESTS_PER_WINDOW | Number of API calls per rate limiting window | 3 |
+| RATE_LIMIT_WINDOW_MS | Duration of API rate limiting window (milliseconds) | 60000 |
+| RATE_LIMIT_MAX_REQUESTS_PER_WINDOW | Number of API calls per rate limiting window | 30 |
+| INFURA_PROJECT_ID | The project ID from https://infura.io | redacted |
+| INFURA_TYPE | The network type (e.g. 'mainnet') | rinkeby |
+| SEED_OLDER_NUMBER_BLOCKS | Controls the number of blocks to seed towards block 0 during each run of the back-fill job | 0 |
+| SEED_OLDER_JOB_PERIOD_MILLIS | Controls how often the back-fill job is called on each node | 30000 |
+
+Take special note of `SEED_OLDER_NUMBER_BLOCKS`.  This service, when started, starts back-filling blocks into the database until it reaches genesis.  If this is set to 0, no back-filling will occur.  This is the value set in [.npmrc.sample](.npmrc.sample).  If you do not back-fill blocks, the service will only
+function properly for blocks since the service came online.
+
+Adjust the `SEED_OLDER_NUMBER_BLOCKS` and `SEED_OLDER_JOB_PERIOD_MILLIS` to match your https://infura.io API limits, number of environments (e.g. mainnet, rinkeby) and number of nodes of this service running on each environment.  Leave room for normal usage API calls.
+
+# First Time DB Setup
+
+All the DB connectivity configuration points assume that the DB and DB user are setup.
+
+For localhost Docker, `psql` into the container:
+
+```
+npm run psql-dev
+\c "oh-eth"
+\dt
+```
+
+
+
+The 'adam' role and 'oh-eth' DB should already be created and connected to with the above command (as per `.npmrc.dev` environment passed into docker-compose).
+
+If not, to manually create:
+
+```
+postgres=# create database "oh-eth";
+postgres=# create user adam with encrypted password 'c0c0nut';
+postgres=# grant all privileges on database "oh-eth" to adam;
+```
+
+Make sure to set the configuration points in your *.npmrc* appropriately.
+
+Now you're ready to run database evolutions on the new database.
+
+# Database Evolutions
+
+There is a single Node file to check for and perform database evolutions.
+
+Run it from the application node with `npm run db-evolve`.
+
+It will evolve the database to whatever it needs to be for the particular application version.
+
+The *main/js/lib/database.js* has an *init(..)* method which should check that the database is at the right evolution for that version of the app.
+
+Consider currently running nodes before evolving: will they be able to run with the evolved DB?  Perhaps stop them all before evolving.
+
+## Check
+
+To check the database pre/post evolution (first time DB setup already done):
+
+- log into DB
+- list tables
+
+```
+npm run psql-dev
+\dt oh-eth.*
+```
+
+If you need to select role and DB:
+
+```
+set role oh-eth;
+\c oh-eth;
+```
+
+More commands:  https://gist.github.com/apolloclark/ea5466d5929e63043dcf
+
+## Evolve
+
+If running using Docker, jump into a container to run the evolution:
+
+`docker run -it --rm --link postgres:postgres --network oh_default oh-eth /bin/sh`
+
+Then run the evolution:
+
+`npm run db-evolve`
 
 # Logging
 
@@ -125,51 +206,6 @@ Non-debug (error/warning/audit) logging is programmatically enabled by default d
 Setting *DEBUG* to "overhide-ethereum:*" will enable all debug logging.  This will be very verbose.  It's likely desirable to target debug logging, e.g:
 
 `npm config set overhide-ethereum:DEBUG "overhide-ethereum:*,-overhide-ethereum:is-signature-valid:txs,-overhide-ethereum:get-transactions:txs"`
-
-# Docker
-
-The *package.json* contains the following *Docker* scripts:
-
-* `npm run build` -- build this service into an image
-* `npm run compose-dev` -- compose and start a *for development* image of this service: uses the *./.npmrc.dev* configuration for environment.
-* `npm run compose-stage` -- compose and start a *staging* image of this service: uses the *./.npmrc.stage* configuration for environment.
-* `npm run compose-prod` -- compose and start a *production* image of this service: uses the *./.npmrc.prod* configuration for environment.
-
-> ## Using *docker-machine* in *VirtualBox*
->
-> If you're running Docker using a *docker-machine* in *VirtualBox*, don't forget to port-forward port 6379 from VirtualBox VM to your host machine as well.
->
-> All the ports you need forwarded:
->
-> | *port* | *why* |
-> | --- | --- |
-> | 8080 | node |
->
-> If you're running *docker-machine* with the above ports opened for listening by the VM, you cannot use port 8080 to run *overhide-ethereum* using *npm* on your local host--the port is already used by *docker-machine*.  If you're running *docker-machine* and want to run the *overhide-ethereum* locally, take care to use the *OH_ETH_PORT* configuration to request a different port for your local *overhide-ethereum* and to target your tests against this local *overhide-ethereum*.
-
-## Docker Containers for *overhide-ethereum*
-
-### Building Docker Image (Non-Compose)
-
-`docker build -t oh-eth -f main/docker/Dockerfile .`
-
-* build from root of this source (same as this *README*)  
-
-Alternatively: `npm run build`
-
-### Running Docker Image (For Dev/Testing, Non-Compose)
-
-`docker run -d --name oh-eth -e ETHERSCAN_KEY='<ETHERSCAN API KEY>'-p 8080:8080 oh-eth`
-
-* runs as daemon
-* furnishes ETHERSCAN_KEY environment variable
-* map to 0.0.0.0:8080 so localhost 8080 works for running tests against container
-* if running in VirtualBox (docker-machine) ensure to port forward port 8080 in the docker-machine VM ('default')
-* if using docker-machine, make sure to stop machine before running node.js outside of docker:  `docker-machine stop`
-
-### Logging from Docker Image
-
-`docker logs oh-eth`
 
 # Notes on Running the Development Environment
 

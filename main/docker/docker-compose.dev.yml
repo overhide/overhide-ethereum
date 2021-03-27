@@ -2,3 +2,10 @@ version: '3'
 services:
   oh-eth:
     env_file: .npmrc.dev
+  postgres:
+    image: postgres
+    ports:
+    - "5432:5432"
+    container_name: postgres
+    env_file:
+    - ./.npmrc.dev    

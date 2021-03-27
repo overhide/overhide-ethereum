@@ -1,5 +1,6 @@
 "use strict";
 
+const database = require('../lib/database.js');
 const eth = require('../lib/eth-chain.js');
 
 const log = require('../lib/log.js').fn("is-signature-valid");
@@ -11,7 +12,7 @@ async function is_signature_valid({signature, message, address}) {
   // check address valid on blockchain
   address = address.toLowerCase();
   if (! address.startsWith('0x')) throw new Error('address must start with 0x');
-  var txs = await eth.getTransactionsForAddress(address); 
+  var txs = await database.getTransactionsFor(address); 
   if (txs.length == 0) throw new Error("no transactions for address");
   debug.extend("txs")("etherscan result: %O", txs);
 

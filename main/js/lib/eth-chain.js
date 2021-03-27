@@ -1,7 +1,7 @@
 "use strict";
 
-const esApi = require('etherscan-api')
-const web3 = new (require('web3'))();
+const Web3 = require('web3')
+const web3 = new (Web3)();
 const crypto = require('crypto')
 
 
@@ -49,16 +49,18 @@ class EthChain {
    * @param {string} etherscan_type - type of network for etherscan.io access ("","ropsten","rinkeby","morden")
    * @return {EthChain} this
    */
-  init({etherscan_key = null, etherscan_type = null} = {}) {
-    var api = null;
-    if (etherscan_key && etherscan_type) {
-      var api = esApi.init(etherscan_key, etherscan_type);
-    } else if (etherscan_key) {
-      var api = esApi.init(etherscan_key);
-    }
+  init({etherscan_key = null, etherscan_type = null, infura_project_id, infura_project_secret, ethereum_network} = {}) {
+    if (infura_project_id == null) throw new Error("INFURA_PROJECT_ID must be specified.");
+    if (infura_project_secret == null) throw new Error("INFURA_PROJECT_SECRET must be specified.");
+    if (ethereum_network == null) throw new Error("INFURA_TYPE must be specified.");
+
+    const web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${ethereum_network}.infura.io/ws/v3/${infura_project_id}`));
 
     this[ctx] = {
-      api: api
+      infura_project_id: infura_project_id,
+      infura_project_secret: infura_project_secret,
+      ethereum_network: ethereum_network,
+      web3: web3
     };
     this[metrics] = {
       txlistForAddressHits: 0
@@ -68,27 +70,42 @@ class EthChain {
   }
 
   /**
-   * @param {string} address - an Ethereum network address ('0x...')
-
-   * @returns {Promise<Object[]>} an array of transactions: [{from:..,to:..,value:..,timeStamp},..] where 'from' is the payee 
-   *   address, 'to' is the recepient, 'value' is the amount of Wei, and 'timeStamp' is the transaction write unix time 
-   *   in seconds.
-   * 
-   * @throws {Error} if problem
+   * @param {number} index -- block index
+   * @returns {number} latest block number.
    */
-  async getTransactionsForAddress(address) {
-    this[checkHasEtherscan]();
+  async getLatestBlock() {
+    this[checkInit]();
     try {
-      var txs = await this[ctx].api.account.txlist(address);
-    } catch (e) {
-      if (e === 'NOTOK') { /* etherscan returns 'NOTOK' when address not found */
-        return [];
-      }
-    } 
-    if (!txs) throw new Error(`no result for ${address}`);
-    if (txs.status != 1) throw new Error(txs.message);
-    this[metrics].txlistForAddressHits++;
-    return txs.result;
+      const result = await this[ctx].web3.eth.getBlockNumber();
+      return result;  
+    } catch (err) {
+      return err;
+    }
+  }
+
+  /**
+   * @param {number} index -- block index
+   * @returns {[{block:.., from:.., to:.., time:.., value:..},..]} transactions with values in wei.
+   */
+  async getTransactionsForBlock(index) {
+    this[checkInit]();
+    try {
+      const result = await this[ctx].web3.eth.getBlock(index, true);
+      if (!result || !result.transactions || result.transactions.length == 0) return [];
+      const block = result.number;
+      const time = new Date(result.timestamp * 1000);
+      return result.transactions.map(t => {
+        return {
+          block: block,
+          from: t.from,
+          to: t.to,
+          time: time,
+          value: t.value
+        }
+      });  
+    } catch (err) {
+      return err;
+    }
   }
 
   /**
