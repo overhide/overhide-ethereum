@@ -19,15 +19,17 @@ async function go() {
     for(var block = maxBlock + 1; block <= latestBlock; block++) {
       const transactions = await eth.getTransactionsForBlock(block);
       if (!transactions) break;
-      if (transactions.length == 0) {
-        await database.addNullTransaction(block);
-      } else {
+      try {
         await database.addTransactions(transactions);
+      } catch (err) {
+        log(`deleting blocks >= ${block - 1} because insertion error`);  
+        await database.deleteBlock(block - 1);
+        throw err;
       }
+      
       var lastUpdated = block;
-      numTrasactions += transactions.length;
+      log(`added block: ${block} (${transactions.filter(t => t.value > 0).length} txs)`);  
     }
-    if (lastUpdated) log(`added blocks: ${maxBlock} -> ${lastUpdated} (${numTrasactions} txs)`);  
   } catch (err) {
     log(`error: ${err}`);
   }

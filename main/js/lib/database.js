@@ -79,9 +79,9 @@ class Database {
   }
 
   /**
-   * Add transactions
+   * Add new transactions -- with chain continuity check: only next new block is allowed to be added.
    * 
-   * @param {[{block: number, from: string, to: string, time: Date, value: string},..]} transactions -- list of transactions to add; `from` and `to` are "0x" prefixed addresses.  
+   * @param {[{block: number, from: string, to: string, time: Date, value: string, hash:.., parentHash:..},..]} transactions -- list of transactions to add; `from` and `to` are "0x" prefixed addresses.  All transactions must be for the same block.
    */
   async addTransactions(transactions) {
     this[checkInit]();
@@ -89,31 +89,101 @@ class Database {
       if (!transactions || transactions.length == 0) {
         throw "no transactions";
       }
-      var values = transactions.map(t => `(${t.block}, ${t.from ? "decode('" + t.from.slice(2) + "','hex')" : null}, ${t.to ? "decode('" + t.to.slice(2) + "','hex')" : null}, '${t.time.toISOString()}', '${t.value}')`);
-      values = values.join(',');
-      const query = `INSERT INTO ethtxs (block, fromaddr, toaddr, transactionts, value) VALUES ${values} ON CONFLICT (block, fromaddr, toaddr, transactionts, value) DO NOTHING;`;
+      if ((new Set(transactions.map(t => t.block))).length > 1) throw "mutliple blocks in transactions list, not allowed";
+      
+      const block = transactions[0].block;
+      const time = transactions[0].time.toISOString();
+      const hash = transactions[0].hash.slice(2);
+      const parentHash = transactions[0].parentHash.slice(2);
+
+      var txs = transactions.map(t => `(${t.block}, ${t.from ? "decode('" + t.from.slice(2) + "','hex')" : null}, ${t.to ? "decode('" + t.to.slice(2) + "','hex')" : null}, '${t.value}')`);
+      txs = txs.join(',');
+
+      // The insertion into ethblocks below is conditional on the table having the previous block as the last block.
+      // If previous block is not present or doesn't match parentHash, do not insert -- it's possible it was deleted because of chain hash mismatch.
+      // If that happens, we cause a null constraint violation (insertion from CTE below) and abort.
+      var query = 
+        `
+          BEGIN;
+            WITH CTE AS (SELECT MAX(block) AS _block_ FROM ethblocks WHERE 
+              block=${block - 1} 
+              AND block=(SELECT MAX(block) FROM ethblocks)
+              AND hash=decode('${parentHash}', 'hex'))
+            INSERT INTO ethblocks (block, blockts, hash) VALUES ((SELECT _block_ + 1 FROM CTE), '${time}', decode('${hash}', 'hex')) ON CONFLICT (block) DO NOTHING;
+
+            INSERT INTO ethtxs (block, fromaddr, toaddr, value) VALUES ${txs} ON CONFLICT (block, fromaddr, toaddr, value) DO NOTHING;
+          COMMIT;
+        `;
       await this[ctx].db.query(query);
     } catch (err) {
-      throw `insertion error :: ${String(err)}`;
+      throw `insertion error :: ${String(err)} :: ${query}`;
     }
   }
 
   /**
-   * Add null for block
+   * Add transactions -- no chain continuity check -- assumption is these are valid.  Use this only for old transactions with trusted validations from
+   * elsewhere.
    * 
-   * @param {number} block -- add a 0 transaction placeholder for block.
-   * @param {Date} time -- block timestamp
+   * @param {[{block: number, from: string, to: string, time: Date, value: string, hash:.., parentHash:..},..]} transactions -- list of transactions to add; `from` and `to` are "0x" prefixed addresses.  All transactions must be for the same block.
    */
-     async addNullTransaction(block) {
-      this[checkInit]();
-      try {
-        var value = `(${block}, ${null}, ${null}, ${null}, '0')`;
-        const query = `INSERT INTO ethtxs (block, fromaddr, toaddr, transactionts, value) VALUES ${value} ON CONFLICT (block, fromaddr, toaddr, transactionts, value) DO NOTHING;`;
-        await this[ctx].db.query(query);
-      } catch (err) {
-        throw `insertion error :: ${String(err)}`;
+   async addTransactionsNoCheck(transactions) {
+    this[checkInit]();
+    try {
+      if (!transactions || transactions.length == 0) {
+        throw "no transactions";
       }
+      if ((new Set(transactions.map(t => t.block))).length > 1) throw "mutliple blocks in transactions list, not allowed";
+      
+      const block = transactions[0].block;
+      const time = transactions[0].time.toISOString();
+      const hash = transactions[0].hash.slice(2);
+
+      var txs = transactions.map(t => `(${t.block}, ${t.from ? "decode('" + t.from.slice(2) + "','hex')" : null}, ${t.to ? "decode('" + t.to.slice(2) + "','hex')" : null}, '${t.value}')`);
+      txs = txs.join(',');
+
+      var query = 
+        `
+          BEGIN;
+            INSERT INTO ethblocks (block, blockts, hash) VALUES (${block}, '${time}', decode('${hash}', 'hex')) ON CONFLICT (block) DO NOTHING;
+            INSERT INTO ethtxs (block, fromaddr, toaddr, value) VALUES ${txs} ON CONFLICT (block, fromaddr, toaddr, value) DO NOTHING;
+          COMMIT;
+        `;
+      await this[ctx].db.query(query);
+    } catch (err) {
+      throw `insertion error :: ${String(err)} :: ${query}`;
     }
+  }
+
+  /**
+   * Delete block from database.
+   * 
+   * @param {number} block -- index to delete
+   * check against
+   */
+   async deleteBlock(block) {
+    this[checkInit]();
+    try {
+      var query = `SELECT * FROM ethblocks WHERE block >= ${block};`;
+      let result = await this[ctx].db.query(query);
+      log('deleting => %o', result.rows.map(row => {
+        return {
+          block: row.block,
+          time: row.blockts,
+          hash: row.hash
+        };     
+      }));
+
+      var query = `
+          BEGIN;
+            DELETE FROM ethblocks WHERE block >= ${block};
+            DELETE FROM ethtxs WHERE block >= ${block};
+          COMMIT;
+        `;
+      await this[ctx].db.query(query);
+    } catch (err) {
+      throw `deletion error :: ${String(err)} :: ${query}`;
+    }
+  }
 
   /**
    * Get transactions for block
@@ -124,8 +194,16 @@ class Database {
    async getTransactionsForBlock(block) {
     this[checkInit]();
     try {
-      const query = `SELECT * FROM ethtxs WHERE block = $1 ORDER BY transactionts DESC`;
-      const params = [block];
+      var query = `SELECT * FROM ethblocks WHERE block = $1`;
+      var params = [block];
+      debug('%s', query);
+      let blockResult = await this[ctx].db.query(query, params);
+      if (blockResult.rowCount == 0) {
+        return [];
+      }
+
+      var query = `SELECT * FROM ethtxs WHERE block = $1`;
+      var params = [block];
       debug('%s', query);
       let result = await this[ctx].db.query(query, params);
       if (result.rowCount == 0) {
@@ -136,7 +214,7 @@ class Database {
           block: row.block,
           from: row.fromaddr ? `0x${row.fromaddr.toString('hex')}` : null,
           to: row.toaddr ? `0x${row.toaddr.toString('hex')}` : null,
-          time: row.transactionts,
+          time: blockResult[0].blockts,
           value: row.value
         };     
       });
@@ -155,7 +233,11 @@ class Database {
    async getTransactionsFor(address) {
     this[checkInit]();
     try {
-      const query = `SELECT * FROM ethtxs WHERE (fromaddr = decode($1,'hex') OR toaddr = decode($2,'hex')) ORDER BY transactionts DESC`;
+      const query = `
+        SELECT T.block, T.fromaddr, T.toaddr, T.value, B.time FROM ethtxs T
+        JOIN ethblocks B ON T.block = B.block
+        WHERE (T.fromaddr = decode($1,'hex') OR T.toaddr = decode($2,'hex')) ORDER BY B.blockts DESC
+      `;
       const params = [address.slice(2), address.slice(2)];
       debug('%s', query);
       let result = await this[ctx].db.query(query, params);
@@ -167,7 +249,7 @@ class Database {
           block: row.block,
           from: row.fromaddr ? `0x${row.fromaddr.toString('hex')}` : null,
           to: row.toaddr ? `0x${row.toaddr.toString('hex')}` : null,
-          time: row.transactionts,
+          time: row.blockts,
           value: row.value
         };     
       });
@@ -187,7 +269,11 @@ class Database {
   async getTransactionsFromTo(fromAddress, toAddress) {
     this[checkInit]();
     try {
-      const query = `SELECT * FROM ethtxs WHERE (fromaddr = decode($1,'hex') AND toaddr = decode($2,'hex')) ORDER BY transactionts DESC`;
+      const query = `
+        SELECT T.block, T.fromaddr, T.toaddr, T.value, B.time FROM ethtxs T
+        JOIN ethblocks B ON T.block = B.block
+        WHERE (T.fromaddr = decode($1,'hex') AND T.toaddr = decode($2,'hex')) ORDER BY B.blockts DESC
+      `;
       const params = [fromAddress.slice(2), toAddress.slice(2)];
       debug('%s', query);
       let result = await this[ctx].db.query(query, params);
@@ -199,7 +285,7 @@ class Database {
           block: row.block,
           from: row.fromaddr ? `0x${row.fromaddr.toString('hex')}` : null,
           to: row.toaddr ? `0x${row.toaddr.toString('hex')}` : null,
-          time: row.transactionts,
+          time: row.blockts,
           value: row.value
         };     
       });
@@ -217,7 +303,7 @@ class Database {
   async getMaxBlock() {
     this[checkInit]();
     try {
-      const query = `SELECT max(block) FROM ethtxs`;
+      const query = `SELECT max(block) FROM ethblocks`;
       let result = await this[ctx].db.query(query);
       if (result.rowCount == 0) {
         return [];
@@ -236,7 +322,7 @@ class Database {
    async getMinBlock() {
     this[checkInit]();
     try {
-      const query = `SELECT min(block) FROM ethtxs`;
+      const query = `SELECT min(block) FROM ethblocks`;
       let result = await this[ctx].db.query(query);
       if (result.rowCount == 0) {
         return [];

@@ -90,24 +90,40 @@ class EthChain {
 
   /**
    * @param {number} index -- block index
-   * @returns {[{block:.., from:.., to:.., time:.., value:..},..]} transactions with values in wei.
+   * @returns {[{block:.., from:.., to:.., time:.., value:.., hash:.., parentHash:..},..]} transactions with values in wei.  If block has only 0-valued
+   *   transactions then only a single transaction is returned with `to` and `from` set to `null`, and `value` to `0`.
    */
   async getTransactionsForBlock(index) {
     this[checkInit]();
     try {
       const result = await this[ctx].web3.eth.getBlock(index, true);
-      if (!result || !result.transactions || result.transactions.length == 0) return [];
+      if (!result) throw `error retrieving block ${index}`;
       const block = result.number;
+      const hash = result.hash;
+      const parentHash = result.parentHash;
       const time = new Date(result.timestamp * 1000);
-      return result.transactions
-        .filter(t => t.value > 0)
+      const filtered = (result.transactions || []).filter(t => t.value > 0);
+      if (filtered.length == 0) {
+        return [{
+          block: block,
+          from: null,
+          to: null,
+          time: time,
+          value: 0,
+          hash: hash,
+          parentHash: parentHash
+        }];
+      }
+      return filtered
         .map(t => {
         return {
           block: block,
           from: t.from,
           to: t.to,
           time: time,
-          value: t.value
+          value: t.value,
+          hash: hash,
+          parentHash: parentHash
         }
       });  
     } catch (err) {

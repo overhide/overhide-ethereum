@@ -30,17 +30,26 @@ db.connect();
   result = await db.query(`SELECT 1 FROM information_schema.tables WHERE table_name = 'ethtxs'`);
   if (result.rowCount == 0) {
     await db.query(`CREATE TABLE ethtxs (id SERIAL PRIMARY KEY,
-                                          block integer NOT NULL,
-                                          fromaddr bytea NULL,
-                                          toaddr bytea NULL,
-                                          transactionts timestamptz NULL,
-                                          value decimal NOT NULL)`);
+                                         block integer NOT NULL,
+                                         fromaddr bytea NULL,
+                                         toaddr bytea NULL,
+                                         value decimal NOT NULL)`);
     console.log(`created 'ethtxs' table.`);
   }
-  await db.query('CREATE UNIQUE INDEX ON ethtxs (block, fromaddr, toaddr, transactionts, value);');
+  await db.query('CREATE UNIQUE INDEX ON ethtxs (block, fromaddr, toaddr, value);');
   await db.query('CREATE INDEX ON ethtxs (block);');
   await db.query('CREATE INDEX ON ethtxs (fromaddr);');
   await db.query('CREATE INDEX ON ethtxs (toaddr);');
+
+  result = await db.query(`SELECT 1 FROM information_schema.tables WHERE table_name = 'ethblocks'`);
+  if (result.rowCount == 0) {
+    await db.query(`CREATE TABLE ethblocks (id SERIAL PRIMARY KEY,
+                                            block integer NOT NULL,
+                                            blockts timestamptz NOT NULL,
+                                            hash bytea NOT NULL)`);
+    console.log(`created 'ethblocks' table.`);
+  }
+  await db.query('CREATE UNIQUE INDEX ON ethblocks (block);');
 
   process.exit(0);
 
