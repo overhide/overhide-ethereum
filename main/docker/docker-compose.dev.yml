@@ -1,6 +1,8 @@
 version: '3'
 services:
   oh-eth:
+    links:
+    - postgres:postgres  
     env_file: .npmrc.dev
   postgres:
     image: postgres
