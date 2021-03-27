@@ -99,6 +99,23 @@ class Database {
   }
 
   /**
+   * Add null for block
+   * 
+   * @param {number} block -- add a 0 transaction placeholder for block.
+   * @param {Date} time -- block timestamp
+   */
+     async addNullTransaction(block) {
+      this[checkInit]();
+      try {
+        var value = `(${block}, ${null}, ${null}, ${null}, '0')`;
+        const query = `INSERT INTO ethtxs (block, fromaddr, toaddr, transactionts, value) VALUES ${value} ON CONFLICT (block, fromaddr, toaddr, transactionts, value) DO NOTHING;`;
+        await this[ctx].db.query(query);
+      } catch (err) {
+        throw `insertion error :: ${String(err)}`;
+      }
+    }
+
+  /**
    * Get transactions for block
    * 
    * @param {number} block -- block to get transactions for.

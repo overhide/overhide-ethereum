@@ -18,8 +18,12 @@ async function go() {
     var numTrasactions = 0;
     for(var block = maxBlock + 1; block <= latestBlock; block++) {
       const transactions = await eth.getTransactionsForBlock(block);
-      if (!transactions || transactions.length == 0) break;
-      await database.addTransactions(transactions);
+      if (!transactions) break;
+      if (transactions.length == 0) {
+        await database.addNullTransaction(block);
+      } else {
+        await database.addTransactions(transactions);
+      }
       var lastUpdated = block;
       numTrasactions += transactions.length;
     }

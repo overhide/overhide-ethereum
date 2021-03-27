@@ -33,7 +33,7 @@ db.connect();
                                           block integer NOT NULL,
                                           fromaddr bytea NULL,
                                           toaddr bytea NULL,
-                                          transactionts timestamptz NOT NULL,
+                                          transactionts timestamptz NULL,
                                           value decimal NOT NULL)`);
     console.log(`created 'ethtxs' table.`);
   }
