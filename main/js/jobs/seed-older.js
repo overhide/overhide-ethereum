@@ -25,13 +25,15 @@ async function go() {
       return;
     }
 
+    var numTrasactions = 0;
     for(var block = minBlock - 1; block >= 0 && block >= minBlock - SEED_OLDER_NUMBER_BLOCKS; block--) {
       const transactions = await eth.getTransactionsForBlock(block);
-      if (!transactions) break;
-      database.addTransactions(transactions);
+      if (!transactions || transactions.length == 0) break;
+      await database.addTransactions(transactions);
       var lastUpdated = block;
+      numTrasactions += transactions.length;
     }
-    if (lastUpdated) log(`added blocks: ${lastUpdated} -> ${minBlock - 1}`);  
+    if (lastUpdated) log(`added blocks: ${lastUpdated} -> ${minBlock - 1} (${numTrasactions} txs)`);  
   } catch (err) {
     log(`error: ${err}`);
   }

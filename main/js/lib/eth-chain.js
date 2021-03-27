@@ -99,7 +99,9 @@ class EthChain {
       if (!result || !result.transactions || result.transactions.length == 0) return [];
       const block = result.number;
       const time = new Date(result.timestamp * 1000);
-      return result.transactions.map(t => {
+      return result.transactions
+        .filter(t => t.value > 0)
+        .map(t => {
         return {
           block: block,
           from: t.from,
