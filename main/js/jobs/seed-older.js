@@ -31,7 +31,7 @@ async function go() {
       database.addTransactions(transactions);
       var lastUpdated = block;
     }
-    if (lastUpdated) log(`added blocks: ${lastUpdated} -> ${minBlock}`);  
+    if (lastUpdated) log(`added blocks: ${lastUpdated} -> ${minBlock - 1}`);  
   } catch (err) {
     log(`error: ${err}`);
   }

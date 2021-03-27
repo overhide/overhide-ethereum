@@ -15,13 +15,13 @@ async function go() {
   try {
     const latestBlock = await eth.getLatestBlock();
     const maxBlock = (await database.getMaxBlock()) || latestBlock - 1;
-    for(var block = latestBlock; block > maxBlock; block--) {
+    for(var block = maxBlock + 1; block <= latestBlock; block++) {
       const transactions = await eth.getTransactionsForBlock(block);
       if (!transactions) break;
       database.addTransactions(transactions);
       var lastUpdated = block;
     }
-    if (lastUpdated) log(`added blocks: ${maxBlock} -> ${latestBlock}`);  
+    if (lastUpdated) log(`added blocks: ${maxBlock} -> ${lastUpdated}`);  
   } catch (err) {
     log(`error: ${err}`);
   }
