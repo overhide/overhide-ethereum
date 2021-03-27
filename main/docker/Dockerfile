@@ -22,6 +22,7 @@ COPY package.json LICENSE /home/node/app/
 COPY main/js /home/node/app/main/js/
 COPY main/static /home/node/app/main/static/
 COPY test /home/node/app/test/
+COPY tools /home/node/app/tools/
 
 ENV OH_ETH_PORT 8080
 
