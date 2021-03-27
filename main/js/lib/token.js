@@ -136,6 +136,7 @@ class Token {
    */
   isValidLocal(token)  {
     try {
+      token = decodeURIComponent(token);
       token = new Buffer(token, 'base64');  
       token = crypto.symmetricDecrypt(token, this[ctx].salt);
       token = JSON.parse(token);

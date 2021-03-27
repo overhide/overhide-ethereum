@@ -27,6 +27,7 @@ async function go() {
 
     for(var block = minBlock - 1; block >= 0 && block >= minBlock - SEED_OLDER_NUMBER_BLOCKS; block--) {
       const transactions = await eth.getTransactionsForBlock(block);
+      if (!transactions) break;
       database.addTransactions(transactions);
       var lastUpdated = block;
     }

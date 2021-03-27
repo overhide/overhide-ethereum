@@ -71,8 +71,8 @@ log("CONFIG:\n%O", ((cfg) => {
 })({...ctx_config}));
 
 // JOBS
-require('./jobs/update-latest')();
-require('./jobs/seed-older')();
+//require('./jobs/update-latest')();
+//require('./jobs/seed-older')();
 
 // START THE APPLICATION
 const app = express();

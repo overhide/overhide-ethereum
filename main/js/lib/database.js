@@ -86,6 +86,9 @@ class Database {
   async addTransactions(transactions) {
     this[checkInit]();
     try {
+      if (!transactions || transactions.length == 0) {
+        throw "no transactions";
+      }
       var values = transactions.map(t => `(${t.block}, ${t.from ? "decode('" + t.from.slice(2) + "','hex')" : null}, ${t.to ? "decode('" + t.to.slice(2) + "','hex')" : null}, '${t.time.toISOString()}', '${t.value}')`);
       values = values.join(',');
       const query = `INSERT INTO ethtxs (block, fromaddr, toaddr, transactionts, value) VALUES ${values} ON CONFLICT (block, fromaddr, toaddr, transactionts, value) DO NOTHING;`;

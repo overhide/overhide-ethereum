@@ -17,6 +17,7 @@ async function go() {
     const maxBlock = (await database.getMaxBlock()) || latestBlock - 1;
     for(var block = latestBlock; block > maxBlock; block--) {
       const transactions = await eth.getTransactionsForBlock(block);
+      if (!transactions) break;
       database.addTransactions(transactions);
       var lastUpdated = block;
     }

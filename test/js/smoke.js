@@ -10,18 +10,43 @@ const OH_ETH_HOST = process.env.OH_ETH_HOST || process.env.npm_config_OH_ETH_HOS
 const OH_ETH_PORT = process.env.OH_ETH_PORT || process.env.npm_config_OH_ETH_PORT || process.env.npm_package_config_OH_ETH_PORT || 8080;
 const TOKEN_URL = `https://token.overhide.io/token`;
 const API_KEY = '0x___API_KEY_ONLY_FOR_DEMOS_AND_TESTS___';
+const POSTGRES_HOST = process.env.POSTGRES_HOST || process.env.npm_config_POSTGRES_HOST || process.env.npm_package_config_POSTGRES_HOST || 'localhost'
+const POSTGRES_PORT = process.env.POSTGRES_PORT || process.env.npm_config_POSTGRES_PORT || process.env.npm_package_config_POSTGRES_PORT || 5432
+const POSTGRES_DB = process.env.POSTGRES_DB || process.env.npm_config_POSTGRES_DB || process.env.npm_package_config_POSTGRES_DB || 'oh-eth';
+const POSTGRES_USER = process.env.POSTGRES_USER || process.env.npm_config_POSTGRES_USER || process.env.npm_package_config_POSTGRES_USER || 'adam';
+const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD || process.env.npm_config_POSTGRES_PASSWORD || process.env.npm_package_config_POSTGRES_PASSWORD || 'c0c0nut';
+const POSTGRES_SSL = process.env.POSTGRES_SSL || process.env.npm_config_POSTGRES_SSL || process.env.npm_package_config_POSTGRES_SSL;
+
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 require('../../main/js/lib/log.js').init({app_name:'smoke'});
 const crypto = require('../../main/js/lib/crypto.js').init();
-const eth = require('../../main/js/lib/eth-chain.js').init();
+const eth = require('../../main/js/lib/eth-chain.js').init({
+  infura_project_id: 'fake',
+  infura_project_secret: 'fake',
+  ethereum_network: 'rinkeby'
+});
+const database = require('../../main/js/lib/database.js').init({
+  pghost: POSTGRES_HOST,
+  pgport: POSTGRES_PORT,
+  pgdatabase: POSTGRES_DB,
+  pguser: POSTGRES_USER,
+  pgpassword: POSTGRES_PASSWORD,
+  pgssl: POSTGRES_SSL
+});
 const uuid = require('uuid');
 const assert = chai.assert;
 
 var TOKEN;
 
 chai.use(chaiHttp);
+
+database.addTransactions([
+  {block: 4340653, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z')},
+  {block: 4340619, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z')},
+  {block: 4340599, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z')}
+]);
 
 // @return promise
 function getToken() {
@@ -110,8 +135,8 @@ describe('smoke tests', () => {
       });
   });
 
-  it('validates .02 eth was transferred in 2 transactions from eth_acct1 to eth_acct2 since 2019-05-07T14:18:00Z', (done) => {
-    const sinceStr = '2019-05-07T14:18:00Z';
+  it('validates .02 eth was transferred in 2 transactions from eth_acct1 to eth_acct2 since 2019-05-07T14:20:00Z', (done) => {
+    const sinceStr = '2019-05-07T14:20:00Z';
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .get('/get-transactions/'+eth_acct1+'/'+eth_acct2+'?since='+sinceStr)
       .set({ "Authorization": `Bearer ${TOKEN}` })
@@ -132,8 +157,8 @@ describe('smoke tests', () => {
       });
   });
 
-  it('validates .02 eth was transferred from eth_acct1 to eth_acct2 since 2019-05-07T14:18:00Z as tally only', (done) => {
-    const sinceStr = '2019-05-07T14:18:00Z';
+  it('validates .02 eth was transferred from eth_acct1 to eth_acct2 since 2019-05-07T14:20:00Z as tally only', (done) => {
+    const sinceStr = '2019-05-07T14:20:00Z';
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .get('/get-transactions/'+eth_acct1+'/'+eth_acct2+'?since='+sinceStr+'&tally-only=true')
       .set({ "Authorization": `Bearer ${TOKEN}` })

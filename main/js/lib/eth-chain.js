@@ -3,6 +3,7 @@
 const Web3 = require('web3')
 const web3 = new (Web3)();
 const crypto = require('crypto')
+const log = require('./log.js').fn("eth-chain");
 
 
 const ENCODING = 'utf-8';
@@ -54,7 +55,11 @@ class EthChain {
     if (infura_project_secret == null) throw new Error("INFURA_PROJECT_SECRET must be specified.");
     if (ethereum_network == null) throw new Error("INFURA_TYPE must be specified.");
 
-    const web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${ethereum_network}.infura.io/ws/v3/${infura_project_id}`));
+    if (infura_project_id != 'fake') {
+      var web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${ethereum_network}.infura.io/ws/v3/${infura_project_id}`));
+    } else {
+      log(`fake infura project, skipping init...`);
+    }
 
     this[ctx] = {
       infura_project_id: infura_project_id,
@@ -79,7 +84,7 @@ class EthChain {
       const result = await this[ctx].web3.eth.getBlockNumber();
       return result;  
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 
@@ -104,7 +109,7 @@ class EthChain {
         }
       });  
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 
