@@ -66,6 +66,9 @@ const database = require('./lib/database.js').init(ctx_config);
 const swagger = require('./lib/swagger.js').init(ctx_config);
 const token = require('./lib/token.js').init(ctx_config);
 log("CONFIG:\n%O", ((cfg) => {
+  cfg.infura_project_id = cfg.infura_project_id.replace(/.(?=.{2})/g,'*'); 
+  cfg.infura_project_secret = cfg.infura_project_secret.replace(/.(?=.{2})/g,'*'); 
+  cfg.pgpassword = cfg.pgpassword.replace(/.(?=.{2})/g,'*'); 
   cfg.salt = cfg.salt.replace(/.(?=.{2})/g,'*'); 
   return cfg;
 })({...ctx_config}));
