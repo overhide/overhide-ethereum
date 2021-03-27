@@ -12,6 +12,7 @@ const UPDATE_LATEST_JOB_PERIOD_MILLIS = process.env.UPDATE_LATEST_JOB_PERIOD_MIL
  * Job function to update most recent ethereum blocks.
  */
 async function go() {
+  var timeout = UPDATE_LATEST_JOB_PERIOD_MILLIS;
   try {
     const latestBlock = await eth.getLatestBlock();
     const maxBlock = (await database.getMaxBlock()) || latestBlock - 1;
@@ -22,6 +23,7 @@ async function go() {
       try {
         await database.addTransactions(transactions);
       } catch (err) {
+        timeout = 0;
         log(`deleting blocks >= ${block - 1} because insertion error`);  
         await database.deleteBlock(block - 1);
         throw err;
@@ -34,7 +36,7 @@ async function go() {
     log(`error: ${err}`);
   }
 
-  setTimeout(go, UPDATE_LATEST_JOB_PERIOD_MILLIS);
+  setTimeout(go, timeout);
 }
 
 module.exports = go;

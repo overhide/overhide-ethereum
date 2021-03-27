@@ -234,12 +234,12 @@ class Database {
     this[checkInit]();
     try {
       const query = `
-        SELECT T.block, T.fromaddr, T.toaddr, T.value, B.time FROM ethtxs T
+        SELECT T.block, T.fromaddr, T.toaddr, T.value, B.blockts FROM ethtxs T
         JOIN ethblocks B ON T.block = B.block
         WHERE (T.fromaddr = decode($1,'hex') OR T.toaddr = decode($2,'hex')) ORDER BY B.blockts DESC
       `;
       const params = [address.slice(2), address.slice(2)];
-      debug('%s', query);
+      debug('%s <= %o', query, params);
       let result = await this[ctx].db.query(query, params);
       if (result.rowCount == 0) {
         return [];
@@ -270,12 +270,12 @@ class Database {
     this[checkInit]();
     try {
       const query = `
-        SELECT T.block, T.fromaddr, T.toaddr, T.value, B.time FROM ethtxs T
+        SELECT T.block, T.fromaddr, T.toaddr, T.value, B.blockts FROM ethtxs T
         JOIN ethblocks B ON T.block = B.block
         WHERE (T.fromaddr = decode($1,'hex') AND T.toaddr = decode($2,'hex')) ORDER BY B.blockts DESC
       `;
       const params = [fromAddress.slice(2), toAddress.slice(2)];
-      debug('%s', query);
+      debug('%s <= %o', query, params);
       let result = await this[ctx].db.query(query, params);
       if (result.rowCount == 0) {
         return [];

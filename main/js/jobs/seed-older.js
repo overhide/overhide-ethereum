@@ -6,7 +6,7 @@ const database = require('../lib/database.js');
 const log = require('../lib/log.js').fn("seed-older");
 const debug = require('../lib/log.js').debug_fn("seed-older");
 
-const SEED_OLDER_JOB_PERIOD_MILLIS = process.env.SEED_OLDER_JOB_PERIOD_MILLIS || process.env.npm_config_SEED_OLDER_JOB_PERIOD_MILLIS || process.env.npm_package_config_SEED_OLDER_JOB_PERIOD_MILLIS || 3000;
+const SEED_OLDER_JOB_PERIOD_MILLIS = process.env.SEED_OLDER_JOB_PERIOD_MILLIS || process.env.npm_config_SEED_OLDER_JOB_PERIOD_MILLIS || process.env.npm_package_config_SEED_OLDER_JOB_PERIOD_MILLIS || 30000;
 const SEED_OLDER_NUMBER_BLOCKS = process.env.SEED_OLDER_NUMBER_BLOCKS || process.env.npm_config_SEED_OLDER_NUMBER_BLOCKS || process.env.npm_package_config_SEED_OLDER_NUMBER_BLOCKS || 5;
 
 /**
