@@ -9,10 +9,28 @@ jobs:
       - run:
           shell: /bin/sh
           command: |
-            printf "DEBUG=overhide-ethereum:*,-overhide-ethereum:is-signature-valid:txs,-overhide-ethereum:get-transactions:txs" > .npmrc.dev
+            printf "DEBUG=overhide-ethereum*\n" > .npmrc.dev;
+            printf "POSTGRES_HOST=postgres\n" >> .npmrc.dev;
+            printf "POSTGRES_PORT=5432\n" >> .npmrc.dev;
+            printf "POSTGRES_DB=oh-eth\n" >> .npmrc.dev;
+            printf "POSTGRES_USER=adam\n" >> .npmrc.dev;
+            printf "POSTGRES_PASSWORD=c0c0nut\n" >> .npmrc.dev;
+            cat .npmrc.dev   
       - run:
           shell: /bin/sh
-          command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -e ETHERSCAN_KEY -e ETHERSCAN_TYPE -v ~/overhide-ethereum/test-report:/home/node/app/test-report -d oh-eth
+          command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh up -d 
+      - run:
+          shell: /bin/sh
+          command: docker exec `docker ps -q --filter name="oh-eth"` npm run db-evolve
+      - run:
+          shell: /bin/sh
+          command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh kill oh-eth
+      - run:
+          shell: /bin/sh
+          command: docker system prune -f
+      - run:
+          shell: /bin/sh
+          command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -v ~/overhide-ethereum/test-report:/home/node/app/test-report -d oh-eth
       - run:
           shell: /bin/sh
           command: sleep 10

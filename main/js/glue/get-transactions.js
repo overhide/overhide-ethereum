@@ -15,7 +15,7 @@ async function get_transactions({fromAddress, toAddress, maxMostRecent = null, s
   var tally = 0;
   var result_txs = [];
   var txsSeen = 0;
-  var sinceSeconds = since == null ? 0 : (new Date(since)).getTime() / 1000;
+  var sinceSeconds = since == null ? 0 : (new Date(since)).getTime();
   for (var tx of txs.sort((a,b) => b.time.getTime() - a.time.getTime())) {
     if (maxMostRecent) {
       if (txsSeen == maxMostRecent) break;

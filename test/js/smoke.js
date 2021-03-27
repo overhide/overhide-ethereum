@@ -45,7 +45,16 @@ chai.use(chaiHttp);
 database.addTransactions([
   {block: 4340653, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z')},
   {block: 4340619, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z')},
-  {block: 4340599, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z')}
+  {block: 4340599, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z')},
+  {block: 4340653, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z')},
+  {block: 4340619, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z')},
+  {block: 4340599, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z')},
+  {block: 4340653, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z')},
+  {block: 4340619, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z')},
+  {block: 4340599, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z')},
+  {block: 4340653, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z')},
+  {block: 4340619, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z')},
+  {block: 4340599, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z')}
 ]);
 
 // @return promise
@@ -135,8 +144,8 @@ describe('smoke tests', () => {
       });
   });
 
-  it('validates .02 eth was transferred in 2 transactions from eth_acct1 to eth_acct2 since 2019-05-07T14:20:00Z', (done) => {
-    const sinceStr = '2019-05-07T14:20:00Z';
+  it('validates .02 eth was transferred in 2 transactions from eth_acct1 to eth_acct2 since 2019-05-07T14:18:00Z', (done) => {
+    const sinceStr = '2019-05-07T14:18:00Z';
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .get('/get-transactions/'+eth_acct1+'/'+eth_acct2+'?since='+sinceStr)
       .set({ "Authorization": `Bearer ${TOKEN}` })
@@ -157,8 +166,8 @@ describe('smoke tests', () => {
       });
   });
 
-  it('validates .02 eth was transferred from eth_acct1 to eth_acct2 since 2019-05-07T14:20:00Z as tally only', (done) => {
-    const sinceStr = '2019-05-07T14:20:00Z';
+  it('validates .02 eth was transferred from eth_acct1 to eth_acct2 since 2019-05-07T14:18:00Z as tally only', (done) => {
+    const sinceStr = '2019-05-07T14:18:00Z';
     chai.request('http://' + OH_ETH_HOST + ':' + OH_ETH_PORT)
       .get('/get-transactions/'+eth_acct1+'/'+eth_acct2+'?since='+sinceStr+'&tally-only=true')
       .set({ "Authorization": `Bearer ${TOKEN}` })
