@@ -22,8 +22,8 @@ const SALT = process.env.SALT || process.env.npm_config_SALT || process.env.npm_
 const TOKEN_URL = process.env.TOKEN_URL || process.env.npm_config_TOKEN_URL || process.env.npm_package_config_TOKEN_URL;
 const ISPROD = process.env.ISPROD || process.env.npm_config_ISPROD || process.env.npm_package_config_ISPROD || false;
 const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID || process.env.npm_config_INFURA_PROJECT_ID || process.env.npm_package_config_INFURA_PROJECT_ID;
-const INFURA_PROJECT_SECRET = process.env.INFURA_PROJECT_SECRET || process.env.npm_config_INFURA_PROJECT_SECRET || process.env.npm_package_config_INFURA_PROJECT_SECRET;
-const INFURA_TYPE = process.env.INFURA_TYPE || process.env.npm_config_INFURA_TYPE || process.env.npm_package_config_INFURA_TYPE;
+const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || process.env.npm_config_ETHERSCAN_KEY || process.env.npm_package_config_ETHERSCAN_KEY;
+const NETWORK_TYPE = process.env.NETWORK_TYPE || process.env.npm_config_NETWORK_TYPE || process.env.npm_package_config_NETWORK_TYPE;
 const RATE_LIMIT_WINDOW_MS = process.env.RATE_LIMIT_WINDOW_MS || process.env.npm_config_RATE_LIMIT_WINDOW_MS || process.env.npm_package_config_RATE_LIMIT_WINDOW_MS || 60000;
 const RATE_LIMIT_MAX_REQUESTS_PER_WINDOW = process.env.RATE_LIMIT_MAX_REQUESTS_PER_WINDOW || process.env.npm_config_RATE_LIMIT_MAX_REQUESTS_PER_WINDOW || process.env.npm_package_config_RATE_LIMIT_MAX_REQUESTS_PER_WINDOW || 10;
 const POSTGRES_HOST = process.env.POSTGRES_HOST || process.env.npm_config_POSTGRES_HOST || process.env.npm_package_config_POSTGRES_HOST || 'localhost'
@@ -44,9 +44,9 @@ const ctx_config = {
   salt: SALT,
   tokenUrl: TOKEN_URL,
   isTest: !ISPROD,
-  ethereum_network: INFURA_TYPE,
+  etherscan_key: ETHERSCAN_KEY,
+  ethereum_network: NETWORK_TYPE,
   infura_project_id: INFURA_PROJECT_ID,
-  infura_project_secret: INFURA_PROJECT_SECRET,
   rateLimitWindowsMs: RATE_LIMIT_WINDOW_MS,
   rateLimitMax: RATE_LIMIT_MAX_REQUESTS_PER_WINDOW,
   base_url: BASE_URL,
@@ -62,12 +62,13 @@ const log = require('./lib/log.js').init(ctx_config).fn("app");
 const debug = require('./lib/log.js').init(ctx_config).debug_fn("app");
 const crypto = require('./lib/crypto.js').init(ctx_config);
 const eth = require('./lib/eth-chain.js').init(ctx_config);
+const etherscan = require('./lib/etherscan.js').init(ctx_config);
 const database = require('./lib/database.js').init(ctx_config);
 const swagger = require('./lib/swagger.js').init(ctx_config);
 const token = require('./lib/token.js').init(ctx_config);
 log("CONFIG:\n%O", ((cfg) => {
   cfg.infura_project_id = cfg.infura_project_id.replace(/.(?=.{2})/g,'*'); 
-  cfg.infura_project_secret = cfg.infura_project_secret.replace(/.(?=.{2})/g,'*'); 
+  cfg.etherscan_key = cfg.etherscan_key.replace(/.(?=.{2})/g,'*'); 
   cfg.pgpassword = cfg.pgpassword.replace(/.(?=.{2})/g,'*'); 
   cfg.salt = cfg.salt.replace(/.(?=.{2})/g,'*'); 
   return cfg;
@@ -75,7 +76,6 @@ log("CONFIG:\n%O", ((cfg) => {
 
 // JOBS
 require('./jobs/update-latest')();
-require('./jobs/seed-older')();
 
 // START THE APPLICATION
 const app = express();

@@ -15,13 +15,20 @@ async function go() {
   var timeout = UPDATE_LATEST_JOB_PERIOD_MILLIS;
   try {
     const latestBlock = await eth.getLatestBlock();
-    const maxBlock = (await database.getMaxBlock()) || latestBlock - 1;
+    const dbMaxBlock = await database.getMaxBlock();
+
+    if (dbMaxBlock === -1) {
+      const transactions = await eth.getTransactionsForBlock(latestBlock);
+      await database.addBlockTransactionsNoCheck(transactions);
+      throw `Empty DB, added first block ${latestBlock}`;
+    }
+
     var numTrasactions = 0;
-    for(var block = maxBlock + 1; block <= latestBlock; block++) {
+    for(var block = dbMaxBlock + 1; block <= latestBlock; block++) {
       const transactions = await eth.getTransactionsForBlock(block);
       if (!transactions) break;
       try {
-        await database.addTransactions(transactions);
+        await database.addBlockTransactions(transactions);
       } catch (err) {
         timeout = 0;
         log(`deleting blocks >= ${block - 1} because insertion error`);  

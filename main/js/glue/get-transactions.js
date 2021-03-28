@@ -1,6 +1,7 @@
 "use strict";
 
 const database = require('../lib/database.js');
+const etherscan = require('../lib/etherscan.js');
 
 const log = require('../lib/log.js').fn("get-transactions");
 const debug = require('../lib/log.js').debug_fn("get-transactions");
@@ -10,6 +11,15 @@ async function get_transactions({fromAddress, toAddress, maxMostRecent = null, s
   fromAddress = fromAddress.toLowerCase();
   toAddress = toAddress.toLowerCase();
   if (! fromAddress.startsWith('0x') || ! toAddress.startsWith('0x')) throw new Error('fromAddress and toAddress must start with 0x');
+
+  if (!await database.checkAddressIsTracked(fromAddress)) {
+    await database.addTransactionsForNewAddress(await etherscan.getTransactionsForAddress(fromAddress), fromAddress);    
+  }
+
+  if (!await database.checkAddressIsTracked(toAddress)) {
+    await database.addTransactionsForNewAddress(await etherscan.getTransactionsForAddress(toAddress), toAddress);        
+  }
+
   var txs = await database.getTransactionsFromTo(fromAddress, toAddress);
   debug.extend("txs")("result: %O", txs);
   var tally = 0;

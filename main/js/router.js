@@ -3,7 +3,6 @@
 const allow_cors = require('cors')();
 const get_transactions = require('./glue/get-transactions');
 const is_signature_valid = require('./glue/is-signature-valid');
-const get_block = require('./glue/get_block');
 const express = require('express')
 const router = express.Router();
 const swagger = require('./lib/swagger.js');
@@ -191,23 +190,6 @@ router.post('/is-signature-valid', token, (req, rsp) => {
             return rsp.status(400).send(err.toString());      
         }
     })();
-})
-
-router.get('/block/:block', token, (req, rsp) => {
-  debug('handling /block endpoint');
-  (async () => {
-      try {
-        var params = req.params;
-        var block = params['block'];   
-        if (!block || !parseInt(block)) throw `invalid block value`;
-        let result = await get_block(block);
-        rsp.json(result);        
-      } 
-      catch (err) {
-          debug(err);
-          return rsp.status(400).send(err.toString());      
-      }
-  })();
 })
 
 module.exports = router;

@@ -16,7 +16,6 @@ const metrics = Symbol('metrics');
 
 // private functions
 const checkInit = Symbol('checkInit');
-const checkHasEtherscan = Symbol('checkHasEtherscan');
 
 /**
  * Wires up functionality we use throughout.
@@ -37,22 +36,16 @@ class EthChain {
     if (! this[ctx]) throw new Error('library not initialized, call "init" when wiring up app first');
   }
 
-  [checkHasEtherscan]() {
-    this[checkInit]();
-    if (! this[ctx].api) throw new Error('ETHERSCAN_KEY must be specified: see README.md#Configuration.  Etherscan API not initialized, call "init" with ETHERSCAN_KEY/TYPE');
-  }
-
   /**
    * Initialize this library: this must be the first method called somewhere from where you're doing context & dependency
    * injection.
    * 
-   * @param {string} etherscan_key - key for etherscan.io API access
-   * @param {string} etherscan_type - type of network for etherscan.io access ("","ropsten","rinkeby","morden")
+   * @param {string} infura_project_id - key for INFURA.io API access
+   * @param {string} ethereum_network - type of network for etherscan.io access ("mainnet","ropsten","rinkeby","morden")
    * @return {EthChain} this
    */
-  init({etherscan_key = null, etherscan_type = null, infura_project_id, infura_project_secret, ethereum_network} = {}) {
+  init({infura_project_id, ethereum_network} = {}) {
     if (infura_project_id == null) throw new Error("INFURA_PROJECT_ID must be specified.");
-    if (infura_project_secret == null) throw new Error("INFURA_PROJECT_SECRET must be specified.");
     if (ethereum_network == null) throw new Error("INFURA_TYPE must be specified.");
 
     if (infura_project_id != 'fake') {
@@ -63,7 +56,6 @@ class EthChain {
 
     this[ctx] = {
       infura_project_id: infura_project_id,
-      infura_project_secret: infura_project_secret,
       ethereum_network: ethereum_network,
       web3: web3
     };

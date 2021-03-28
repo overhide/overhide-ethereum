@@ -27,29 +27,40 @@ db.connect();
 (async () =>  {
   let result = null;
 
-  result = await db.query(`SELECT 1 FROM information_schema.tables WHERE table_name = 'ethtxs'`);
+  result = await db.query(`SELECT 1 FROM information_schema.tables WHERE table_name = 'ethstaging'`);
   if (result.rowCount == 0) {
-    await db.query(`CREATE TABLE ethtxs (id SERIAL PRIMARY KEY,
-                                         block integer NOT NULL,
-                                         fromaddr bytea NULL,
-                                         toaddr bytea NULL,
-                                         value decimal NOT NULL)`);
-    console.log(`created 'ethtxs' table.`);
+    await db.query(`CREATE TABLE ethstaging (block integer NOT NULL,
+                                             fromaddr bytea NULL,
+                                             toaddr bytea NULL,
+                                             blockts timestamptz NOT NULL,
+                                             hash bytea NOT NULL,
+                                             value decimal NOT NULL)`);
+    console.log(`created 'ethstaging' table.`);
   }
-  await db.query('CREATE UNIQUE INDEX ON ethtxs (block, fromaddr, toaddr, value);');
-  await db.query('CREATE INDEX ON ethtxs (block);');
-  await db.query('CREATE INDEX ON ethtxs (fromaddr);');
-  await db.query('CREATE INDEX ON ethtxs (toaddr);');
+  await db.query('CREATE UNIQUE INDEX ON ethstaging (block, fromaddr, toaddr, value);');
+  await db.query('CREATE INDEX ON ethstaging (block);');
+  await db.query('CREATE INDEX ON ethstaging (fromaddr);');
+  await db.query('CREATE INDEX ON ethstaging (toaddr);');
 
-  result = await db.query(`SELECT 1 FROM information_schema.tables WHERE table_name = 'ethblocks'`);
+  result = await db.query(`SELECT 1 FROM information_schema.tables WHERE table_name = 'ethtransactions'`);
   if (result.rowCount == 0) {
-    await db.query(`CREATE TABLE ethblocks (id SERIAL PRIMARY KEY,
-                                            block integer NOT NULL,
-                                            blockts timestamptz NOT NULL,
-                                            hash bytea NOT NULL)`);
-    console.log(`created 'ethblocks' table.`);
+    await db.query(`CREATE TABLE ethtransactions (fromaddr bytea NULL,
+                                                  toaddr bytea NULL,
+                                                  transactionts timestamptz NOT NULL,
+                                                  value decimal NOT NULL)`);
+    console.log(`created 'ethtransactions' table.`);
   }
-  await db.query('CREATE UNIQUE INDEX ON ethblocks (block);');
+  await db.query('CREATE UNIQUE INDEX ON ethtransactions (fromaddr, toaddr, transactionts, value);');
+  await db.query('CREATE INDEX ON ethtransactions (fromaddr);');
+  await db.query('CREATE INDEX ON ethtransactions (toaddr);');
+
+  result = await db.query(`SELECT 1 FROM information_schema.tables WHERE table_name = 'ethtrackedaddress'`);
+  if (result.rowCount == 0) {
+    await db.query(`CREATE TABLE ethtrackedaddress (address bytea NULL,
+                                                    checked timestamptz NOT NULL)`);
+    console.log(`created 'ethtrackedaddress' table.`);
+  }
+  await db.query('CREATE UNIQUE INDEX ON ethtrackedaddress (address);');
 
   process.exit(0);
 
