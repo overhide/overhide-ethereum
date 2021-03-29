@@ -72,6 +72,18 @@ router.get('/swagger.json', (req, res, next) => {
  *
  *            If not present or set to anything but `true` then the 200/OK response will list individual *transactions* in
  *            addition to the *tally*.  
+ *        - in: query
+ *          name: include-refunds
+ *          required: false
+ *          schema:
+ *            type: boolean
+ *          description: |
+ *            If present and set to `true` then the 200/OK response will also include transactions from the *to-address* to the *from-address*
+ *            &mdash; presumably considered to be refunds.
+ *
+ *            If not present or set to anything but `true` then the 200/OK response will not include these transactions.  
+ * 
+ *            If the *tally-only* query parameter is also passed in, the tally will reflect the refunds (or not).
  *      produces:
  *        - application/json
  *      responses:
@@ -111,7 +123,8 @@ router.get('/get-transactions/:fromAddress/:toAddress', token, (req, rsp) => {
                 toAddress: req.params['toAddress'],
                 maxMostRecent: req.query['max-most-recent'],
                 since: req.query['since'],
-                tallyOnly: /t/.test(req.query['tally-only'])
+                tallyOnly: /t/.test(req.query['tally-only']),
+                includeRefunds: /t/.test(req.query['include-refunds'])
             });
             debug('result from get-transactions endpoint: %o', result);
             rsp.json(result);        

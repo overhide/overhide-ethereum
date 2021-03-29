@@ -6,7 +6,7 @@ const etherscan = require('../lib/etherscan.js');
 const log = require('../lib/log.js').fn("get-transactions");
 const debug = require('../lib/log.js').debug_fn("get-transactions");
 
-async function get_transactions({fromAddress, toAddress, maxMostRecent = null, since = null, tallyOnly = false}) {
+async function get_transactions({fromAddress, toAddress, maxMostRecent = null, since = null, tallyOnly = false, includeRefunds = false}) {
   if (typeof fromAddress !== 'string' || typeof toAddress !== 'string') throw new Error('fromAddress and toAddress must be strings');
   fromAddress = fromAddress.toLowerCase();
   toAddress = toAddress.toLowerCase();
@@ -21,6 +21,9 @@ async function get_transactions({fromAddress, toAddress, maxMostRecent = null, s
   }
 
   var txs = await database.getTransactionsFromTo(fromAddress, toAddress);
+  if (includeRefunds) {
+    txs = [...txs,...await database.getTransactionsFromTo(toAddress, fromAddress)];
+  }
   debug.extend("txs")("result: %O", txs);
   var tally = 0;
   var result_txs = [];
@@ -33,15 +36,16 @@ async function get_transactions({fromAddress, toAddress, maxMostRecent = null, s
     if (sinceSeconds > 0) {
       if (tx.time < sinceSeconds) break;
     }
-    if (tx.from.toLowerCase() == fromAddress && tx.to.toLowerCase() == toAddress) {
-      let value = parseInt(tx.value);
-      tally += value;
-      result_txs.push({
-        "transaction-value": value,
-        "transaction-date": tx.time
-      });
-      txsSeen++;
-    }
+    let value = parseInt(tx.value);
+    if (tx.from.toLowerCase() == toAddress && tx.to.toLowerCase() == fromAddress) {
+      value *= -1;
+    } 
+    result_txs.push({
+      "transaction-value": value,
+      "transaction-date": tx.time
+    });
+    tally += value;
+    txsSeen++;
   }  
   return tallyOnly ? {tally: tally} : {tally: tally, transactions: result_txs};
 }
