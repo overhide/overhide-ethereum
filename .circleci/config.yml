@@ -21,7 +21,7 @@ jobs:
           command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh up -d 
       - run:
           shell: /bin/sh
-          command: docker exec `docker ps -q --filter name="oh-eth"` npm run db-evolve
+          command: docker exec `docker ps -q --filter name=oh-eth` npm run db-evolve
       - run:
           shell: /bin/sh
           command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh kill oh-eth
@@ -36,7 +36,7 @@ jobs:
           command: sleep 10
       - run:
           shell: /bin/sh
-          command: docker exec `docker ps -q --filter name="oh-eth"` npm run test-report
+          command: docker exec `docker ps -q --filter name=oh-eth` npm run test-report
       - store_test_results:
           path: ./test-report
       - store_artifacts:
