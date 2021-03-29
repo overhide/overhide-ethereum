@@ -290,7 +290,7 @@ class Database {
       address = `decode('${address.slice(2)}','hex')`;
       const query = `UPDATE ethtrackedaddress SET checked = NOW() WHERE address = ${address};`;
       let result = await this[ctx].db.query(query);
-      return result > 0;
+      return result.rowCount > 0;
     } catch (err) {
       throw `checkAddressIsTracked error :: ${String(err)}`;
     }
