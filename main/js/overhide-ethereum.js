@@ -119,8 +119,7 @@ async function onHealthCheck() {
     metrics: {
       eth: eth.metrics(),
       earliestBlockDb: await database.getMinBlock(),
-      latestBlockDb: await database.getMaxBlock(),
-      latestBlock: await eth.getLatestBlock()
+      latestBlockDb: await database.getMaxBlock()
     }
   };  
   return status;

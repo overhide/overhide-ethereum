@@ -201,11 +201,19 @@ class Database {
       let result = await this[ctx].db.query(query);
       log('deleting blocks from staging => %o', [...new Set(result.rows.map(row => row.block))]);
 
-      var addresses = new Set([...result.rows.map(r => r.fromaddr.toString('hex')) ,...result.rows.map(r => r.toaddr.toString('hex'))]);
-      addresses = [...addresses].map(a => `decode('${a}','hex')`);
-      addresses = addresses.join(',');
+      var addresses = new Set([...result.rows.filter(r => !!r.fromaddr).map(r => r.fromaddr.toString('hex')) ,...result.rows.filter(r => !!r.toaddr).map(r => r.toaddr.toString('hex'))]);
+      addresses = [...addresses];
 
-      var query = `
+      if (addresses.length === 0) {
+        var query = `
+          BEGIN;
+            DELETE FROM ethstaging WHERE block >= ${block};
+          COMMIT;
+        `;
+      } else {
+        addresses = [...addresses].map(a => `decode('${a}','hex')`);
+        addresses = addresses.join(',');
+        var query = `
           BEGIN;
             DELETE FROM ethstaging WHERE block >= ${block};
             DELETE FROM ethtransactions WHERE fromaddr in (${addresses});
@@ -213,6 +221,8 @@ class Database {
             DELETE FROM ethtrackedaddress WHERE address in (${addresses});
           COMMIT;
         `;
+      }
+
       await this[ctx].db.query(query);
     } catch (err) {
       throw `deleteBlock error :: ${String(err)} :: ${query}`;
