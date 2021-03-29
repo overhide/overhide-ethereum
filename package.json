@@ -41,7 +41,7 @@
     "SALT": "",
     "ISPROD": "",
     "ETHERSCAN_KEY": "",
-    "INFURA_PROJECT_ID": "",
+    "WEB3_WSS_URI": "",
     "NETWORK_TYPE": "",
     "RATE_LIMIT_WINDOW_MS": 1000,
     "RATE_LIMIT_MAX_REQUESTS_PER_WINDOW": 100,

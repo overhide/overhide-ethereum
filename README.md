@@ -106,6 +106,9 @@ Some notable configuration points for *overhide-ethereum*:
 
 | *Configuration Point* | *Description* | *Sample Value* |
 | --- | --- | --- |
+| WEB3_WSS_URI | The websocket web3 provider URI | redacted |
+| NETWORK_TYPE | The network type (e.g. 'mainnet') | rinkeby |
+| ETHERSCAN_KEY | The [etherscan.io](https://etherscan.io) API key &mdash; good account summary source | redacted |
 | OH_ETH_PORT | *overhide-ethereum*'s port | 8080 |
 | OH_ETH_HOST | *overhide-ethereum*'s host | localhost |
 | BASE_URL | `host:port` *base URL* as used from outside (of load-balancer) to access service | localhost:8080
@@ -114,15 +117,8 @@ Some notable configuration points for *overhide-ethereum*:
 | TOKEN_URL | Token validation URL (see *Security* above) | https://token.overhide.io/validate |
 | RATE_LIMIT_WINDOW_MS | Duration of API rate limiting window (milliseconds) | 60000 |
 | RATE_LIMIT_MAX_REQUESTS_PER_WINDOW | Number of API calls per rate limiting window | 30 |
-| INFURA_PROJECT_ID | The project ID from https://infura.io | redacted |
-| INFURA_TYPE | The network type (e.g. 'mainnet') | rinkeby |
 | SEED_OLDER_NUMBER_BLOCKS | Controls the number of blocks to seed towards block 0 during each run of the back-fill job | 0 |
 | SEED_OLDER_JOB_PERIOD_MILLIS | Controls how often the back-fill job is called on each node | 30000 |
-
-Take special note of `SEED_OLDER_NUMBER_BLOCKS`.  This service, when started, starts back-filling blocks into the database until it reaches genesis.  If this is set to 0, no back-filling will occur.  This is the value set in [.npmrc.sample](.npmrc.sample).  If you do not back-fill blocks, the service will only
-function properly for blocks since the service came online.
-
-Adjust the `SEED_OLDER_NUMBER_BLOCKS` and `SEED_OLDER_JOB_PERIOD_MILLIS` to match your https://infura.io API limits, number of environments (e.g. mainnet, rinkeby) and number of nodes of this service running on each environment.  Leave room for normal usage API calls.
 
 # First Time DB Setup
 

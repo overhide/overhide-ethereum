@@ -21,7 +21,7 @@ const DEBUG = process.env.DEBUG || process.env.npm_config_DEBUG || process.env.n
 const SALT = process.env.SALT || process.env.npm_config_SALT || process.env.npm_package_config_SALT;
 const TOKEN_URL = process.env.TOKEN_URL || process.env.npm_config_TOKEN_URL || process.env.npm_package_config_TOKEN_URL;
 const ISPROD = process.env.ISPROD || process.env.npm_config_ISPROD || process.env.npm_package_config_ISPROD || false;
-const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID || process.env.npm_config_INFURA_PROJECT_ID || process.env.npm_package_config_INFURA_PROJECT_ID;
+const WEB3_WSS_URI = process.env.WEB3_WSS_URI || process.env.npm_config_WEB3_WSS_URI || process.env.npm_package_config_WEB3_WSS_URI;
 const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || process.env.npm_config_ETHERSCAN_KEY || process.env.npm_package_config_ETHERSCAN_KEY;
 const NETWORK_TYPE = process.env.NETWORK_TYPE || process.env.npm_config_NETWORK_TYPE || process.env.npm_package_config_NETWORK_TYPE;
 const RATE_LIMIT_WINDOW_MS = process.env.RATE_LIMIT_WINDOW_MS || process.env.npm_config_RATE_LIMIT_WINDOW_MS || process.env.npm_package_config_RATE_LIMIT_WINDOW_MS || 60000;
@@ -46,7 +46,7 @@ const ctx_config = {
   isTest: !ISPROD,
   etherscan_key: ETHERSCAN_KEY,
   ethereum_network: NETWORK_TYPE,
-  infura_project_id: INFURA_PROJECT_ID,
+  web3_wss_uri: WEB3_WSS_URI,
   rateLimitWindowsMs: RATE_LIMIT_WINDOW_MS,
   rateLimitMax: RATE_LIMIT_MAX_REQUESTS_PER_WINDOW,
   base_url: BASE_URL,
@@ -67,7 +67,7 @@ const database = require('./lib/database.js').init(ctx_config);
 const swagger = require('./lib/swagger.js').init(ctx_config);
 const token = require('./lib/token.js').init(ctx_config);
 log("CONFIG:\n%O", ((cfg) => {
-  cfg.infura_project_id = cfg.infura_project_id.replace(/.(?=.{2})/g,'*'); 
+  cfg.web3_wss_uri = cfg.web3_wss_uri.replace(/.(?=.{2})/g,'*'); 
   cfg.etherscan_key = cfg.etherscan_key.replace(/.(?=.{2})/g,'*'); 
   cfg.pgpassword = cfg.pgpassword.replace(/.(?=.{2})/g,'*'); 
   cfg.salt = cfg.salt.replace(/.(?=.{2})/g,'*'); 
