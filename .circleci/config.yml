@@ -30,7 +30,10 @@ jobs:
           command: docker system prune -f
       - run:
           shell: /bin/sh
-          command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -v ~/overhide-ethereum/test-report:/home/node/app/test-report -d oh-eth
+          command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh run -v ~/overhide-ethereum/test-report:/home/node/app/test-report -d oh-eth          
+      - run:
+          shell: /bin/sh
+          command: docker logs -f `docker ps -q --filter name="oh-eth"`
       - run:
           shell: /bin/sh
           command: sleep 10
