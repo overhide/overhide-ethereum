@@ -111,6 +111,7 @@ describe('smoke tests', () => {
       .get('/get-transactions/'+eth_acct1+'/'+eth_acct2)
       .set({ "Authorization": `Bearer ${TOKEN}` })
       .then(function(res) {
+        console.log(`result: ${res.text}`);
         var reso = JSON.parse(res.text);
         assert.isTrue(reso.tally == (3 * POINT_0_1_ETH_IN_WEI));
         assert.isTrue(Array.isArray(reso.transactions));
