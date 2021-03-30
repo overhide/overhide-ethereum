@@ -21,7 +21,7 @@ jobs:
           command: docker-compose -f main/docker/docker-compose.yml -f main/docker/docker-compose.dev.yml --project-directory . --project-name oh up -d 
       - run:
           shell: /bin/sh
-          command: docker ps -q
+          command: docker ps -a
       - run:
           shell: /bin/sh
           command: docker exec oh-eth npm run db-evolve
