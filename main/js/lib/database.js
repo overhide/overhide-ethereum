@@ -53,14 +53,16 @@ class Database {
    * @param {string} pguse
    * @param {string} pgpassword
    * @param {string} pgssl - true or false
+   * @param {number} confirmations - number of confirmations required to approve of tx
    * @returns {Database} this
    */
-  init({pghost,pgport,pgdatabase,pguser,pgpassword, pgssl} = {}) {
+  init({pghost,pgport,pgdatabase,pguser,pgpassword, pgssl, confirmations} = {}) {
     if (pghost == null) throw new Error("POSTGRES_HOST must be specified.");
     if (pgport == null) throw new Error("POSTGRES_PORT must be specified.");
     if (pgdatabase == null) throw new Error("POSTGRES_DB must be specified.");
     if (pguser == null) throw new Error("POSTGRES_USER must be specified.");
     if (pgpassword == null) throw new Error("POSTGRES_PASSWORD must be specified.");
+    if (confirmations == null) throw new Error("EXPECTED_CONFIRMATIONS must be specified.");
 
     const db = new Pool({
       host: pghost,
@@ -72,7 +74,8 @@ class Database {
     });
 
     this[ctx] = {
-      db: db
+      db: db,
+      confirmations: confirmations
     };
     
     return this;
@@ -232,6 +235,8 @@ class Database {
   /**
    * Add transactions for a new address we will be tracking.
    * 
+   * REMARK:  this method respects the EXPECTED_CONFIRMATIONS config point -- checks max block and does not add transactions higher than that.
+   * 
    * @param {[{block: number, from: string, to: string, time: Date, value: string, hash:.., parentHash:..},..]} transactions -- list of transactions
    *   to add; `from` and `to` are "0x" prefixed addresses.
    * @param {string} address -- '0x' prefixed hex address.
@@ -239,16 +244,21 @@ class Database {
    async addTransactionsForNewAddress(transactions, address) {
     this[checkInit]();
     try {
+      const maxBlock = (await this.getMaxBlock()) - this[ctx].confirmations;
+
+      transactions = transactions.filter(t => t.block <= maxBlock);
+
       if (!transactions || transactions.length == 0) {
         throw "no transactions";
-      }
-      
-      var txs = transactions.map(t => `(
-          ${t.from ? "decode('" + t.from.slice(2) + "','hex')" : null}, 
-          ${t.to ? "decode('" + t.to.slice(2) + "','hex')" : null}, 
-          '${t.time.toISOString()}', 
-          '${t.value}'
-        )`);
+      }      
+     
+      var txs = transactions
+        .map(t => `(
+            ${t.from ? "decode('" + t.from.slice(2) + "','hex')" : null}, 
+            ${t.to ? "decode('" + t.to.slice(2) + "','hex')" : null}, 
+            '${t.time.toISOString()}', 
+            '${t.value}'
+          )`);
       txs = txs.join(',');
 
       address = `decode('${address.slice(2)}','hex')`;

@@ -119,6 +119,7 @@ Some notable configuration points for *overhide-ethereum*:
 | RATE_LIMIT_MAX_REQUESTS_PER_WINDOW | Number of API calls per rate limiting window | 30 |
 | SEED_OLDER_NUMBER_BLOCKS | Controls the number of blocks to seed towards block 0 during each run of the back-fill job | 0 |
 | SEED_OLDER_JOB_PERIOD_MILLIS | Controls how often the back-fill job is called on each node | 30000 |
+| EXPECTED_CONFIRMATIONS | Number of confirmations before transaction is considered valid | 7 |
 
 # First Time DB Setup
 

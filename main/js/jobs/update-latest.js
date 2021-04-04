@@ -7,6 +7,7 @@ const log = require('../lib/log.js').fn("update-latest");
 const debug = require('../lib/log.js').debug_fn("update-latest");
 
 const UPDATE_LATEST_JOB_PERIOD_MILLIS = process.env.UPDATE_LATEST_JOB_PERIOD_MILLIS || process.env.npm_config_UPDATE_LATEST_JOB_PERIOD_MILLIS || process.env.npm_package_config_UPDATE_LATEST_JOB_PERIOD_MILLIS || 5000;
+const EXPECTED_CONFIRMATIONS = process.env.EXPECTED_CONFIRMATIONS || process.env.npm_config_EXPECTED_CONFIRMATIONS || process.env.npm_package_config_EXPECTED_CONFIRMATIONS || 7;
 
 /**
  * Job function to update most recent ethereum blocks.
@@ -14,7 +15,7 @@ const UPDATE_LATEST_JOB_PERIOD_MILLIS = process.env.UPDATE_LATEST_JOB_PERIOD_MIL
 async function go() {
   var timeout = UPDATE_LATEST_JOB_PERIOD_MILLIS;
   try {
-    const latestBlock = await eth.getLatestBlock();
+    const latestBlock = (await eth.getLatestBlock()) - EXPECTED_CONFIRMATIONS;
     const dbMaxBlock = await database.getMaxBlock();
 
     if (dbMaxBlock === -1) {

@@ -16,6 +16,7 @@ const POSTGRES_DB = process.env.POSTGRES_DB || process.env.npm_config_POSTGRES_D
 const POSTGRES_USER = process.env.POSTGRES_USER || process.env.npm_config_POSTGRES_USER || process.env.npm_package_config_POSTGRES_USER || 'adam';
 const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD || process.env.npm_config_POSTGRES_PASSWORD || process.env.npm_package_config_POSTGRES_PASSWORD || 'c0c0nut';
 const POSTGRES_SSL = process.env.POSTGRES_SSL || process.env.npm_config_POSTGRES_SSL || process.env.npm_package_config_POSTGRES_SSL;
+const EXPECTED_CONFIRMATIONS = process.env.EXPECTED_CONFIRMATIONS || process.env.npm_config_EXPECTED_CONFIRMATIONS || process.env.npm_package_config_EXPECTED_CONFIRMATIONS || 7;
 
 
 const chai = require('chai');
@@ -32,7 +33,8 @@ const database = require('../../main/js/lib/database.js').init({
   pgdatabase: POSTGRES_DB,
   pguser: POSTGRES_USER,
   pgpassword: POSTGRES_PASSWORD,
-  pgssl: POSTGRES_SSL
+  pgssl: POSTGRES_SSL,
+  confirmations: EXPECTED_CONFIRMATIONS
 });
 const uuid = require('uuid');
 const assert = chai.assert;
@@ -41,23 +43,24 @@ var TOKEN;
 
 chai.use(chaiHttp);
 
-database.addTransactionsForNewAddress([
-  {block: 4340653, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z'), hash:'0x00'},
-  {block: 4340653, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z'), hash:'0x00'},
-  {block: 4340653, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z'), hash:'0x00'},
-  {block: 4340653, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z'), hash:'0x00'},
-], '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12');
-database.addTransactionsForNewAddress([
-  {block: 4340619, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
-  {block: 4340619, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
-  {block: 4340619, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
-  {block: 4340619, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
-  {block: 4340599, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'},
-  {block: 4340599, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'},
-  {block: 4340599, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'},
-  {block: 4340599, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'}
-], '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76');
-
+(async () => {
+  await database.addTransactionsForNewAddress([
+    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z'), hash:'0x00'},
+    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z'), hash:'0x00'},
+    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z'), hash:'0x00'},
+    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z'), hash:'0x00'},
+  ], '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12');
+  await database.addTransactionsForNewAddress([
+    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
+    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
+    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
+    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
+    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'},
+    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'},
+    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'},
+    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'}
+  ], '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76');
+})();
 
 
 // @return promise
