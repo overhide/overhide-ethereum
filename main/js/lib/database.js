@@ -124,12 +124,12 @@ class Database {
               VALUES ${stageValues} 
               ON CONFLICT (block, fromaddr, toaddr, value) DO NOTHING;
 
-            INSERT INTO ethtransactions (fromaddr, toaddr, transactionts, value)
+            INSERT INTO ethtransactions (block, fromaddr, toaddr, transactionts, value)
               (
-                SELECT fromaddr, toaddr, blockts, value FROM ethstaging S
+                SELECT block, fromaddr, toaddr, blockts, value FROM ethstaging S
                   JOIN ethtrackedaddress A ON S.fromaddr = A.address OR S.toaddr = A.address
               )
-              ON CONFLICT (fromaddr, toaddr, transactionts, value) DO NOTHING;
+              ON CONFLICT (block, fromaddr, toaddr, value) DO NOTHING;
 
             DELETE FROM ethstaging WHERE block < ${block} - 100;
 
@@ -176,12 +176,12 @@ class Database {
               VALUES ${stageValues} 
               ON CONFLICT (block, fromaddr, toaddr, value) DO NOTHING;
           
-            INSERT INTO ethtransactions (fromaddr, toaddr, transactionts, value)
+            INSERT INTO ethtransactions (block, fromaddr, toaddr, transactionts, value)
               (
-                SELECT fromaddr, toaddr, blockts, value FROM ethstaging S
+                SELECT block, fromaddr, toaddr, blockts, value FROM ethstaging S
                   JOIN ethtrackedaddress A ON S.fromaddr = A.address OR S.toaddr = A.address
               )
-              ON CONFLICT (fromaddr, toaddr, transactionts, value) DO NOTHING;
+              ON CONFLICT (block, fromaddr, toaddr, value) DO NOTHING;
               
           COMMIT;
         `;
@@ -254,6 +254,7 @@ class Database {
      
       var txs = transactions
         .map(t => `(
+            ${t.block},
             ${t.from ? "decode('" + t.from.slice(2) + "','hex')" : null}, 
             ${t.to ? "decode('" + t.to.slice(2) + "','hex')" : null}, 
             '${t.time.toISOString()}', 
@@ -267,15 +268,15 @@ class Database {
         `
           BEGIN;
 
-            INSERT INTO ethtransactions (fromaddr, toaddr, transactionts, value) VALUES ${txs} 
-              ON CONFLICT (fromaddr, toaddr, transactionts, value) DO NOTHING;
+            INSERT INTO ethtransactions (block, fromaddr, toaddr, transactionts, value) VALUES ${txs} 
+              ON CONFLICT (block, fromaddr, toaddr, value) DO NOTHING;
 
-            INSERT INTO ethtransactions (fromaddr, toaddr, transactionts, value) 
+            INSERT INTO ethtransactions (block, fromaddr, toaddr, transactionts, value) 
              (
-                SELECT fromaddr, toaddr, blockts, value FROM ethstaging S
+                SELECT block, fromaddr, toaddr, blockts, value FROM ethstaging S
                   WHERE S.fromaddr = ${address} OR S.toaddr = ${address}
              )
-             ON CONFLICT (fromaddr, toaddr, transactionts, value) DO NOTHING;
+             ON CONFLICT (block, fromaddr, toaddr, value) DO NOTHING;
           
             INSERT INTO ethtrackedaddress (address, checked) VALUES (${address}, NOW())
               ON CONFLICT (address) DO NOTHING;
@@ -311,13 +312,13 @@ class Database {
    * 
    * @param {string} fromAddress -- '0x' prefixed address to get transactions for.
    * @param {string} toAddress -- '0x' prefixed recepient address to get transactions for.
-   * @returns {[{from: string, to: string, time: Date, value: string},..]} transactions
+   * @returns {[{block: number, from: string, to: string, time: Date, value: string},..]} transactions
    */
   async getTransactionsFromTo(fromAddress, toAddress) {
     this[checkInit]();
     try {
       const query = `
-        SELECT fromaddr, toaddr, value, transactionts 
+        SELECT block, fromaddr, toaddr, value, transactionts 
           FROM ethtransactions 
           WHERE fromaddr = decode($1,'hex') AND toaddr = decode($2,'hex')
           ORDER BY transactionts DESC
@@ -330,6 +331,7 @@ class Database {
       }
       result = result.rows.map(row => {
         return {
+          block: row.block,
           from: row.fromaddr ? `0x${row.fromaddr.toString('hex')}` : null,
           to: row.toaddr ? `0x${row.toaddr.toString('hex')}` : null,
           time: row.transactionts,

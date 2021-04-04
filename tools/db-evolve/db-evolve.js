@@ -44,13 +44,14 @@ db.connect();
 
   result = await db.query(`SELECT 1 FROM information_schema.tables WHERE table_name = 'ethtransactions'`);
   if (result.rowCount == 0) {
-    await db.query(`CREATE TABLE ethtransactions (fromaddr bytea NULL,
+    await db.query(`CREATE TABLE ethtransactions (block integer NOT NULL,
+                                                  fromaddr bytea NULL,
                                                   toaddr bytea NULL,
                                                   transactionts timestamptz NOT NULL,
                                                   value decimal NOT NULL)`);
     console.log(`created 'ethtransactions' table.`);
   }
-  await db.query('CREATE UNIQUE INDEX ON ethtransactions (fromaddr, toaddr, transactionts, value);');
+  await db.query('CREATE UNIQUE INDEX ON ethtransactions (block, fromaddr, toaddr, value);');
   await db.query('CREATE INDEX ON ethtransactions (fromaddr);');
   await db.query('CREATE INDEX ON ethtransactions (toaddr);');
 

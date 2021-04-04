@@ -33,6 +33,7 @@ const POSTGRES_DB = process.env.POSTGRES_DB || process.env.npm_config_POSTGRES_D
 const POSTGRES_USER = process.env.POSTGRES_USER || process.env.npm_config_POSTGRES_USER || process.env.npm_package_config_POSTGRES_USER || 'adam';
 const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD || process.env.npm_config_POSTGRES_PASSWORD || process.env.npm_package_config_POSTGRES_PASSWORD || 'c0c0nut';
 const POSTGRES_SSL = process.env.POSTGRES_SSL || process.env.npm_config_POSTGRES_SSL || process.env.npm_package_config_POSTGRES_SSL;
+const IS_WORKER = process.env.IS_WORKER || process.env.npm_config_IS_WORKER || process.env.npm_package_config_IS_WORKER || true;
 
 // Wire up application context
 const ctx_config = {
@@ -76,8 +77,10 @@ log("CONFIG:\n%O", ((cfg) => {
   return cfg;
 })({...ctx_config}));
 
-// JOBS
-require('./jobs/update-latest')();
+// WORKER JOBS
+if (IS_WORKER) {
+  require('./jobs/update-latest')();
+}
 
 // START THE APPLICATION
 const app = express();

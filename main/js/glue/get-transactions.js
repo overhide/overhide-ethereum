@@ -6,7 +6,9 @@ const etherscan = require('../lib/etherscan.js');
 const log = require('../lib/log.js').fn("get-transactions");
 const debug = require('../lib/log.js').debug_fn("get-transactions");
 
-async function get_transactions({fromAddress, toAddress, maxMostRecent = null, since = null, tallyOnly = false, includeRefunds = false}) {
+const EXPECTED_CONFIRMATIONS = process.env.EXPECTED_CONFIRMATIONS || process.env.npm_config_EXPECTED_CONFIRMATIONS || process.env.npm_package_config_EXPECTED_CONFIRMATIONS || 7;
+
+async function get_transactions({fromAddress, toAddress, maxMostRecent = null, since = null, tallyOnly = false, includeRefunds = false, confirmations = 0}) {
   if (typeof fromAddress !== 'string' || typeof toAddress !== 'string') throw new Error('fromAddress and toAddress must be strings');
   fromAddress = fromAddress.toLowerCase();
   toAddress = toAddress.toLowerCase();
@@ -24,6 +26,10 @@ async function get_transactions({fromAddress, toAddress, maxMostRecent = null, s
   if (includeRefunds) {
     txs = [...txs,...await database.getTransactionsFromTo(toAddress, fromAddress)];
   }
+
+  const highestAllowedBlock = (await database.getMaxBlock()) - Math.max((confirmations - EXPECTED_CONFIRMATIONS), 0);
+  txs = txs.filter(t => t.block < highestAllowedBlock);
+
   debug.extend("txs")("result: %O", txs);
   var tally = 0;
   var result_txs = [];

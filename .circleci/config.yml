@@ -17,6 +17,7 @@ jobs:
             printf "POSTGRES_DB=oh-eth\n" >> .npmrc.dev;
             printf "POSTGRES_USER=adam\n" >> .npmrc.dev;
             printf "POSTGRES_PASSWORD=c0c0nut\n" >> .npmrc.dev;
+            printf "IS_WORKER=false\n" >> .npmrc.dev;
             cat .npmrc.dev   
       - run:
           shell: /bin/sh

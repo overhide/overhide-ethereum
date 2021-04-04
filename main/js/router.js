@@ -67,7 +67,7 @@ router.get('/swagger.json', (req, res, next) => {
  *          schema:
  *            type: boolean
  *          description: |
- *            If present and set to `true` then the 200/OK response will not list individual *transactions*, just the
+ *            If present and set to `true`, then the 200/OK response will not list individual *transactions*, just the
  *            *tally*.
  *
  *            If not present or set to anything but `true` then the 200/OK response will list individual *transactions* in
@@ -78,12 +78,27 @@ router.get('/swagger.json', (req, res, next) => {
  *          schema:
  *            type: boolean
  *          description: |
- *            If present and set to `true` then the 200/OK response will also include transactions from the *to-address* to the *from-address*
+ *            If present and set to `true`, then the 200/OK response will also include transactions from the *to-address* to the *from-address*
  *            &mdash; presumably considered to be refunds.
  *
  *            If not present or set to anything but `true` then the 200/OK response will not include these transactions.  
  * 
  *            If the *tally-only* query parameter is also passed in, the tally will reflect the refunds (or not).
+ *        - in: query
+ *          name: confirmations-required
+ *          required: false
+ *          schema:
+ *            type: number
+ *          description: |
+ *            If present and set to a number, then the 200/OK response will only include transactions from the *to-address* to the *from-address*
+ *            that have at least this number of (block) confirmation.
+ * 
+ *            No transactions from blocks higher than `(blockchain-height - confirmations-required)` will be included.
+ *
+ *            If not present or set to anything but `true` then the 200/OK response will only respect the service's `EXPECTED_CONFIRMATIONS` configuration
+ *            point.
+ * 
+ *            If the *tally-only* query parameter is also passed in, the tally will reflect this setting (or not).
  *      produces:
  *        - application/json
  *      responses:
@@ -124,7 +139,8 @@ router.get('/get-transactions/:fromAddress/:toAddress', token, (req, rsp) => {
                 maxMostRecent: req.query['max-most-recent'],
                 since: req.query['since'],
                 tallyOnly: /t/.test(req.query['tally-only']),
-                includeRefunds: /t/.test(req.query['include-refunds'])
+                includeRefunds: /t/.test(req.query['include-refunds']),
+                confirmations: req.query['confirmations-required'] ? req.query['confirmations-required'] : 0
             });
             debug('result from get-transactions endpoint: %o', result);
             rsp.json(result);        
