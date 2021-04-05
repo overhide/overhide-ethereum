@@ -43,7 +43,8 @@ var TOKEN;
 
 chai.use(chaiHttp);
 
-(async () => {
+async function instrumentDb() {
+  await database.addBlockTransactionsNoCheck([{block: 400, from: '0x00', to: '0x00', value: '10000000000000000', time: new Date('2020-05-07T14:27:36Z'), hash:'0x00', parentHash:'0x00'}]);
   await database.addTransactionsForNewAddress([
     {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z'), hash:'0x00'},
     {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z'), hash:'0x00'},
@@ -51,16 +52,16 @@ chai.use(chaiHttp);
     {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:27:36Z'), hash:'0x00'},
   ], '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12');
   await database.addTransactionsForNewAddress([
-    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
-    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
-    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
-    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
-    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'},
-    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'},
-    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'},
-    {block: 200, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'}
-  ], '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76');
-})();
+    {block: 190, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
+    {block: 190, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
+    {block: 190, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
+    {block: 190, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:19:06Z'), hash:'0x00'},
+    {block: 180, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'},
+    {block: 180, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'},
+    {block: 180, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F12', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'},
+    {block: 180, from: '0x1b8a1Cc23Aa6D8A882BaCf6d27546DF9305e0F13', to: '0x6A23B59ff43F82B761162DFc5b6F0F461210EC76', value: '10000000000000000', time: new Date('2019-05-07T14:14:06Z'), hash:'0x00'}
+  ], '0x6A23B59ff43F82B761162DFc5b6F0F461210EC77');
+}
 
 
 // @return promise
@@ -101,6 +102,7 @@ describe('smoke tests', () => {
 
     (async () => {
       await getToken();
+      await instrumentDb();
       done();
     })();
   });
