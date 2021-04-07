@@ -82,7 +82,7 @@ class EthChain {
 
   /**
    * @param {number} index -- block index
-   * @returns {[{block:.., from:.., to:.., time:.., value:.., hash:.., parentHash:..},..]} transactions with values in wei.  If block has only 0-valued
+   * @returns {[{block:.., from:.., to:.., time:.., value:.., bkhash:.., txhash:.., parentHash:..},..]} transactions with values in wei.  If block has only 0-valued
    *   transactions then only a single transaction is returned with `to` and `from` set to `null`, and `value` to `0`.
    */
   async getTransactionsForBlock(index) {
@@ -102,7 +102,8 @@ class EthChain {
           to: null,
           time: time,
           value: 0,
-          hash: hash,
+          bkhash: hash,
+          txhash: hash, /* use block hash, doesn't matter, just a palce holder value */
           parentHash: parentHash
         }];
       }
@@ -114,7 +115,8 @@ class EthChain {
           to: t.to,
           time: time,
           value: t.value,
-          hash: hash,
+          bkhash: hash,
+          txhash: t.hash,
           parentHash: parentHash
         }
       });  

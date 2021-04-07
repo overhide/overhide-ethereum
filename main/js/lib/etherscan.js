@@ -92,7 +92,8 @@ class Etherscan {
         block: r.blockNumber,
         from: r.from,
         to: r.to,
-        hash: r.blockHash,
+        bkhash: r.blockHash,
+        txhash: r.hash,
         value: r.value,
         time: new Date(+r.timeStamp * 1000)
       };

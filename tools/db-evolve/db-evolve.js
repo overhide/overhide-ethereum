@@ -33,11 +33,12 @@ db.connect();
                                              fromaddr bytea NULL,
                                              toaddr bytea NULL,
                                              blockts timestamptz NOT NULL,
-                                             hash bytea NOT NULL,
+                                             bkhash bytea NOT NULL,
+                                             txhash bytea NOT NULL,
                                              value decimal NOT NULL)`);
     console.log(`created 'ethstaging' table.`);
   }
-  await db.query('CREATE UNIQUE INDEX ON ethstaging (block, fromaddr, toaddr, value);');
+  await db.query('CREATE UNIQUE INDEX ON ethstaging (fromaddr, toaddr, txhash, value);');
   await db.query('CREATE INDEX ON ethstaging (block);');
   await db.query('CREATE INDEX ON ethstaging (fromaddr);');
   await db.query('CREATE INDEX ON ethstaging (toaddr);');
@@ -48,10 +49,11 @@ db.connect();
                                                   fromaddr bytea NULL,
                                                   toaddr bytea NULL,
                                                   transactionts timestamptz NOT NULL,
+                                                  txhash bytea NOT NULL,
                                                   value decimal NOT NULL)`);
     console.log(`created 'ethtransactions' table.`);
   }
-  await db.query('CREATE UNIQUE INDEX ON ethtransactions (block, fromaddr, toaddr, value);');
+  await db.query('CREATE UNIQUE INDEX ON ethtransactions (fromaddr, toaddr, txhash, value);');
   await db.query('CREATE INDEX ON ethtransactions (fromaddr);');
   await db.query('CREATE INDEX ON ethtransactions (toaddr);');
 
