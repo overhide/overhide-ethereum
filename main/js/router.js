@@ -27,6 +27,8 @@ router.get('/swagger.json', (req, res, next) => {
  *      summary: Retrieve remuneration transactions and/or their tally.
  *      description: |
  *        Retrieve the latest remuneration transactions (and/or their tally) from *from-address* to *to-address*
+ * 
+ *        All values in *wei*.
  *      tags:
  *        - remuneration provider
  *      parameters:
