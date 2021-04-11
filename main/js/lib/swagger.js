@@ -82,9 +82,9 @@ class Swagger {
 
             GitHub repository for this *overhide-ethereum* service: [https://github.com/overhide/overhide-ethereum](https://github.com/overhide/overhide-ethereum).
 
-            Motivation for this API is written up at [https://overhide.io/2019/03/20/why.html](https://overhide.io/2019/03/20/why.html).
+            This API is in support of [ledger-based authorizations](https://overhide.io/2019/03/20/why.html) as per [https://overhide.io](https://overhide.io).
 
-            An example show case leveraging this API is at [https://github.com/overhide/ledgers.js](https://github.com/overhide/ledgers.js).
+            This API is in support of the [https://github.com/overhide/ledgers.js](https://github.com/overhide/ledgers.js) library.
 
             These APIs require bearer tokens to be furnished in an 'Authorization' header as 'Bearer ..' values.  The tokens are to be retrieved from
             [https://token.overhide.io](https://token.overhide.io).
