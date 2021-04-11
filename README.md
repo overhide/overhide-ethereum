@@ -1,5 +1,9 @@
 <p align="center"><a href="https://overhide.io"><img src="./.github/logo.png" width="200px"/></a></p>
 
+<p align="center"><a href="https://overhide.io">overhide.io</a></p><p style="width: 500px; margin: auto">a free and open-sourced (mostly) ecosystem of widgets, a front-end library, and back-end services &mdash; to make addition of "logins" and "in-app-purchases" (IAP) to your app as banal as possible.</p>
+
+<hr/>
+
 # overhide-ethereum
 
 [![CircleCI](https://circleci.com/gh/overhide/overhide-ethereum.svg?style=svg)](https://circleci.com/gh/overhide/overhide-ethereum)
@@ -49,7 +53,6 @@ To build a non-test container see *Building Docker Image* section below.
 1. jump to "Database Evolutions" section, especially the "For Docker" subsection
 1. your *oh-eth* container failed since your DB wasn't setup--now it is--find your *oh-eth* container name: `docker ps -a`; look for *oh-eth* with an "Exited" status.
 1. `npm test` -- run tests against above
-1. `npm run set-auth` -- add user to authenticate against service
 1. `point browser at http://editor.swagger.io/?url=http://localhost:8080/swagger.json` -- to use the API
 
 From now on you'll need to use the following commands to stop/restart things:
@@ -66,7 +69,6 @@ From now on you'll need to use the following commands to stop/restart things:
 1. `npm config set overhide-ethereum:OH_ETH_PORT=8081` -- (optional) only necessary if you have a port conflict
 1. `npm run start` -- start *overhide-ethereum* on localhost
 1. `npm test` -- in another terminal; run tests against above: 
-1. `npm run set-auth` -- add user to authenticate against service
 1. `point browser at http://editor.swagger.io/?url=http://localhost:8081/swagger.json` -- to use the API
 
 # Security
@@ -117,8 +119,6 @@ Some notable configuration points for *overhide-ethereum*:
 | TOKEN_URL | Token validation URL (see *Security* above) | https://token.overhide.io/validate |
 | RATE_LIMIT_WINDOW_MS | Duration of API rate limiting window (milliseconds) | 60000 |
 | RATE_LIMIT_MAX_REQUESTS_PER_WINDOW | Number of API calls per rate limiting window | 30 |
-| SEED_OLDER_NUMBER_BLOCKS | Controls the number of blocks to seed towards block 0 during each run of the back-fill job | 0 |
-| SEED_OLDER_JOB_PERIOD_MILLIS | Controls how often the back-fill job is called on each node | 30000 |
 | EXPECTED_CONFIRMATIONS | Number of confirmations before transaction is considered valid | 2 |
 | IS_WORKER | Enable this on one (and only one) node -- runs worker processes that use up API limits | true |
 

@@ -71,7 +71,11 @@ class Swagger {
         basePath: /
         info:
           description: |          
-            An *overhide* "remuneration provider" API for Ethereum networks.
+            <hr/>         
+            <a href="https://overhide.io" target="_blank">overhide.io</a> is a free and open-sourced (mostly) ecosystem of widgets, a front-end library, and back-end services &mdash; to make addition of "logins" and "in-app-purchases" (IAP) to your app as banal as possible.
+            <hr/><br/>
+
+            This is an *overhide* "remuneration provider" API for Ethereum networks.
 
             These API docs are live: connected to the \`${this[ctx].network}\` Ethereum network.
 
