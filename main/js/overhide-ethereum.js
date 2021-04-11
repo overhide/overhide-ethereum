@@ -59,7 +59,8 @@ const ctx_config = {
   pgdatabase: POSTGRES_DB,
   pguser: POSTGRES_USER,
   pgpassword: POSTGRES_PASSWORD,
-  pgssl: POSTGRES_SSL
+  pgssl: POSTGRES_SSL,
+  isWorker: !!IS_WORKER && /true/i.test(IS_WORKER)
 };
 const log = require('./lib/log.js').init(ctx_config).fn("app");
 const debug = require('./lib/log.js').init(ctx_config).debug_fn("app");
@@ -78,7 +79,7 @@ log("CONFIG:\n%O", ((cfg) => {
 })({...ctx_config}));
 
 // WORKER JOBS
-if (IS_WORKER) {
+if (ctx_config.isWorker) {
   require('./jobs/update-latest')();
 }
 
@@ -121,6 +122,7 @@ async function onHealthCheck() {
   let status = {
     id: process.pid,
     version: VERSION,
+    worker: ctx_config.isWorker,
     healthy: healthy ? true : false,
     metrics: {
       eth: eth.metrics(),
