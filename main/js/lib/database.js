@@ -248,7 +248,7 @@ class Database {
    async addTransactionsForNewAddress(transactions, address) {
     this[checkInit]();
     try {
-      const maxBlock = (await this.getMaxBlock()) - this[ctx].confirmations;
+      const maxBlock = (await this.getMaxBlock());
 
       transactions = transactions.filter(t => t.block <= maxBlock);
 
