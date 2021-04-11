@@ -33,7 +33,7 @@ const POSTGRES_DB = process.env.POSTGRES_DB || process.env.npm_config_POSTGRES_D
 const POSTGRES_USER = process.env.POSTGRES_USER || process.env.npm_config_POSTGRES_USER || process.env.npm_package_config_POSTGRES_USER || 'adam';
 const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD || process.env.npm_config_POSTGRES_PASSWORD || process.env.npm_package_config_POSTGRES_PASSWORD || 'c0c0nut';
 const POSTGRES_SSL = process.env.POSTGRES_SSL || process.env.npm_config_POSTGRES_SSL || process.env.npm_package_config_POSTGRES_SSL;
-const IS_WORKER = process.env.IS_WORKER || process.env.npm_config_IS_WORKER || process.env.npm_package_config_IS_WORKER || true;
+const IS_WORKER = process.env.IS_WORKER || process.env.npm_config_IS_WORKER || process.env.npm_package_config_IS_WORKER;
 
 // Wire up application context
 const ctx_config = {
@@ -119,6 +119,7 @@ async function onHealthCheck() {
     throw new HealthCheckError('healtcheck failed', [reason])
   }
   let status = {
+    id: process.pid,
     version: VERSION,
     healthy: healthy ? true : false,
     metrics: {
