@@ -1,10 +1,10 @@
-<p align="center"><a href="https://github.com/overhide"><img src="./.github/logo.png" width="200px"/></a></p>
+<p align="center"><a href="https://overhide.io"><img src="./.github/logo.png" width="200px"/></a></p>
 
 # overhide-ethereum
 
 [![CircleCI](https://circleci.com/gh/overhide/overhide-ethereum.svg?style=svg)](https://circleci.com/gh/overhide/overhide-ethereum)
 
-[Ethereum](https://www.ethereum.org/) implementation of the [overhide](https://overhide.io) remuneration API.
+[Ethereum](https://www.ethereum.org/) implementation of the [overhide.io](https://overhide.io) remuneration API.
 
 Read about the API and play with it here:
 
