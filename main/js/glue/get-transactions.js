@@ -28,7 +28,7 @@ async function get_transactions({fromAddress, toAddress, maxMostRecent = null, s
   }
 
   const highestAllowedBlock = (await database.getMaxBlock()) - Math.max((confirmations - EXPECTED_CONFIRMATIONS), 0);
-  txs = txs.filter(t => t.block < highestAllowedBlock);
+  txs = txs.filter(t => t.block <= highestAllowedBlock);
 
   debug.extend("txs")("result: %O", txs);
   var tally = 0;

@@ -130,6 +130,7 @@ class Database {
               (
                 SELECT block, fromaddr, toaddr, blockts, txhash, value FROM ethstaging S
                   JOIN ethtrackedaddress A ON S.fromaddr = A.address OR S.toaddr = A.address
+                  WHERE S.block >= ${block - 3}
               )
               ON CONFLICT (fromaddr, toaddr, txhash, value) DO NOTHING;
 
@@ -184,6 +185,7 @@ class Database {
               (
                 SELECT block, fromaddr, toaddr, blockts, txhash, value FROM ethstaging S
                   JOIN ethtrackedaddress A ON S.fromaddr = A.address OR S.toaddr = A.address
+                  WHERE S.block >= ${block - 3}
               )
               ON CONFLICT (fromaddr, toaddr, txhash, value) DO NOTHING;
               
@@ -279,7 +281,8 @@ class Database {
             INSERT INTO ethtransactions (block, fromaddr, toaddr, transactionts, txhash, value) 
              (
                 SELECT block, fromaddr, toaddr, blockts, txhash, value FROM ethstaging S
-                  WHERE S.fromaddr = ${address} OR S.toaddr = ${address}
+                  WHERE (S.fromaddr = ${address} OR S.toaddr = ${address})
+                  AND S.block >= ${maxBlock - 3}
              )
              ON CONFLICT (fromaddr, toaddr, txhash, value) DO NOTHING;
           
