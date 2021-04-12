@@ -120,7 +120,7 @@ async function onHealthCheck() {
     throw new HealthCheckError('healtcheck failed', [reason])
   }
   let status = {
-    id: process.pid,
+    host: os.hostname(),
     version: VERSION,
     worker: ctx_config.isWorker,
     healthy: healthy ? true : false,
