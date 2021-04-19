@@ -47,6 +47,9 @@ class Etherscan {
     };
 
     this[metrics] = {
+      errors: 0,
+      errorsLastCheck: 0,
+      errorsDelta: 0,
       txlistForAddressHits: 0
     };
 
@@ -63,52 +66,59 @@ class Etherscan {
    * @throws {Error} if problem
    */
   async getTransactionsForAddress(address) {
-    this[checkInit]();
-    const network = this[ctx].ethereum_network == 'mainnet' ? '' :  `-${this[ctx].ethereum_network}`;
-
-    let startBlock = 0;
-    var txs = []
-    for(;;) {
-      const url = `https://api${network}.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=${startBlock}&sort=asc&apikey=${this[ctx].etherscan_key}`;
-      let response = await fetch(url, {
-        method: 'GET', headers: {
-          'Content-Type': 'text/plain',
-          'Accept': 'application/json'
+    try {
+      this[checkInit]();
+      const network = this[ctx].ethereum_network == 'mainnet' ? '' :  `-${this[ctx].ethereum_network}`;
+  
+      let startBlock = 0;
+      var txs = []
+      for(;;) {
+        const url = `https://api${network}.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=${startBlock}&sort=asc&apikey=${this[ctx].etherscan_key}`;
+        let response = await fetch(url, {
+          method: 'GET', headers: {
+            'Content-Type': 'text/plain',
+            'Accept': 'application/json'
+          }
+        });
+        if (response.status != 200) {
+          let text = await response.text();
+          throw `etherscan GET   async getTransactionsForAddress(${address}) code: ${response.status} error: ${text}`;
         }
-      });
-      if (response.status != 200) {
-        let text = await response.text();
-        throw `etherscan GET   async getTransactionsForAddress(${address}) code: ${response.status} error: ${text}`;
+        response = await response.json();
+        txs = [...txs,...response.result];
+        if (response.result.length < 10000) break;
+        debug(`more than 10000 results from etherscan for ${address}, fetching more`);
+        startBlock = Math.max(...response.result.map(r => parseInt(r.blockNumber)));      
       }
-      response = await response.json();
-      txs = [...txs,...response.result];
-      if (response.result.length < 10000) break;
-      debug(`more than 10000 results from etherscan for ${address}, fetching more`);
-      startBlock = Math.max(...response.result.map(r => parseInt(r.blockNumber)));      
+      
+      txs = txs.map(r => {
+        return {
+          block: r.blockNumber,
+          from: r.from,
+          to: r.to,
+          bkhash: r.blockHash,
+          txhash: r.hash,
+          value: r.value,
+          time: new Date(+r.timeStamp * 1000)
+        };
+      });
+  
+      if (!txs) throw new Error(`no result for ${address}`);
+      this[metrics].txlistForAddressHits++;
+      return txs; 
+    } catch (err) {
+      this[metrics].errors++;
+      throw err;
     }
-    
-    txs = txs.map(r => {
-      return {
-        block: r.blockNumber,
-        from: r.from,
-        to: r.to,
-        bkhash: r.blockHash,
-        txhash: r.hash,
-        value: r.value,
-        time: new Date(+r.timeStamp * 1000)
-      };
-    });
-
-    if (!txs) throw new Error(`no result for ${address}`);
-    this[metrics].txlistForAddressHits++;
-    return txs;
   }
 
   /**
-   * @returns {{txlistForAddressHits:..}} metrics object.
+   * @returns {{errors:.., errorsDelta:..}} metrics object.
    */
-  metrics() {
+   metrics() {
     this[checkInit]();
+    this[metrics].errorsDelta = this[metrics].errors - this[metrics].errorsLastCheck;
+    this[metrics].errorsLastCheck = this[metrics].errors;
     return this[metrics];
   }
 }

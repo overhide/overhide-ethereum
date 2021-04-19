@@ -7,6 +7,7 @@ const debug = require('./log.js').debug_fn("database");
 
 // private attribtues
 const ctx = Symbol('context');
+const metrics = Symbol('metrics');
 
 // private functions
 const checkInit = Symbol('checkInit');
@@ -77,7 +78,12 @@ class Database {
       db: db,
       confirmations: confirmations
     };
-    
+    this[metrics] = {
+      errors: 0,
+      errorsLastCheck: 0,
+      errorsDelta: 0
+    };
+
     return this;
   }
 
@@ -140,6 +146,7 @@ class Database {
         `;
       await this[ctx].db.query(query);
     } catch (err) {
+      this[metrics].errors++;
       throw `addBlockTransactions error :: ${String(err)} :: ${query}`;
     }
   }
@@ -193,6 +200,7 @@ class Database {
         `;
       await this[ctx].db.query(query);
     } catch (err) {
+      this[metrics].errors++;
       throw `addBlockTransactionsNoCheck error :: ${String(err)} :: ${query}`;
     }
   }
@@ -234,6 +242,7 @@ class Database {
 
       await this[ctx].db.query(query);
     } catch (err) {
+      this[metrics].errors++;
       throw `deleteBlock error :: ${String(err)} :: ${query}`;
     }
   }
@@ -293,6 +302,7 @@ class Database {
         `;
       await this[ctx].db.query(query);
     } catch (err) {
+      this[metrics].errors++;
       throw `addTransactionsForNewAddress error :: ${String(err)} :: ${query}`;
     }
   }
@@ -311,6 +321,7 @@ class Database {
       let result = await this[ctx].db.query(query);
       return result.rowCount > 0;
     } catch (err) {
+      this[metrics].errors++;
       throw `checkAddressIsTracked error :: ${String(err)}`;
     }
   }
@@ -348,6 +359,7 @@ class Database {
       });
       return result;
     } catch (err) {
+      this[metrics].errors++;
       throw `getTransactionsFromTo error :: ${String(err)}`;
     }
   }
@@ -367,6 +379,7 @@ class Database {
       }
       return result.rows[0].max;
     } catch (err) {
+      this[metrics].errors++;
       throw `getMaxBlock error :: ${String(err)}`;
     }
   }
@@ -386,6 +399,7 @@ class Database {
       }
       return result.rows[0].min;
     } catch (err) {
+      this[metrics].errors++;
       throw `getMinBlock error :: ${String(err)}`;
     }
   }  
@@ -415,6 +429,16 @@ class Database {
       if (client) client.release()
     }    
   }
+
+  /**
+   * @returns {{errors:.., errorsDelta:..}} metrics object.
+   */
+   metrics() {
+    this[checkInit]();
+    this[metrics].errorsDelta = this[metrics].errors - this[metrics].errorsLastCheck;
+    this[metrics].errorsLastCheck = this[metrics].errors;
+    return this[metrics];
+  }  
 }
 
 module.exports = (new Database());

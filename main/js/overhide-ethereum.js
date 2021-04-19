@@ -113,9 +113,12 @@ function onSignal() {
 }
 
 async function onHealthCheck() {
-  var healthy = true;
+  const etherscanMetrics = etherscan.metrics();
+  const ethMetrics = eth.metrics();
+  const dbMetrics = database.metrics();
+  var healthy = etherscanMetrics.errorsDelta === 0 && ethMetrics.errorsDelta === 0 && dbMetrics.errorsDelta === 0;
   if (!healthy) {
-    let reason = 'onHealthCheck failed';
+    let reason = `onHealthCheck failed: etherscanErros:${etherscanMetrics.errorsDelta}, ethErrors:${ethMetrics.errorsDelta}, dbErrors:${dbMetrics.errorsDelta}`;
     log(reason);
     throw new HealthCheckError('healtcheck failed', [reason])
   }
@@ -125,7 +128,9 @@ async function onHealthCheck() {
     worker: ctx_config.isWorker,
     healthy: healthy ? true : false,
     metrics: {
-      eth: eth.metrics(),
+      etherscanMetrics: etherscanMetrics,
+      ethMetrics: ethMetrics,
+      dbMetrics: dbMetrics,      
       earliestBlockDb: await database.getMinBlock(),
       latestBlockDb: await database.getMaxBlock()
     }

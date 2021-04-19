@@ -60,7 +60,9 @@ class EthChain {
       web3: web3
     };
     this[metrics] = {
-      txlistForAddressHits: 0
+      errors: 0,
+      errorsLastCheck: 0,
+      errorsDelta: 0
     };
 
     return this;
@@ -76,6 +78,7 @@ class EthChain {
       const result = await this[ctx].web3.eth.getBlockNumber();
       return result;  
     } catch (err) {
+      this[metrics].errors++;
       throw err;
     }
   }
@@ -121,6 +124,7 @@ class EthChain {
         }
       });  
     } catch (err) {
+      this[metrics].errors++;
       throw err;
     }
   }
@@ -166,10 +170,12 @@ class EthChain {
   }
 
   /**
-   * @returns {{txlistForAddressHits:..}} metrics object.
+   * @returns {{errors:.., errorsDelta:..}} metrics object.
    */
-  metrics() {
+   metrics() {
     this[checkInit]();
+    this[metrics].errorsDelta = this[metrics].errors - this[metrics].errorsLastCheck;
+    this[metrics].errorsLastCheck = this[metrics].errors;
     return this[metrics];
   }
 }
