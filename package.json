@@ -26,6 +26,7 @@
     "license-compatibility-checker": "^0.3.4",
     "node-fetch": "2.3.0",
     "pg": "8.5.1",
+    "rate-limit-redis": "2.1.0",
     "read": "1.0.7",
     "run-script-os": "1.0.3",
     "swagger-jsdoc": "^3.2.9",
@@ -46,6 +47,8 @@
     "EXPECTED_CONFIRMATIONS": 7,
     "RATE_LIMIT_WINDOW_MS": 1000,
     "RATE_LIMIT_MAX_REQUESTS_PER_WINDOW": 100,
+    "RATE_LIMIT_REDIS_URI": "",
+    "RATE_LIMIT_REDIS_NAMESPACE": "",
     "POSTGRES_HOST": "localhost",
     "POSTGRES_PORT": 5432,
     "POSTGRES_DATABASE": "",
@@ -72,6 +75,7 @@
     "clean:win32": "@powershell docker rm (docker kill (docker ps -a -q --filter name=oh-eth)) ; docker rmi oh-eth:latest",
     "clean:darwin:freebsd:linux:sunos": "docker rm $(docker kill $(docker ps -a -q --filter name=oh-eth)) ; docker rmi oh-eth:latest",
     "psql-dev": "docker run -it --rm --link postgres:postgres -e PGPASSWORD=c0c0nut --network oh_default postgres psql -h postgres -U adam -d postgres",
-    "db-evolve": "node tools/db-evolve/db-evolve.js"    
+    "redis-cli": "docker exec -it redis redis-cli",
+    "db-evolve": "node tools/db-evolve/db-evolve.js"
   }
 }
