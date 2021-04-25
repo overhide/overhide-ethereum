@@ -3,7 +3,7 @@
 const debug = require('./log.js').debug_fn("tally-cache");
 const Keyv = require('keyv');
 
-const NAMESPACE = 'btc-tc'; 
+const NAMESPACE = 'eth-tc'; 
 
 // private attribtues
 const ctx = Symbol('context');
