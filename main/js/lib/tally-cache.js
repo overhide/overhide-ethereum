@@ -119,6 +119,12 @@ class TallyCache {
       return;
     }
 
+    if (!res.locals.result) {
+      // no result to cache (error)
+      next();
+      return;
+    }
+    
     const tallyDollars = /t/.test(req.query['tally-dollars']);
 
     if (!(tallyDollars || /t/.test(req.query['tally-only']))) {
