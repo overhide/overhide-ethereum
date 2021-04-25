@@ -71,8 +71,8 @@ class TallyCache {
     });
   }
 
-  [getKey](fromAddress, toAddress, maxMostRecent, since, asOf, includeRefunds, confirmations) {
-    return `${fromAddress}, ${toAddress}, ${maxMostRecent}, ${new Date(since).getTime() / 1000}, ${new Date(asOf).getTime() / 1000}, ${includeRefunds}, ${confirmations}`;
+  [getKey](fromAddress, toAddress, maxMostRecent, since, asOf, tallyDollars, includeRefunds, confirmations) {
+    return `${fromAddress}, ${toAddress}, ${maxMostRecent}, ${new Date(since).getTime() / 1000}, ${new Date(asOf).getTime() / 1000}, ${tallyDollars}, ${includeRefunds}, ${confirmations}`;
   }
 
   /**
@@ -84,13 +84,14 @@ class TallyCache {
    */
      async cacheCheck(req, res, next) {
       this[checkInit]();
+      const tallyDollars = /t/.test(req.query['tally-dollars']);
 
-      if (!req.query['as-of'] || !/t/.test(req.query['tally-dollars'])) {
+      if (!req.query['as-of'] || !(tallyDollars || /t/.test(req.query['tally-only']))) {
         next();
         return;
       }
       
-      const key = this[getKey](req.params['fromAddress'], req.params['toAddress'], req.query['max-most-recent'], req.query['since'], req.query['as-of'], /t/.test(req.query['include-refunds']), req.query['confirmations-required'] ? req.query['confirmations-required'] : 0);
+      const key = this[getKey](req.params['fromAddress'], req.params['toAddress'], req.query['max-most-recent'], req.query['since'], req.query['as-of'], tallyDollars, /t/.test(req.query['include-refunds']), req.query['confirmations-required'] ? req.query['confirmations-required'] : 0);
       const val = await this[ctx].keyv.get(key);
       if (val) {
         this[metrics].hits++;
@@ -118,14 +119,16 @@ class TallyCache {
       return;
     }
 
-    if (!/t/.test(req.query['tally-dollars'])) {
+    const tallyDollars = /t/.test(req.query['tally-dollars']);
+
+    if (!(tallyDollars || /t/.test(req.query['tally-only']))) {
       // not cachable
       next();
       return;
     }
 
     const newAsOf = res.locals.result['as-of'];
-    const key = this[getKey](req.params['fromAddress'], req.params['toAddress'], req.query['max-most-recent'], req.query['since'], newAsOf, /t/.test(req.query['include-refunds']), req.query['confirmations-required'] ? req.query['confirmations-required'] : 0);
+    const key = this[getKey](req.params['fromAddress'], req.params['toAddress'], req.query['max-most-recent'], req.query['since'], newAsOf, tallyDollars, /t/.test(req.query['include-refunds']), req.query['confirmations-required'] ? req.query['confirmations-required'] : 0);
     await this[ctx].keyv.set(key, res.locals.result);  
     this[metrics].caches++;
     next();

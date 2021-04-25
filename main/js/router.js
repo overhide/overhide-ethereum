@@ -78,8 +78,8 @@ router.get('/swagger.json', throttle, (req, res, next) => {
  *          description: |
  *            Retrieve transactions as-of this date-time (inclusive).
  * 
- *            Responses from this endpoint include an *as-of* timestamp.  Subsequent *tally-dollars* requests with this *as-of* timestamp are
- *            treated as *back-end* requests and go against *back-end* rate limits IFF the same *tally-dollars* request has recently been made 
+ *            Responses from this endpoint include an *as-of* timestamp.  Subsequent *tally-only* or *tally-dollars* requests with this *as-of* timestamp are
+ *            treated as *back-end* requests and go against *back-end* rate limits IFF the same *tally-only* or *tally-dollars* request has recently been made 
  *            (by the front-end, for example), and is cached.
  *
  *            The date-time is a string in [ISO 8601/RFC3339 format](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14).
@@ -160,7 +160,7 @@ router.get('/swagger.json', throttle, (req, res, next) => {
  *                  Timestamp of this request.
  * 
  *                  Use this timestamp as the *as-of* parameter to subsequent requests to be rate-limited at *back-end* limits (higher).  Only
- *                  works with *tally-dollars* requests.
+ *                  works with *tally-only* or *tally-dollars* requests.
  * 
  *                  The date-time is a string in [ISO 8601/RFC3339 format](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14).
  *        400:
