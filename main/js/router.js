@@ -34,8 +34,8 @@ router.get('/swagger.json', throttle, (req, res, next) => {
  *        All values in *wei*.
  * 
  *        Rate limits:  
- *          - *front-end* (all calls unless providing *as-of* and *tally-dollars* that are cached): 30 calls / minute / IP (across all overhide APIs)
- *          - *back-end* (calls providing *as-of* and *tally-dollars* IFF already cached): 600 calls / minute / IP (across all overhide APIs)
+ *          - *front-end* (all calls unless providing *as-of* and *tally-only* or *tally-dollars* that are cached): 30 calls / minute / IP (across all overhide APIs)
+ *          - *back-end* (calls providing *as-of* and *tally-only* or *tally-dollars* IFF already cached): 600 calls / minute / IP (across all overhide APIs)
  *      tags:
  *        - remuneration provider
  *      parameters:
