@@ -22,8 +22,10 @@ jobs:
             printf "KEYV_TALLY_CACHE_URI=redis://redis:6379\n" >> .npmrc.dev;
             printf "RATE_LIMIT_FE_WINDOW_MS=1000\n" >> .npmrc.dev;
             printf "RATE_LIMIT_FE_MAX_REQUESTS_PER_WINDOW=100\n" >> .npmrc.dev;
+            printf "RATE_LIMIT_FE_REDIS_URI=redis://redis:6379\n" >> .npmrc.dev;
             printf "RATE_LIMIT_BE_WINDOW_MS=1000\n" >> .npmrc.dev;
             printf "RATE_LIMIT_BE_MAX_REQUESTS_PER_WINDOW=100\n" >> .npmrc.dev;            
+            printf "RATE_LIMIT_BE_REDIS_URI=redis://redis:6379\n" >> .npmrc.dev;
             cat .npmrc.dev   
       - run:
           shell: /bin/sh
