@@ -50,15 +50,17 @@ class Token {
    * @param {string} salt - salt for token decryption: if provided, tokenUrl is ignored.
    * @param {string} tokenUrl - URL for validating tokens: not used if salt is provided.
    * @param {bool} isTest - is this instance a test instance?
+   * @param {string} internalToken - if any, to bypass token + throttle
    * @returns {Token} this
    */
-  init({salt, tokenUrl, isTest} = {}) {
+  init({salt, tokenUrl, isTest, internalToken} = {}) {
     if (salt == null && tokenUrl == null) throw new Error("Either SALT or TOKEN_URL must be specified.");
 
     this[ctx] = {
       salt: salt,
       tokenUrl, tokenUrl,
-      isTest: isTest
+      isTest: isTest,
+      internalToken: internalToken
     };
     return this;
   }
@@ -90,7 +92,10 @@ class Token {
       return false;
     }
 
-    if (this[ctx].salt) {
+    if (token == this[ctx].internalToken) {
+      res.locals.internal = true;
+      isValid = true;
+    } else if (this[ctx].salt) {
       var [isValid, reason] = this.isValidLocal(token);
     } else {
       var [isValid, reason] = await this.isValidRemote(token);

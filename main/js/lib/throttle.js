@@ -8,7 +8,8 @@ const ctx = Symbol('context');
 
 // private functions
 const checkInit = Symbol('checkInit');
-const regularThrottle = Symbol('regularThrottle');
+const frontendThrottle = Symbol('frontendThrottle');
+const backendThrottle = Symbol('backendThrottle');
 const RedisStore = require("rate-limit-redis");
 
 /**
@@ -34,28 +35,43 @@ class Throttle {
    * Initialize this library: this must be the first method called somewhere from where you're doing context & dependency
    * injection.
    * 
-   * @param {number} rateLimitMax
-   * @param {number} rateLimitWindowsMs
-   * @param {string} rateLimitRedis
-   * @param {string} rateLimitRedisNamespace
+   * @param {number} rateLimitFeMax
+   * @param {number} rateLimitFeWindowsMs
+   * @param {string} rateLimitFeRedis
+   * @param {string} rateLimitFeRedisNamespace
+   * @param {number} rateLimitBeMax
+   * @param {number} rateLimitBeWindowsMs
+   * @param {string} rateLimitBeRedis
+   * @param {string} rateLimitBeRedisNamespace
    * @returns {Throttle} this
    */
-  init({rateLimitMax, rateLimitWindowsMs, rateLimitRedis, rateLimitRedisNamespace} = {}) {
-    if (rateLimitMax == null || rateLimitWindowsMs == null) throw new Error("Both RATE_LIMIT_WINDOW_MS and RATE_LIMIT_MAX_REQUESTS_PER_WINDOW must be specified.");
-
+  init({rateLimitFeMax, rateLimitFeWindowsMs, rateLimitFeRedis, rateLimitFeRedisNamespace, rateLimitBeMax, rateLimitBeWindowsMs, rateLimitBeRedis, rateLimitBeRedisNamespace} = {}) {
+    if (rateLimitFeMax == null || rateLimitFeWindowsMs == null) throw new Error("Both RATE_LIMIT_FE_WINDOW_MS and RATE_LIMIT_FE_MAX_REQUESTS_PER_WINDOW must be specified.");
+    if (rateLimitBeMax == null || rateLimitBeWindowsMs == null) throw new Error("Both RATE_LIMIT_BE_WINDOW_MS and RATE_LIMIT_BE_MAX_REQUESTS_PER_WINDOW must be specified.");
+   
     this[ctx] = {
     };
 
-    this[regularThrottle] = rateLimit({
+    this[frontendThrottle] = rateLimit({
       store: new RedisStore({
-        expiry: rateLimitWindowsMs / 1000,
-        prefix: rateLimitRedisNamespace,
-        redisURL: rateLimitRedis
+        expiry: rateLimitFeWindowsMs / 1000,
+        prefix: rateLimitFeRedisNamespace,
+        redisURL: rateLimitFeRedis
       }),
-      windowMs: rateLimitWindowsMs,
-      max: rateLimitMax
+      windowMs: rateLimitFeWindowsMs,
+      max: rateLimitFeMax
     });
   
+    this[backendThrottle] = rateLimit({
+      store: new RedisStore({
+        expiry: rateLimitBeWindowsMs / 1000,
+        prefix: rateLimitBeRedisNamespace,
+        redisURL: rateLimitBeRedis
+      }),
+      windowMs: rateLimitBeWindowsMs,
+      max: rateLimitBeMax
+    });
+
     return this;
   }
 
@@ -69,12 +85,15 @@ class Throttle {
    */
   async check(req, res, next) {
     this[checkInit]();
-    if (!res.locals.internal) {
-      this[regularThrottle](req, res, next);
+    if (res.locals.internal) {
+      next();
+    } else if (res.locals.backend) {
+      this[backendThrottle](req, res, next);
+      return;
+    } else {
+      this[frontendThrottle](req, res, next);
       return;
     }
-
-    next();
   }
 }
 

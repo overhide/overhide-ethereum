@@ -10,6 +10,8 @@ const swagger = require('./lib/swagger.js');
 const debug = require('./lib/log.js').debug_fn("router");
 const token = require('./lib/token.js').check.bind(require('./lib/token.js'));
 const throttle = require('./lib/throttle.js').check.bind(require('./lib/throttle.js'));
+const cacheCheck = require('./lib/tally-cache.js').cacheCheck.bind(require('./lib/tally-cache.js'));
+const cacheSave = require('./lib/tally-cache.js').cacheSave.bind(require('./lib/tally-cache.js'));
 
 router.use(allow_cors);
 
@@ -31,7 +33,9 @@ router.get('/swagger.json', throttle, (req, res, next) => {
  * 
  *        All values in *wei*.
  * 
- *        Rate limits:  30 calls / minute / IP (across all overhide APIs), does not apply to vouchers for tallies.
+ *        Rate limits:  
+ *          - *front-end* (all calls unless providing *as-of* and *tally-dollars* that are cached): 30 calls / minute / IP (across all overhide APIs)
+ *          - *back-end* (calls providing *as-of* and *tally-dollars* IFF already cached): 600 calls / minute / IP (across all overhide APIs)
  *      tags:
  *        - remuneration provider
  *      parameters:
@@ -67,6 +71,19 @@ router.get('/swagger.json', throttle, (req, res, next) => {
  *
  *            The date-time is a string in [ISO 8601/RFC3339 format](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14).
  *        - in: query
+ *          name: as-of
+ *          required: false
+ *          schema:
+ *            type: string
+ *          description: |
+ *            Retrieve transactions as-of this date-time (inclusive).
+ * 
+ *            Responses from this endpoint include an *as-of* timestamp.  Subsequent *tally-dollars* requests with this *as-of* timestamp are
+ *            treated as *back-end* requests and go against *back-end* rate limits IFF the same *tally-dollars* request has recently been made 
+ *            (by the front-end, for example), and is cached.
+ *
+ *            The date-time is a string in [ISO 8601/RFC3339 format](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14).
+ *        - in: query
  *          name: tally-only
  *          required: false
  *          schema:
@@ -77,6 +94,16 @@ router.get('/swagger.json', throttle, (req, res, next) => {
  *
  *            If not present or set to anything but `true` then the 200/OK response will list individual *transactions* in
  *            addition to the *tally*.  
+ *        - in: query
+ *          name: tally-dollars
+ *          required: false
+ *          schema:
+ *            type: boolean
+ *          description: |
+ *            If present and set to `true`, then the 200/OK response will not list individual *transactions*, just the
+ *            *tally* in US dollars.
+ * 
+ *            All transactions are exchanged to USD at an approximate (highest) exchange rate close to the transactions' times.  
  *        - in: query
  *          name: include-refunds
  *          required: false
@@ -127,6 +154,15 @@ router.get('/swagger.json', throttle, (req, res, next) => {
  *                  (*since*,*max-most-recent*,or unlimited).
  *                items:
  *                  $ref: "#/definitions/Transaction"
+ *              as-of:
+ *                type: string
+ *                description: |
+ *                  Timestamp of this request.
+ * 
+ *                  Use this timestamp as the *as-of* parameter to subsequent requests to be rate-limited at *back-end* limits (higher).  Only
+ *                  works with *tally-dollars* requests.
+ * 
+ *                  The date-time is a string in [ISO 8601/RFC3339 format](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14).
  *        400:
  *          $ref: "#/responses/400"
  *        401:
@@ -134,8 +170,14 @@ router.get('/swagger.json', throttle, (req, res, next) => {
  *        429:
  *          $ref: "#/responses/429"
  */
-router.get('/get-transactions/:fromAddress/:toAddress', token, throttle, (req, rsp) => {
+router.get('/get-transactions/:fromAddress/:toAddress', token, cacheCheck, throttle, (req, rsp, next) => {
     debug('handling get-transactions endpoint');
+
+    if (rsp.locals.backend && rsp.locals.result) {
+      rsp.json(rsp.locals.result);
+      return; 
+    }
+
     (async () => {
         try {
             let result = await get_transactions({
@@ -143,19 +185,23 @@ router.get('/get-transactions/:fromAddress/:toAddress', token, throttle, (req, r
                 toAddress: req.params['toAddress'],
                 maxMostRecent: req.query['max-most-recent'],
                 since: req.query['since'],
+                asOf: req.query['as-of'],
                 tallyOnly: /t/.test(req.query['tally-only']),
+                tallyDollars: /t/.test(req.query['tally-dollars']),
                 includeRefunds: /t/.test(req.query['include-refunds']),
                 confirmations: req.query['confirmations-required'] ? req.query['confirmations-required'] : 0
             });
             debug('result from get-transactions endpoint: %o', result);
-            rsp.json(result);        
+            rsp.json(result);
+            rsp.locals.result = result;
+            next();             
         } 
         catch (err) {
             debug(err);
             return rsp.status(400).send(err.toString());      
         }
     })();
-})
+}, cacheSave)
 
 /**
  * @swagger
@@ -165,9 +211,11 @@ router.get('/get-transactions/:fromAddress/:toAddress', token, throttle, (req, r
  *     description: |
  *       Check if provided signature corresponds to the provided address, resolved to the provided message.
  *
- *       Check if provided address is a valid address with at least one entry on the ledger.
+ *       Check if provided address is a valid address with, optionally, at least one entry on the ledger.
  * 
- *       Rate limits:  30 calls / minute / IP (across all overhide APIs), does not apply to `skip-ledger-check` calls.
+ *       Rate limits:  
+ *         - *front-end* (all calls unless providing `true` *skip-ledger*): 30 calls / minute / IP (across all overhide APIs)
+ *         - *back-end* (calls providing `true` *skip-ledger*): 600 calls / minute / IP (across all overhide APIs)
  *     tags:
  *       - remuneration provider
  *     requestBody:
@@ -193,6 +241,18 @@ router.get('/get-transactions/:fromAddress/:toAddress', token, throttle, (req, r
  *                  type: string
  *                  description: |
  *                    the address (public key) of signature: a 42 character 'hex' string prefixed with '0x'
+ *     parameters:
+ *       - in: query
+ *         name: skip-ledger
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: |
+ *           Defaults to `false`.
+ * 
+ *           Controls whether the ledger should be checked for existance of transactions from this address.
+ * 
+ *           Setting to `true` skips the ledger check but allows *back-end* rate-limits on this API.
  *     consumes:
  *       - application/json
  *     produces:
@@ -208,7 +268,11 @@ router.get('/get-transactions/:fromAddress/:toAddress', token, throttle, (req, r
  *       429:
  *         $ref: "#/responses/429"
  */
-router.post('/is-signature-valid', token, throttle, (req, rsp) => {
+router.post('/is-signature-valid', 
+            token,
+            (req, res, next) => {res.locals.backend = /t/.test(req.query['skip-ledger']); next()},
+            throttle, 
+            (req, rsp) => {
     debug('handling is-signature-valid endpoint');
     (async () => {
         try {

@@ -20,13 +20,19 @@ const DEBUG = process.env.DEBUG || process.env.npm_config_DEBUG || process.env.n
 const SALT = process.env.SALT || process.env.npm_config_SALT || process.env.npm_package_config_SALT;
 const TOKEN_URL = process.env.TOKEN_URL || process.env.npm_config_TOKEN_URL || process.env.npm_package_config_TOKEN_URL;
 const ISPROD = process.env.ISPROD || process.env.npm_config_ISPROD || process.env.npm_package_config_ISPROD || false;
+const INTERNAL_TOKEN = process.env.INTERNAL_TOKEN || process.env.npm_config_INTERNAL_TOKEN || process.env.npm_package_config_INTERNAL_TOKEN;
 const WEB3_WSS_URI = process.env.WEB3_WSS_URI || process.env.npm_config_WEB3_WSS_URI || process.env.npm_package_config_WEB3_WSS_URI;
 const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || process.env.npm_config_ETHERSCAN_KEY || process.env.npm_package_config_ETHERSCAN_KEY;
 const NETWORK_TYPE = process.env.NETWORK_TYPE || process.env.npm_config_NETWORK_TYPE || process.env.npm_package_config_NETWORK_TYPE;
-const RATE_LIMIT_WINDOW_MS = process.env.RATE_LIMIT_WINDOW_MS || process.env.npm_config_RATE_LIMIT_WINDOW_MS || process.env.npm_package_config_RATE_LIMIT_WINDOW_MS || 60000;
-const RATE_LIMIT_MAX_REQUESTS_PER_WINDOW = process.env.RATE_LIMIT_MAX_REQUESTS_PER_WINDOW || process.env.npm_config_RATE_LIMIT_MAX_REQUESTS_PER_WINDOW || process.env.npm_package_config_RATE_LIMIT_MAX_REQUESTS_PER_WINDOW || 10;
-const RATE_LIMIT_REDIS_URI = process.env.RATE_LIMIT_REDIS_URI || process.env.npm_config_RATE_LIMIT_REDIS_URI || process.env.npm_package_config_RATE_LIMIT_REDIS_URI || null;
-const RATE_LIMIT_REDIS_NAMESPACE = process.env.RATE_LIMIT_REDIS_NAMESPACE || process.env.npm_config_RATE_LIMIT_REDIS_NAMESPACE || process.env.npm_package_config_RATE_LIMIT_REDIS_NAMESPACE || "rate-limit";
+const RATE_LIMIT_FE_WINDOW_MS = process.env.RATE_LIMIT_FE_WINDOW_MS || process.env.npm_config_RATE_LIMIT_FE_WINDOW_MS || process.env.npm_package_config_RATE_LIMIT_FE_WINDOW_MS || 60000;
+const RATE_LIMIT_FE_MAX_REQUESTS_PER_WINDOW = process.env.RATE_LIMIT_FE_MAX_REQUESTS_PER_WINDOW || process.env.npm_config_RATE_LIMIT_FE_MAX_REQUESTS_PER_WINDOW || process.env.npm_package_config_RATE_LIMIT_FE_MAX_REQUESTS_PER_WINDOW || 10;
+const RATE_LIMIT_FE_REDIS_URI = process.env.RATE_LIMIT_FE_REDIS_URI || process.env.npm_config_RATE_LIMIT_FE_REDIS_URI || process.env.npm_package_config_RATE_LIMIT_FE_REDIS_URI || null;
+const RATE_LIMIT_FE_REDIS_NAMESPACE = process.env.RATE_LIMIT_FE_REDIS_NAMESPACE || process.env.npm_config_RATE_LIMIT_FE_REDIS_NAMESPACE || process.env.npm_package_config_RATE_LIMIT_FE_REDIS_NAMESPACE || "rate-limit";
+const RATE_LIMIT_BE_WINDOW_MS = process.env.RATE_LIMIT_BE_WINDOW_MS || process.env.npm_config_RATE_LIMIT_BE_WINDOW_MS || process.env.npm_package_config_RATE_LIMIT_BE_WINDOW_MS || 60000;
+const RATE_LIMIT_BE_MAX_REQUESTS_PER_WINDOW = process.env.RATE_LIMIT_BE_MAX_REQUESTS_PER_WINDOW || process.env.npm_config_RATE_LIMIT_BE_MAX_REQUESTS_PER_WINDOW || process.env.npm_package_config_RATE_LIMIT_BE_MAX_REQUESTS_PER_WINDOW || 10;
+const RATE_LIMIT_BE_REDIS_URI = process.env.RATE_LIMIT_BE_REDIS_URI || process.env.npm_config_RATE_LIMIT_BE_REDIS_URI || process.env.npm_package_config_RATE_LIMIT_BE_REDIS_URI || null;
+const RATE_LIMIT_BE_REDIS_NAMESPACE = process.env.RATE_LIMIT_BE_REDIS_NAMESPACE || process.env.npm_config_RATE_LIMIT_BE_REDIS_NAMESPACE || process.env.npm_package_config_RATE_LIMIT_BE_REDIS_NAMESPACE || "rate-limit";
+const KEYV_TALLY_CACHE_URI = process.env.KEYV_TALLY_CACHE_URI || process.env.npm_config_KEYV_TALLY_CACHE_URI || process.env.npm_package_config_KEYV_TALLY_CACHE_URI;
 const EXPECTED_CONFIRMATIONS = process.env.EXPECTED_CONFIRMATIONS || process.env.npm_config_EXPECTED_CONFIRMATIONS || process.env.npm_package_config_EXPECTED_CONFIRMATIONS || 7;
 const POSTGRES_HOST = process.env.POSTGRES_HOST || process.env.npm_config_POSTGRES_HOST || process.env.npm_package_config_POSTGRES_HOST || 'localhost'
 const POSTGRES_PORT = process.env.POSTGRES_PORT || process.env.npm_config_POSTGRES_PORT || process.env.npm_package_config_POSTGRES_PORT || 5432
@@ -45,15 +51,21 @@ const ctx_config = {
   port: OH_ETH_PORT,
   debug: DEBUG,
   salt: SALT,
+  internalToken: INTERNAL_TOKEN,
   tokenUrl: TOKEN_URL,
   isTest: !ISPROD,
   etherscan_key: ETHERSCAN_KEY,
   ethereum_network: NETWORK_TYPE,
   web3_wss_uri: WEB3_WSS_URI,
-  rateLimitWindowsMs: RATE_LIMIT_WINDOW_MS,
-  rateLimitMax: RATE_LIMIT_MAX_REQUESTS_PER_WINDOW,
-  rateLimitRedis: RATE_LIMIT_REDIS_URI,
-  rateLimitRedisNamespace: RATE_LIMIT_REDIS_NAMESPACE,
+  rateLimitFeWindowsMs: RATE_LIMIT_FE_WINDOW_MS,
+  rateLimitFeMax: RATE_LIMIT_FE_MAX_REQUESTS_PER_WINDOW,
+  rateLimitFeRedis: RATE_LIMIT_FE_REDIS_URI,
+  rateLimitFeRedisNamespace: RATE_LIMIT_FE_REDIS_NAMESPACE,
+  rateLimitBeWindowsMs: RATE_LIMIT_BE_WINDOW_MS,
+  rateLimitBeMax: RATE_LIMIT_BE_MAX_REQUESTS_PER_WINDOW,
+  rateLimitBeRedis: RATE_LIMIT_BE_REDIS_URI,
+  rateLimitBeRedisNamespace: RATE_LIMIT_BE_REDIS_NAMESPACE,
+  keyv_tally_cache_uri: KEYV_TALLY_CACHE_URI,
   confirmations: EXPECTED_CONFIRMATIONS,
   base_url: BASE_URL,
   swagger_endpoints_path: __dirname + path.sep + 'router.js',
@@ -74,11 +86,14 @@ const database = require('./lib/database.js').init(ctx_config);
 const swagger = require('./lib/swagger.js').init(ctx_config);
 const token = require('./lib/token.js').init(ctx_config);
 const throttle = require('./lib/throttle.js').init(ctx_config);
+const normalizer = require('./lib/normalizer.js').init(ctx_config);
+const tallyCache = require('./lib/tally-cache.js').init(ctx_config);
 log("CONFIG:\n%O", ((cfg) => {
   cfg.web3_wss_uri = cfg.web3_wss_uri.replace(/.(?=.{2})/g,'*'); 
   cfg.etherscan_key = cfg.etherscan_key.replace(/.(?=.{2})/g,'*'); 
   cfg.pgpassword = cfg.pgpassword.replace(/.(?=.{2})/g,'*'); 
   cfg.salt = cfg.salt.replace(/.(?=.{2})/g,'*'); 
+  cfg.internalToken = cfg.internalToken.replace(/.(?=.{2})/g,'*'); 
   return cfg;
 })({...ctx_config}));
 
@@ -113,9 +128,11 @@ async function onHealthCheck() {
   const etherscanMetrics = etherscan.metrics();
   const ethMetrics = eth.metrics();
   const dbMetrics = database.metrics();
-  var healthy = etherscanMetrics.errorsDelta === 0 && ethMetrics.errorsDelta === 0 && dbMetrics.errorsDelta === 0;
+  const normalizerMetrics = normalizer.metrics();
+  const tallyCacheMetrics = tallyCache.metrics();
+  var healthy = etherscanMetrics.errorsDelta === 0 && ethMetrics.errorsDelta === 0 && dbMetrics.errorsDelta === 0  && normalizerMetrics.errorsDelta === 0 && tallyCacheMetrics.errorsDelta === 0;
   if (!healthy) {
-    let reason = `onHealthCheck failed: etherscanErros:${etherscanMetrics.errorsDelta}, ethErrors:${ethMetrics.errorsDelta}, dbErrors:${dbMetrics.errorsDelta}`;
+    let reason = `onHealthCheck failed: etherscanErros:${etherscanMetrics.errorsDelta}, ethErrors:${ethMetrics.errorsDelta}, dbErrors:${dbMetrics.errorsDelta}, normalizerErrors: ${normalizerMetrics.errorsDelta}, tallyCacheErrors: ${tallyCacheMetrics.errorsDelta}`;
     log(reason);
     throw new HealthCheckError('healtcheck failed', [reason])
   }
@@ -127,7 +144,9 @@ async function onHealthCheck() {
     metrics: {
       etherscanMetrics: etherscanMetrics,
       ethMetrics: ethMetrics,
-      dbMetrics: dbMetrics,      
+      dbMetrics: dbMetrics,
+      normalizerMetrics: normalizerMetrics,      
+      tallyCacheMetrics: tallyCacheMetrics,
       earliestBlockDb: await database.getMinBlock(),
       latestBlockDb: await database.getMaxBlock()
     }

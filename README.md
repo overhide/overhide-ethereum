@@ -117,8 +117,12 @@ Some notable configuration points for *overhide-ethereum*:
 | DEBUG | see 'Logging' section below | overhide-ethereum:*,-overhide-ethereum:is-signature-valid:txs,-overhide-ethereum:get-transactions:txs |
 | SALT | Salt for bearer-token validation (see *Security* above) | c0c0nut |
 | TOKEN_URL | Token validation URL (see *Security* above) | https://token.overhide.io/validate |
-| RATE_LIMIT_WINDOW_MS | Duration of API rate limiting window (milliseconds) | 60000 |
-| RATE_LIMIT_MAX_REQUESTS_PER_WINDOW | Number of API calls per rate limiting window | 30 |
+| INTERNAL_TOKEN | Token to use with internal services to avoid rate-limiting (just set once from https://token.overhide.io/register in all services) | ... |
+| KEYV_TALLY_CACHE_URI | URI of cache (redis) to tally requests (back-end) | redis://localhost:6379 |
+| RATE_LIMIT_FE_WINDOW_MS | Duration of API rate limiting window (milliseconds) (frontend) | 60000 |
+| RATE_LIMIT_FE_MAX_REQUESTS_PER_WINDOW | Number of API calls per rate limiting window | 30 |
+| RATE_LIMIT_BE_WINDOW_MS | Duration of API rate limiting window (milliseconds) (backend) | 60000 |
+| RATE_LIMIT_BE_MAX_REQUESTS_PER_WINDOW | Number of API calls per rate limiting window | 600 |
 | EXPECTED_CONFIRMATIONS | Number of confirmations before transaction is considered valid | 2 |
 | IS_WORKER | Enable this on one (and only one) node -- runs worker processes that use up API limits | true |
 
@@ -278,9 +282,13 @@ curl http://localhost:8080/status.html
 
 Access to these APIs is gated via config points:
 
-- `RATE_LIMIT_MAX_REQUESTS_PER_WINDOW`
-- `RATE_LIMIT_WINDOW_MS`
+- `RATE_LIMIT_FE_MAX_REQUESTS_PER_WINDOW`
+- `RATE_LIMIT_FE_WINDOW_MS`
+- `RATE_LIMIT_BE_MAX_REQUESTS_PER_WINDOW`
+- `RATE_LIMIT_BE_WINDOW_MS`
 
 This only applies to requests with a token other than the `INTERNAL_TOKEN` (if set).  `INTERNAL_TOKEN` requests are not rate-limited.
 
-All rate-limits are shared across nodes sharing the same `RATE_LIMIT_REDIS_NAMESPACE` if `RATE_LIMIT_REDIS_URI` is set to a redis instance.
+All front-end rate-limits are shared across nodes sharing the same `RATE_LIMIT_FE_REDIS_NAMESPACE` if `RATE_LIMIT_FE_REDIS_URI` is set to a redis instance.  These are expected rate-limits for user client access.
+
+All back-end rate-limits are shared across nodes sharing the same `RATE_LIMIT_BE_REDIS_NAMESPACE` if `RATE_LIMIT_BE_REDIS_URI` is set to a redis instance.  These are expected rate-limits for developer's back-end access.
