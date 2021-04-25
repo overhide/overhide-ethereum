@@ -280,7 +280,8 @@ router.post('/is-signature-valid',
             let result = await is_signature_valid({
                 signature: body['signature'],
                 message: body['message'],
-                address: body['address']
+                address: body['address'],
+                skipLedger: /t/.test(req.query['skip-ledger'])
             });
             debug('result from is-signature-valid endpoint: %o',result);
             rsp.json(result);        
