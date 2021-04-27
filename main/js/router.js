@@ -104,6 +104,8 @@ router.get('/swagger.json', throttle, (req, res, next) => {
  *            *tally* in US dollars.
  * 
  *            All transactions are exchanged to USD at an approximate (highest) exchange rate close to the transactions' times.  
+ * 
+ *            See [this blog post](https://overhide.io//2021/04/25/ex-rate.html) for more details.
  *        - in: query
  *          name: include-refunds
  *          required: false
