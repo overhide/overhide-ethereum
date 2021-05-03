@@ -6,7 +6,7 @@ const database = require('../lib/database.js');
 const log = require('../lib/log.js').fn("update-latest");
 const debug = require('../lib/log.js').debug_fn("update-latest");
 
-const UPDATE_LATEST_JOB_PERIOD_MILLIS = process.env.UPDATE_LATEST_JOB_PERIOD_MILLIS || process.env.npm_config_UPDATE_LATEST_JOB_PERIOD_MILLIS || process.env.npm_package_config_UPDATE_LATEST_JOB_PERIOD_MILLIS || 5000;
+const UPDATE_LATEST_JOB_PERIOD_MILLIS = process.env.UPDATE_LATEST_JOB_PERIOD_MILLIS || process.env.npm_config_UPDATE_LATEST_JOB_PERIOD_MILLIS || process.env.npm_package_config_UPDATE_LATEST_JOB_PERIOD_MILLIS || 30000;
 const EXPECTED_CONFIRMATIONS = process.env.EXPECTED_CONFIRMATIONS || process.env.npm_config_EXPECTED_CONFIRMATIONS || process.env.npm_package_config_EXPECTED_CONFIRMATIONS || 7;
 
 /**

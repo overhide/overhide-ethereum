@@ -21,7 +21,7 @@ const SALT = process.env.SALT || process.env.npm_config_SALT || process.env.npm_
 const TOKEN_URL = process.env.TOKEN_URL || process.env.npm_config_TOKEN_URL || process.env.npm_package_config_TOKEN_URL;
 const ISPROD = process.env.ISPROD || process.env.npm_config_ISPROD || process.env.npm_package_config_ISPROD || false;
 const INTERNAL_TOKEN = process.env.INTERNAL_TOKEN || process.env.npm_config_INTERNAL_TOKEN || process.env.npm_package_config_INTERNAL_TOKEN;
-const WEB3_WSS_URI = process.env.WEB3_WSS_URI || process.env.npm_config_WEB3_WSS_URI || process.env.npm_package_config_WEB3_WSS_URI;
+const WEB3_URI = process.env.WEB3_URI || process.env.npm_config_WEB3_URI || process.env.npm_package_config_WEB3_URI;
 const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || process.env.npm_config_ETHERSCAN_KEY || process.env.npm_package_config_ETHERSCAN_KEY;
 const NETWORK_TYPE = process.env.NETWORK_TYPE || process.env.npm_config_NETWORK_TYPE || process.env.npm_package_config_NETWORK_TYPE;
 const RATE_LIMIT_FE_WINDOW_MS = process.env.RATE_LIMIT_FE_WINDOW_MS || process.env.npm_config_RATE_LIMIT_FE_WINDOW_MS || process.env.npm_package_config_RATE_LIMIT_FE_WINDOW_MS || 60000;
@@ -56,7 +56,7 @@ const ctx_config = {
   isTest: !ISPROD,
   etherscan_key: ETHERSCAN_KEY,
   ethereum_network: NETWORK_TYPE,
-  web3_wss_uri: WEB3_WSS_URI,
+  web3_uri: WEB3_URI,
   rateLimitFeWindowsMs: RATE_LIMIT_FE_WINDOW_MS,
   rateLimitFeMax: RATE_LIMIT_FE_MAX_REQUESTS_PER_WINDOW,
   rateLimitFeRedis: RATE_LIMIT_FE_REDIS_URI,
@@ -89,7 +89,7 @@ const throttle = require('./lib/throttle.js').init(ctx_config);
 const normalizer = require('./lib/normalizer.js').init(ctx_config);
 const tallyCache = require('./lib/tally-cache.js').init(ctx_config);
 log("CONFIG:\n%O", ((cfg) => {
-  cfg.web3_wss_uri = cfg.web3_wss_uri.replace(/.(?=.{2})/g,'*'); 
+  cfg.web3_uri = cfg.web3_uri.replace(/.(?=.{2})/g,'*'); 
   cfg.etherscan_key = cfg.etherscan_key.replace(/.(?=.{2})/g,'*'); 
   cfg.pgpassword = cfg.pgpassword.replace(/.(?=.{2})/g,'*'); 
   cfg.salt = cfg.salt.replace(/.(?=.{2})/g,'*'); 

@@ -40,22 +40,26 @@ class EthChain {
    * Initialize this library: this must be the first method called somewhere from where you're doing context & dependency
    * injection.
    * 
-   * @param {string} web3_wss_uri - URI to web3 websocket provider
+   * @param {string} web3_uri - URI to web3 websocket provider
    * @param {string} ethereum_network - type of network for etherscan.io access ("mainnet","ropsten","rinkeby","morden")
    * @return {EthChain} this
    */
-  init({web3_wss_uri, ethereum_network} = {}) {
-    if (web3_wss_uri == null) throw new Error("WEB3_WSS_URI must be specified.");
+  init({web3_uri, ethereum_network} = {}) {
+    if (web3_uri == null) throw new Error("WEB3_URI must be specified.");
     if (ethereum_network == null) throw new Error("NETWORK_TYPE must be specified.");
 
-    if (web3_wss_uri != 'fake') {
-      var web3 = new Web3(new Web3.providers.WebsocketProvider(web3_wss_uri));
+    if (web3_uri != 'fake') {
+      if (/https/.test(web3_uri)) {
+        var web3 = new Web3(new Web3.providers.HttpProvider(web3_uri));
+      } else {
+        var web3 = new Web3(new Web3.providers.WebsocketProvider(web3_uri));
+      }
     } else {
       log(`fake infura project, skipping init...`);
     }
 
     this[ctx] = {
-      web3_wss_uri: web3_wss_uri,
+      web3_uri: web3_uri,
       ethereum_network: ethereum_network,
       web3: web3
     };

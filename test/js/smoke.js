@@ -24,7 +24,7 @@ const chaiHttp = require('chai-http');
 require('../../main/js/lib/log.js').init({app_name:'smoke'});
 const crypto = require('../../main/js/lib/crypto.js').init();
 const eth = require('../../main/js/lib/eth-chain.js').init({
-  web3_wss_uri: 'fake',
+  WEB3_URI: 'fake',
   ethereum_network: 'rinkeby'
 });
 const database = require('../../main/js/lib/database.js').init({

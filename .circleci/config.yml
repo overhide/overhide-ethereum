@@ -10,7 +10,7 @@ jobs:
           shell: /bin/sh
           command: |
             printf "DEBUG=overhide-ethereum*\n" > .npmrc.dev;
-            printf "WEB3_WSS_URI=fake\n" >> .npmrc.dev;
+            printf "WEB3_URI=fake\n" >> .npmrc.dev;
             printf "NETWORK_TYPE=rinkeby\n" >> .npmrc.dev;
             printf "POSTGRES_HOST=postgres\n" >> .npmrc.dev;
             printf "POSTGRES_PORT=5432\n" >> .npmrc.dev;

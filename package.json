@@ -45,7 +45,7 @@
     "SALT": "",
     "ISPROD": "",
     "ETHERSCAN_KEY": "",
-    "WEB3_WSS_URI": "",
+    "WEB3_URI": "",
     "NETWORK_TYPE": "",
     "EXPECTED_CONFIRMATIONS": 7,
     "RATE_LIMIT_FE_WINDOW_MS": 1000,

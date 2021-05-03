@@ -108,7 +108,7 @@ Some notable configuration points for *overhide-ethereum*:
 
 | *Configuration Point* | *Description* | *Sample Value* |
 | --- | --- | --- |
-| WEB3_WSS_URI | The websocket web3 provider URI | redacted |
+| WEB3_URI | The web3 provider URI (either `https` or `wss`) | redacted |
 | NETWORK_TYPE | The network type (e.g. 'mainnet') | rinkeby |
 | ETHERSCAN_KEY | The [etherscan.io](https://etherscan.io) API key &mdash; good account summary source | redacted |
 | OH_ETH_PORT | *overhide-ethereum*'s port | 8080 |
