@@ -139,32 +139,34 @@ router.get('/swagger.json', throttle, (req, res, next) => {
  *        200:
  *          description: |
  *            List of transactions and/or tally.
- *          schema:
- *            type: object
- *            required:
- *              - tally
- *            properties:
- *              tally:
- *                type: number
- *                description: |
- *                  Tally of all the transactions from *from-address* to *to-address* in the range required
- *                  (*since*,*max-most-recent*,or unlimited).
- *              transactions:
- *                type: array
- *                description: |
- *                  All the transactions from *from-address* to *to-address* in the range required
- *                  (*since*,*max-most-recent*,or unlimited).
- *                items:
- *                  $ref: "#/definitions/Transaction"
- *              as-of:
- *                type: string
- *                description: |
- *                  Timestamp of this request.
- * 
- *                  Use this timestamp as the *as-of* parameter to subsequent requests to be rate-limited at *back-end* limits (higher).  Only
- *                  works with *tally-only* or *tally-dollars* requests.
- * 
- *                  The date-time is a string in [ISO 8601/RFC3339 format](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14).
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                required:
+ *                  - tally
+ *                properties:
+ *                  tally:
+ *                    type: number
+ *                    description: |
+ *                      Tally of all the transactions from *from-address* to *to-address* in the range required
+ *                      (*since*,*max-most-recent*,or unlimited).
+ *                  transactions:
+ *                    type: array
+ *                    description: |
+ *                      All the transactions from *from-address* to *to-address* in the range required
+ *                      (*since*,*max-most-recent*,or unlimited).
+ *                    items:
+ *                      $ref: "#/definitions/Transaction"
+ *                  as-of:
+ *                    type: string
+ *                    description: |
+ *                      Timestamp of this request.
+ *     
+ *                      Use this timestamp as the *as-of* parameter to subsequent requests to be rate-limited at *back-end* limits (higher).  Only
+ *                      works with *tally-only* or *tally-dollars* requests.
+ *     
+ *                      The date-time is a string in [ISO 8601/RFC3339 format](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14).
  *        400:
  *          $ref: "#/responses/400"
  *        401:
