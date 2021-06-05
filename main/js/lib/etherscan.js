@@ -48,8 +48,6 @@ class Etherscan {
 
     this[metrics] = {
       errors: 0,
-      errorsLastCheck: 0,
-      errorsDelta: 0,
       txlistForAddressHits: 0
     };
 
@@ -113,12 +111,10 @@ class Etherscan {
   }
 
   /**
-   * @returns {{errors:.., errorsDelta:..}} metrics object.
+   * @returns {{errors:..}} metrics object.
    */
    metrics() {
     this[checkInit]();
-    this[metrics].errorsDelta = this[metrics].errors - this[metrics].errorsLastCheck;
-    this[metrics].errorsLastCheck = this[metrics].errors;
     return this[metrics];
   }
 }

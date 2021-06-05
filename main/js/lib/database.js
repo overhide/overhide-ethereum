@@ -140,7 +140,7 @@ class Database {
               )
               ON CONFLICT (fromaddr, toaddr, txhash, value) DO NOTHING;
 
-            DELETE FROM ethstaging WHERE block < ${block} - 100;
+            DELETE FROM ethstaging WHERE block < ${block} - 10;
 
           COMMIT;
         `;

@@ -53,7 +53,8 @@ const ctx_config = {
   salt: SALT,
   internalToken: INTERNAL_TOKEN,
   tokenUrl: TOKEN_URL,
-  isTest: !ISPROD,
+  isProd: ISPROD && /true/i.test(ISPROD),
+  isTest: !(!!ISPROD && /true/i.test(ISPROD)),
   etherscan_key: ETHERSCAN_KEY,
   ethereum_network: NETWORK_TYPE,
   web3_uri: WEB3_URI,
@@ -130,9 +131,9 @@ async function onHealthCheck() {
   const dbMetrics = database.metrics();
   const normalizerMetrics = normalizer.metrics();
   const tallyCacheMetrics = tallyCache.metrics();
-  var healthy = etherscanMetrics.errorsDelta === 0 && ethMetrics.errorsDelta === 0 && dbMetrics.errorsDelta === 0  && normalizerMetrics.errorsDelta === 0 && tallyCacheMetrics.errorsDelta === 0;
+  var healthy = etherscanMetrics.errors === 0 && ethMetrics.errors === 0 && dbMetrics.errorsDelta === 0  && normalizerMetrics.errorsDelta === 0 && tallyCacheMetrics.errorsDelta === 0;
   if (!healthy) {
-    let reason = `onHealthCheck failed: etherscanErros:${etherscanMetrics.errorsDelta}, ethErrors:${ethMetrics.errorsDelta}, dbErrors:${dbMetrics.errorsDelta}, normalizerErrors: ${normalizerMetrics.errorsDelta}, tallyCacheErrors: ${tallyCacheMetrics.errorsDelta}`;
+    let reason = `onHealthCheck failed: etherscanErros:${etherscanMetrics.errors}, ethErrors:${ethMetrics.errors}, dbErrors:${dbMetrics.errorsDelta}, normalizerErrors: ${normalizerMetrics.errorsDelta}, tallyCacheErrors: ${tallyCacheMetrics.errorsDelta}`;
     log(reason);
     throw new HealthCheckError('healtcheck failed', [reason])
   }
