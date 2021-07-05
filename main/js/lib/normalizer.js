@@ -59,7 +59,7 @@ class Normalizer {
   async transform(transactions) {
     this[checkInit]();    
 
-    if (!transactions || transactions.length == 0) return [];
+    if (!transactions || transactions.length == 0) return 0;
     const values = transactions.map(t => `${t['transaction-value']}@${(new Date(t['transaction-date'])).toISOString()}`);        
 
     try {

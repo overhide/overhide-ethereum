@@ -16,11 +16,17 @@ async function get_transactions({fromAddress, toAddress, maxMostRecent = null, s
   if (! fromAddress.startsWith('0x') || ! toAddress.startsWith('0x')) throw new Error('fromAddress and toAddress must start with 0x');
 
   if (!await database.checkAddressIsTracked(fromAddress)) {
-    await database.addTransactionsForNewAddress(await etherscan.getTransactionsForAddress(fromAddress), fromAddress);    
+    let txsToAdd = await etherscan.getTransactionsForAddress(fromAddress);
+    if (txsToAdd && txsToAdd.length > 0) {
+      await database.addTransactionsForNewAddress(txsToAdd, fromAddress);    
+    }
   }
 
   if (!await database.checkAddressIsTracked(toAddress)) {
-    await database.addTransactionsForNewAddress(await etherscan.getTransactionsForAddress(toAddress), toAddress);        
+    let txsToAdd = await etherscan.getTransactionsForAddress(toAddress);
+    if (txsToAdd && txsToAdd.length > 0) {
+      await database.addTransactionsForNewAddress(txsToAdd, toAddress);        
+    }    
   }
 
   var txs = await database.getTransactionsFromTo(fromAddress, toAddress);
