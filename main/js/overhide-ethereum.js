@@ -20,6 +20,7 @@ const DEBUG = process.env.DEBUG || process.env.npm_config_DEBUG || process.env.n
 const SALT = process.env.SALT || process.env.npm_config_SALT || process.env.npm_package_config_SALT;
 const TOKEN_URL = process.env.TOKEN_URL || process.env.npm_config_TOKEN_URL || process.env.npm_package_config_TOKEN_URL;
 const ISPROD = process.env.ISPROD || process.env.npm_config_ISPROD || process.env.npm_package_config_ISPROD || false;
+const INSIGHTS_KEY = process.env.INSIGHTS_KEY || process.env.npm_config_INSIGHTS_KEY || process.env.npm_package_config_INSIGHTS_KEY
 const INTERNAL_TOKEN = process.env.INTERNAL_TOKEN || process.env.npm_config_INTERNAL_TOKEN || process.env.npm_package_config_INTERNAL_TOKEN;
 const WEB3_URI = process.env.WEB3_URI || process.env.npm_config_WEB3_URI || process.env.npm_package_config_WEB3_URI;
 const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || process.env.npm_config_ETHERSCAN_KEY || process.env.npm_package_config_ETHERSCAN_KEY;
@@ -55,6 +56,7 @@ const ctx_config = {
   tokenUrl: TOKEN_URL,
   isProd: ISPROD && /true/i.test(ISPROD),
   isTest: !(!!ISPROD && /true/i.test(ISPROD)),
+  insights_key: INSIGHTS_KEY,
   etherscan_key: ETHERSCAN_KEY,
   ethereum_network: NETWORK_TYPE,
   web3_uri: WEB3_URI,
@@ -80,6 +82,7 @@ const ctx_config = {
 };
 const log = require('./lib/log.js').init(ctx_config).fn("app");
 const debug = require('./lib/log.js').init(ctx_config).debug_fn("app");
+const insights_key = require('./lib/insights.js').init(ctx_config);
 const crypto = require('./lib/crypto.js').init(ctx_config);
 const eth = require('./lib/eth-chain.js').init(ctx_config);
 const etherscan = require('./lib/etherscan.js').init(ctx_config);
@@ -90,6 +93,7 @@ const throttle = require('./lib/throttle.js').init(ctx_config);
 const normalizer = require('./lib/normalizer.js').init(ctx_config);
 const tallyCache = require('./lib/tally-cache.js').init(ctx_config);
 log("CONFIG:\n%O", ((cfg) => {
+  cfg.insights_key = cfg.insights_key ? cfg.insights_key.replace(/.(?=.{2})/g,'*') : null; 
   cfg.web3_uri = cfg.web3_uri.replace(/.(?=.{2})/g,'*'); 
   cfg.etherscan_key = cfg.etherscan_key.replace(/.(?=.{2})/g,'*'); 
   cfg.pgpassword = cfg.pgpassword.replace(/.(?=.{2})/g,'*'); 
