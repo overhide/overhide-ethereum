@@ -43,7 +43,19 @@ class Insights {
       insights_key: insights_key
     };
 
-    applicationinsights.setup(insights_key).start();
+    applicationinsights.setup(insights_key)
+      .setAutoDependencyCorrelation(false)
+      .setAutoCollectRequests(true)
+      .setAutoCollectPerformance(true, false)
+      .setAutoCollectExceptions(true)
+      .setAutoCollectDependencies(false)
+      .setAutoCollectConsole(false)
+      .setUseDiskRetryCaching(false)
+      .setSendLiveMetrics(false)
+      .setDistributedTracingMode(applicationinsights.DistributedTracingModes.AI_AND_W3C)
+      .setInternalLogging(false, false)
+      .setAutoCollectHeartbeat(false)
+      .start();
     
     return this;
   }
