@@ -1,6 +1,6 @@
 <p align="center"><a href="https://overhide.io"><img src="./.github/logo.png" width="200px"/></a></p>
 
-<p align="center"><a href="https://overhide.io">overhide.io</a></p><p style="width: 500px; margin: auto">A free and open-sourced (mostly) ecosystem of widgets, a front-end library, and back-end services &mdash; to make addition of "logins" and "in-app-purchases" (IAP) to your app as banal as possible.</p>
+<p align="center"><a href="https://overhide.io">overhide.io</a></p><p style="width: 500px; margin: auto">A free and fully open-sourced ecosystem of widgets, a front-end library, and back-end services &mdash; to make addition of "logins" and "in-app-purchases" (IAP) to your app as banal as possible.</p>
 
 <hr/>
 
@@ -28,6 +28,8 @@ Read more about this suite of tools in support of ledger-based authorization flo
 This [Rinkeyby testnet](https://rinkeby.ethereum.overhide.io/swagger.html) provider is used in the [demos](https://www.npmjs.com/package/ledgers.js#getting-a-taste).
 
 # Quick Start
+
+> For help, reach out on [r/overhide](https://www.reddit.com/r/overhide/).
 
 These steps assume Docker is available.
 

@@ -72,7 +72,7 @@ class Swagger {
         info:
           description: |          
             <hr/>         
-            <a href="https://overhide.io" target="_blank">overhide.io</a> is a free and open-sourced (mostly) ecosystem of widgets, a front-end library, and back-end services &mdash; to make addition of "logins" and "in-app-purchases" (IAP) to your app as banal as possible.
+            <a href="https://overhide.io" target="_blank">overhide.io</a> is a free and fully open-sourced ecosystem of widgets, a front-end library, and back-end services &mdash; to make addition of "logins" and "in-app-purchases" (IAP) to your app as banal as possible.
             <hr/><br/>
 
             This is an *overhide* "remuneration provider" API for Ethereum networks.
